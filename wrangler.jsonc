@@ -1,0 +1,10 @@
+// Only used if the web app is deployed as a Cloudflare Worker with static assets
+// (Cloudflare Pages ignores this file and uses its own build settings).
+{
+  "name": "qirtas",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}

@@ -3,7 +3,7 @@ name: Android APK
 on:
   push:
     branches: [main]
-    paths-ignore: ['**.md', 'supabase/**', 'docs/**', 'e2e/**', '.github/workflows/sync-test.yml', '.github/workflows/android-smoke.yml', '.github/workflows/probe.yml']
+    paths-ignore: ['**.md', 'supabase/**', 'docs/**', 'e2e/**', '.github/workflows/sync-test.yml', '.github/workflows/android-smoke.yml', '.github/workflows/probe.yml', 'wrangler.jsonc']
   workflow_dispatch:
 
 permissions:
