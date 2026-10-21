@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost /usr/local/lib/android/sdk/ndk "$AGENT_TOOLSDIRECTORY" || true
+          df -h / | tail -1
+
       - name: Enable hardware acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -56,9 +61,13 @@ jobs:
           yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager --install emulator platform-tools "$IMG" > smoke/sdk.txt 2>&1
           echo no | avdmanager create avd -n smoke -k "$IMG" -d pixel_6 --force -p "$ANDROID_AVD_HOME/smoke.avd" > smoke/avd.txt 2>&1
+          # a small data partition is plenty for one app
+          sed -i 's/^disk.dataPartition.size=.*/disk.dataPartition.size=2048M/' "$ANDROID_AVD_HOME/smoke.avd/config.ini"
+          grep -q '^disk.dataPartition.size' "$ANDROID_AVD_HOME/smoke.avd/config.ini" || echo 'disk.dataPartition.size=2048M' >> "$ANDROID_AVD_HOME/smoke.avd/config.ini"
           ls -la "$ANDROID_AVD_HOME" >> smoke/avd.txt 2>&1
           emulator -list-avds >> smoke/avd.txt 2>&1
-          nohup emulator -avd smoke -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -accel on -cores 2 -memory 3072 -camera-back none -camera-front none > smoke/emulator.txt 2>&1 &
+          df -h / >> smoke/avd.txt 2>&1
+          nohup emulator -avd smoke -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -accel on -cores 2 -memory 3072 -partition-size 2048 -camera-back none -camera-front none > smoke/emulator.txt 2>&1 &
           adb start-server
           timeout 300 adb wait-for-device || { echo "no device"; exit 1; }
           start=$(date +%s)
