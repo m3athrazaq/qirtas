@@ -2121,3 +2121,6 @@ button.sb-brand:hover {
   border-color: var(--tc-red);
   color: #fff;
 }
+
+.sb-item.sb-signin { color: var(--lapis); }
+.sb-item.sb-signin svg { color: var(--lapis); }

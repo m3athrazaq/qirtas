@@ -4,7 +4,10 @@ import { getRecent, navigate } from '../data/nav'
 import { useCanEdit, useStore, ws } from '../data/store'
 import { t } from '../lib/i18n'
 import { num } from '../lib/hijri'
+import { syncAvailable } from '../sync/config'
+import { useSession } from '../sync/session'
 import { PageTree } from './PageTree'
+import { openSettingsAt } from './SettingsDialog'
 import { WorkspaceMenu } from './WorkspaceMenu'
 
 function isMac() {
@@ -19,6 +22,7 @@ export function Sidebar({ variant = 'side' }: { variant?: 'side' | 'home' }) {
   const numerals = useStore((s) => s.settings.numerals)
   const syncStatus = useStore((s) => s.syncStatus)
   const openModal = useStore((s) => s.openModal)
+  const user = useSession((s) => s.user)
   const rtl = lang === 'ar'
   const canEdit = useCanEdit()
   const [wsMenu, setWsMenu] = useState<Element | null>(null)
@@ -124,6 +128,12 @@ export function Sidebar({ variant = 'side' }: { variant?: 'side' | 'home' }) {
           <Settings size={17} strokeWidth={1.7} />
           <span>{t('settings')}</span>
         </button>
+        {syncAvailable() && !user && (
+          <button type="button" className="sb-item sb-signin" onClick={() => openSettingsAt('account')}>
+            <Cloud size={17} strokeWidth={1.7} />
+            <span>{t('signInToSync')}</span>
+          </button>
+        )}
       </div>
       {variant === 'home' && canEdit && (
         <button type="button" className="fab" aria-label={t('newPage')} onClick={newPage}>
