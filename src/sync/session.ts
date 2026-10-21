@@ -3,7 +3,7 @@ import type { User } from '@supabase/supabase-js'
 import * as Y from 'yjs'
 import { create } from 'zustand'
 import { setAssetUploadHook, setRemoteAssetResolver } from '../data/assets'
-import { getAsset, kvGet, kvSet, putAsset, wipeAll } from '../data/idb'
+import { getAsset, kvGet, kvSet, outboxClear, putAsset, wipeAll } from '../data/idb'
 import { flushWrites, getDoc, resetDocs } from '../data/docs'
 import { useStore } from '../data/store'
 import { getActor, setActor } from '../data/workspace'
@@ -60,15 +60,25 @@ export async function initSync() {
         useStore.getState().toast(t('setNewPassword'))
       }, 400)
     }
-    if (session?.user && useSession.getState().user?.id !== session.user.id) void connect(session.user)
+    if (session?.user && useSession.getState().user?.id !== session.user.id) void connectOnce(session.user)
   })
   const { data } = await sb.auth.getSession()
-  if (data.session?.user) await connect(data.session.user)
+  if (data.session?.user) await connectOnce(data.session.user)
+}
+
+// The initial session is reported twice (auth event + getSession); connect only once per user.
+let connecting: { userId: string; done: Promise<void> } | null = null
+function connectOnce(user: User): Promise<void> {
+  if (connecting?.userId === user.id) return connecting.done
+  const done = connect(user)
+  connecting = { userId: user.id, done }
+  return done
 }
 
 async function loadWorkspaces(userId: string): Promise<WorkspaceInfo[]> {
   const sb = supa()!
-  const { data } = await sb.from('members').select('workspace_id, role, workspaces(name)').eq('user_id', userId)
+  const { data, error } = await sb.from('members').select('workspace_id, role, workspaces(name)').eq('user_id', userId)
+  if (error) throw error
   return ((data ?? []) as unknown as { workspace_id: string; role: Role; workspaces: { name: string } | null }[]).map((r) => ({
     id: r.workspace_id,
     name: r.workspaces?.name ?? '',
@@ -76,15 +86,20 @@ async function loadWorkspaces(userId: string): Promise<WorkspaceInfo[]> {
   }))
 }
 
+function setRole(role: Role | null) {
+  useSession.setState({ role })
+  useStore.setState({ wsRole: role })
+}
+
 async function connect(user: User) {
   const sb = supa()!
-  const st = useStore.getState()
-  const w = st.ws
+  const w = useStore.getState().ws
   if (!w) return
   const name = displayName(user)
   // Favorites saved before signing in move to the account
   const localFavs = w.favorites('local')
   setActor({ id: user.id, name })
+  void kvSet('sync:user', { id: user.id, name })
   if (localFavs.length) {
     localFavs.forEach((f) => {
       if (!w.favorites(user.id).includes(f)) w.toggleFavorite(user.id, f)
@@ -94,7 +109,32 @@ async function connect(user: User) {
   useStore.setState({ favorites: w.favorites(user.id) })
   useSession.setState({ user })
 
-  let workspaces = await loadWorkspaces(user.id)
+  // A workspace this device already syncs starts right away (offline too); the role is re-checked after
+  const linked = await kvGet<boolean>(`sync:linked:${w.id}`)
+  const knownRole = await kvGet<Role>(`sync:role:${w.id}`)
+  if (linked && knownRole) {
+    setRole(knownRole)
+    await startEngine(user, knownRole, false)
+    void refreshMembership(user)
+    return
+  }
+
+  let workspaces: WorkspaceInfo[]
+  try {
+    workspaces = await loadWorkspaces(user.id)
+  } catch {
+    // No connection for the first link: try again once it's back
+    useStore.setState({ syncStatus: 'offline' })
+    window.addEventListener(
+      'online',
+      () => {
+        connecting = null
+        void connectOnce(user)
+      },
+      { once: true },
+    )
+    return
+  }
   let role = workspaces.find((x) => x.id === w.id)?.role ?? null
   let upload = false
 
@@ -103,7 +143,13 @@ async function connect(user: User) {
     if (workspaces.length && !linkedTo) {
       // The account already has pages: bring this device's own pages into the main workspace
       const target = workspaces.find((x) => x.role === 'owner') ?? workspaces[0]
-      if (!w.isPristine()) await mergeLocalInto(target.id)
+      try {
+        if (!w.isPristine()) await mergeLocalInto(target.id)
+      } catch {
+        useStore.setState({ syncStatus: 'offline' })
+        useStore.getState().toast(t('mergeFailed'))
+        return
+      }
       await switchWorkspace(target.id)
       return
     }
@@ -115,20 +161,34 @@ async function connect(user: User) {
     role = 'owner'
     upload = true
     await kvSet(`sync:owner:${w.id}`, user.id)
-    workspaces = await loadWorkspaces(user.id)
-  } else if (!(await kvGet(`sync:linked:${w.id}`))) {
+    workspaces = await loadWorkspaces(user.id).catch(() => workspaces)
+  } else {
     upload = role !== 'viewer' && !w.isPristine()
   }
 
-  useSession.setState({ role, workspaces })
-  useStore.setState({ wsRole: role })
+  useSession.setState({ workspaces })
+  setRole(role)
+  await startEngine(user, role, upload)
+}
+
+let hooksReady = false
+
+async function startEngine(user: User, role: Role, upload: boolean) {
+  const sb = supa()!
+  const w = useStore.getState().ws!
+  const name = displayName(user)
   engine?.stop()
+  if (role === 'viewer') await outboxClear() // a viewer's edits can't be sent
   engine = new SyncEngine(sb, w.id, role, { id: user.id, name })
   engine.onPresence = (users) => useSession.setState({ presence: users.filter((u) => u.userId !== user.id) })
-  await engine.start({ upload })
+  engine.onMembersChanged = () => void refreshMembership(user)
   await kvSet(`sync:linked:${w.id}`, true)
+  await kvSet(`sync:role:${w.id}`, role)
+  await engine.start({ upload })
   const route = useStore.getState().route
   engine.setPage(route.name === 'page' ? route.id : null)
+  if (hooksReady) return
+  hooksReady = true
   useStore.subscribe((s, prev) => {
     if (s.route !== prev.route) engine?.setPage(s.route.name === 'page' ? s.route.id : null)
   })
@@ -152,6 +212,35 @@ async function connect(user: User) {
     })
   })
   void uploadPendingAssets(w.id)
+  window.addEventListener('online', () => void uploadPendingAssets(w.id))
+}
+
+/** Re-read this account's workspaces; follow role changes and removals. */
+async function refreshMembership(user: User) {
+  const w = useStore.getState().ws
+  if (!w) return
+  let list: WorkspaceInfo[]
+  try {
+    list = await loadWorkspaces(user.id)
+  } catch {
+    return
+  }
+  useSession.setState({ workspaces: list })
+  const role = list.find((x) => x.id === w.id)?.role ?? null
+  if (role === useSession.getState().role) return
+  if (!role) {
+    // Removed from this workspace (or it was deleted)
+    engine?.stop()
+    engine = null
+    await kvSet(`sync:linked:${w.id}`, false)
+    await kvSet(`sync:role:${w.id}`, null)
+    useStore.getState().toast(t('removedFromWorkspace'))
+    const next = list.find((x) => x.role === 'owner') ?? list[0]
+    await switchWorkspace(next ? next.id : crypto.randomUUID(), !!next)
+    return
+  }
+  setRole(role)
+  await startEngine(user, role, false)
 }
 
 async function uploadAsset(wsId: string, id: string, blob: Blob) {
@@ -190,12 +279,15 @@ async function mergeLocalInto(targetId: string) {
     const doc = await getDoc(docId)
     rows.push({ workspace_id: targetId, doc_id: docId.startsWith('ws:') ? `ws:${targetId}` : docId, data: toB64(Y.encodeStateAsUpdate(doc)) })
   }
-  for (let i = 0; i < rows.length; i += 25) await sb.from('doc_updates').insert(rows.slice(i, i + 25))
+  for (let i = 0; i < rows.length; i += 25) {
+    const { error } = await sb.from('doc_updates').insert(rows.slice(i, i + 25))
+    if (error) throw error
+  }
 }
 
-export async function switchWorkspace(id: string) {
+export async function switchWorkspace(id: string, remote = true) {
   await flushWrites()
-  await kvSet(`sync:remote:${id}`, true)
+  if (remote) await kvSet(`sync:remote:${id}`, true)
   await kvSet('currentWs', id)
   location.hash = '#/'
   location.reload()

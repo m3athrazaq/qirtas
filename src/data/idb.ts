@@ -179,6 +179,16 @@ export async function outboxAll(): Promise<OutboxItem[]> {
   return reqP(tx.objectStore('outbox').getAll()) as Promise<OutboxItem[]>
 }
 
+export async function outboxClear(): Promise<void> {
+  const db = await openDb()
+  const tx = db.transaction('outbox', 'readwrite')
+  tx.objectStore('outbox').clear()
+  await new Promise<void>((resolve, reject) => {
+    tx.oncomplete = () => resolve()
+    tx.onerror = () => reject(tx.error)
+  })
+}
+
 export async function outboxDelete(ids: number[]): Promise<void> {
   if (!ids.length) return
   const db = await openDb()

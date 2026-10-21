@@ -2,10 +2,11 @@ import { installMarkdownHooks } from '../lib/exporter'
 import { setLang, t } from '../lib/i18n'
 import { todayIso } from '../lib/hijri'
 import { b, callout, code, date, doc, h2, p, pageLink, setPageContent, tasks } from '../templates/build'
-import { kvGet, kvSet } from './idb'
+import { setSyncHook } from './docs'
+import { kvGet, kvSet, outboxAdd } from './idb'
 import { initRouter, navigate, takePendingAction } from './nav'
 import { useStore, type Settings } from './store'
-import { setActor, Workspace } from './workspace'
+import { getActor, setActor, Workspace } from './workspace'
 
 function resolveTheme(theme: Settings['theme']): 'light' | 'dark' {
   if (theme === 'system') return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -78,7 +79,14 @@ export async function boot() {
     wsId = crypto.randomUUID()
     await kvSet('currentWs', wsId)
   }
-  setActor({ id: 'local', name: store.settings.userName })
+  // Signed in before: act as that user straight away, and queue changes for the server even
+  // before the sync layer connects (or while offline).
+  const user = await kvGet<{ id: string; name: string }>('sync:user')
+  setActor(user ?? { id: 'local', name: store.settings.userName })
+  const role = await kvGet<string>(`sync:role:${wsId}`)
+  if (user && role && role !== 'viewer' && (await kvGet(`sync:linked:${wsId}`))) {
+    setSyncHook((docId, update) => void outboxAdd(docId, update))
+  }
   const w = await Workspace.open(wsId)
   installMarkdownHooks()
   useStore.setState({ ws: w })
@@ -87,7 +95,7 @@ export async function boot() {
   // A workspace that lives on the server fills in through sync; only brand-new local ones get the guide
   if (w.pages.size === 0 && !(await kvGet(`sync:remote:${wsId}`))) firstPage = await seedWelcome(w)
 
-  const actorId = () => 'local'
+  const actorId = () => getActor().id
   useStore.setState({
     pages: w.snapshot(),
     wsName: (w.meta.get('name') as string) || '',

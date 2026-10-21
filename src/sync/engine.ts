@@ -48,6 +48,7 @@ export class SyncEngine {
   private pollTimer: ReturnType<typeof setInterval> | null = null
   private lastPull = 0
   onPresence: (users: PresenceUser[]) => void = () => {}
+  onMembersChanged: () => void = () => {}
   private me: PresenceUser
 
   private sb: SupabaseClient
@@ -72,8 +73,8 @@ export class SyncEngine {
     window.addEventListener('online', this.onOnline)
     window.addEventListener('offline', this.onOffline)
     document.addEventListener('visibilitychange', this.onVisible)
+    if (opts.upload) await this.uploadAll()
     try {
-      if (opts.upload) await this.uploadAll()
       await this.pull()
     } catch {
       this.status('offline')
@@ -165,19 +166,14 @@ export class SyncEngine {
     }
   }
 
-  /** First link of a device's workspace: send the full state of every document. */
+  /** First link of a device's workspace: queue the full state of every document.
+   *  It goes through the outbox, so it survives going offline or closing the app. */
   private async uploadAll() {
     const w = useStore.getState().ws
     if (!w || w.id !== this.wsId) return
-    const ids = await workspaceDocIds(w)
-    const rows: { workspace_id: string; doc_id: string; data: string; client_id: string }[] = []
-    for (const docId of ids) {
+    for (const docId of await workspaceDocIds(w)) {
       const doc = await getDoc(docId)
-      rows.push({ workspace_id: this.wsId, doc_id: docId, data: toB64(Y.encodeStateAsUpdate(doc)), client_id: this.clientId })
-    }
-    for (let i = 0; i < rows.length; i += 25) {
-      const { error } = await this.sb.from('doc_updates').insert(rows.slice(i, i + 25))
-      if (error) throw error
+      await outboxAdd(docId, Y.encodeStateAsUpdate(doc))
     }
   }
 
@@ -244,6 +240,10 @@ export class SyncEngine {
     const ch = this.sb.channel(`ws-${this.wsId}`, { config: { presence: { key: this.clientId } } })
     ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'doc_updates', filter: `workspace_id=eq.${this.wsId}` }, (payload) => {
       void this.apply(payload.new as Row)
+    })
+    // Someone changed the members (a role, a removal): let the session re-check
+    ch.on('postgres_changes', { event: '*', schema: 'public', table: 'members', filter: `workspace_id=eq.${this.wsId}` }, () => {
+      this.onMembersChanged()
     })
     ch.on('presence', { event: 'sync' }, () => {
       const state = ch.presenceState<PresenceUser>()
