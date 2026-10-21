@@ -49,10 +49,15 @@ jobs:
           set -x
           SDK="$ANDROID_HOME"
           export PATH="$SDK/cmdline-tools/latest/bin:$SDK/emulator:$SDK/platform-tools:$PATH"
+          # avdmanager and the emulator must agree on where AVDs live
+          export ANDROID_EMULATOR_HOME="$HOME/.android" ANDROID_AVD_HOME="$HOME/.android/avd"
+          mkdir -p "$ANDROID_AVD_HOME"
           IMG="system-images;android-34;google_apis;x86_64"
           yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager --install emulator platform-tools "$IMG" > smoke/sdk.txt 2>&1
-          echo no | avdmanager create avd -n smoke -k "$IMG" -d pixel_6 --force > smoke/avd.txt 2>&1
+          echo no | avdmanager create avd -n smoke -k "$IMG" -d pixel_6 --force -p "$ANDROID_AVD_HOME/smoke.avd" > smoke/avd.txt 2>&1
+          ls -la "$ANDROID_AVD_HOME" >> smoke/avd.txt 2>&1
+          emulator -list-avds >> smoke/avd.txt 2>&1
           nohup emulator -avd smoke -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -accel on -cores 2 -memory 3072 -camera-back none -camera-front none > smoke/emulator.txt 2>&1 &
           adb start-server
           timeout 300 adb wait-for-device || { echo "no device"; exit 1; }
