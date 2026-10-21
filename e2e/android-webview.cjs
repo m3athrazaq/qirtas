@@ -101,6 +101,8 @@ async function evaluate(c, expression, timeout) {
         hijriToday: new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { dateStyle: 'full' }).format(new Date()),
         safeVar: getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-top'),
         idb: typeof indexedDB,
+        timing: Object.fromEntries(performance.getEntriesByType('mark').filter((m) => m.name.startsWith('qirtas:')).map((m) => [m.name, Math.round(m.startTime)])),
+        nav: (() => { const n = performance.getEntriesByType('navigation')[0]; return n && { dcl: Math.round(n.domContentLoadedEventEnd), load: Math.round(n.loadEventEnd) } })(),
         bodyText: document.body.innerText.slice(0, 200),
       }
     })()`,
@@ -116,6 +118,10 @@ async function evaluate(c, expression, timeout) {
     await c.send('Input.dispatchKeyEvent', { type: 'keyUp', key: k, code, windowsVirtualKeyCode: k === 'Enter' ? 13 : 0 })
   }
 
+  const focusApp = () => adb('dumpsys window').split('\n').find((l) => l.includes('mCurrentFocus')) ?? ''
+  const newParagraph = (text) =>
+    evaluate(c, `(() => { const ed = document.querySelector('.ProseMirror').editor; ed.chain().focus('end').splitBlock().run(); return 'ok' })()`, 10000).then(() => text && type(text))
+
   if (diag && !diag.error && diag.fab) {
     console.log('new page:', await click('.fab'))
     await sleep(1500)
@@ -123,34 +129,45 @@ async function evaluate(c, expression, timeout) {
     await key('Enter', 'Enter')
     await sleep(600)
     await type('سطر عربي ثم English line')
-    await sleep(1200)
+    await sleep(1000)
     shot('03-page')
-    await key('Enter', 'Enter')
+    await newParagraph('')
+    await sleep(300)
     await type('/')
-    await sleep(1200)
+    await sleep(1500)
+    console.log('slash menu open:', await evaluate(c, `!!document.querySelector('.slash-menu, .slash')`, 5000))
     shot('04-slash')
     await type('مهام')
     await sleep(800)
-    await key('Enter', 'Enter')
+    console.log('slash pick:', await evaluate(c, `(() => { const el = document.querySelector('.slash-menu .is-active, .slash .is-active, .slash-item.is-active'); if (!el) return 'no active item'; el.click(); return el.textContent.trim().slice(0, 30) })()`, 5000))
+    await sleep(500)
     await type('مهمة أولى')
     await sleep(800)
-    adb('input keyevent 111') // hide the keyboard
-    await sleep(800)
     shot('05-tasks')
-    adb('input keyevent 4') // system back → home
-    await sleep(1500)
+    console.log('page html:', await evaluate(c, `document.querySelector('.ProseMirror').innerHTML.replace(/ (class|style|data-[a-z-]+|dir|contenteditable|draggable)="[^"]*"/g, '').slice(0, 400)`, 5000))
+    adb('input keyevent 4') // first back: closes the keyboard (system)
+    await sleep(1200)
+    adb('input keyevent 4') // second back: our handler goes to the parent (home)
+    await sleep(1800)
+    console.log('after back:', focusApp().trim(), '| route:', await evaluate(c, `location.hash || '(home)'`, 5000))
     shot('06-home')
     const tpl = await evaluate(c, `(() => { const b = [...document.querySelectorAll('button.sb-item')].find((x) => x.textContent.includes('القوالب')); if (!b) return 'no templates button'; b.click(); return 'ok' })()`, 10000)
     console.log('templates:', tpl)
-    await sleep(1200)
+    await sleep(1500)
     shot('07-templates')
     const ram = await evaluate(c, `(() => { const b = [...document.querySelectorAll('.tpl')].find((x) => x.textContent.includes('رمضان')); if (!b) return 'no ramadan'; b.click(); return 'ok' })()`, 10000)
     console.log('ramadan:', ram)
-    await sleep(3000)
+    await sleep(3500)
     shot('08-ramadan')
+    adb('input keyevent 4')
+    await sleep(1500)
+    console.log('after back from template page:', focusApp().trim())
     await evaluate(c, `document.documentElement.setAttribute('data-theme', 'dark')`, 5000)
     await sleep(800)
     shot('09-dark')
+    adb('input keyevent 4') // back on the home screen leaves the app
+    await sleep(1500)
+    console.log('after back on home:', focusApp().trim())
   }
   console.log('done')
   c.close()

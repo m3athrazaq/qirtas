@@ -19,13 +19,17 @@ if (import.meta.env.PROD && !import.meta.env.VITE_PREVIEW && !isNative() && 'ser
 }
 
 const root = createRoot(document.getElementById('root')!)
+performance.mark('qirtas:start')
 boot()
-  .then(() => initNative())
   .catch((err) => console.error('boot failed', err))
   .finally(() => {
+    performance.mark('qirtas:booted')
     root.render(
       <StrictMode>
         <App />
       </StrictMode>,
     )
+    requestAnimationFrame(() => performance.mark('qirtas:painted'))
+    // Phone integration (back button, shortcuts, shared content) doesn't hold up the first paint
+    void initNative()
   })
