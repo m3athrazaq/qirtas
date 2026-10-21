@@ -9,7 +9,8 @@ const adb = (cmd) => execSync(`adb shell ${cmd}`)
 ;(async () => {
   const browser = await chromium.connectOverCDP('http://127.0.0.1:9222')
   const ctx = browser.contexts()[0]
-  const page = ctx.pages()[0]
+  const page = ctx.pages()[0] ?? (await ctx.waitForEvent('page', { timeout: 15000 }))
+  await page.waitForSelector('button.sb-item', { timeout: 30000 })
   page.on('console', (m) => console.log(`[console.${m.type()}] ${m.text().slice(0, 300)}`))
   page.on('pageerror', (e) => console.log(`[pageerror] ${e.message}`))
   console.log('url:', page.url())
