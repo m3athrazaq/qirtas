@@ -1,0 +1,10 @@
+Loading local repository...                                                     [=========                              ] 25% Loading local repository...       [=========                              ] 25% Fetch remote repository...        [=======================================] 100% Fetch remote repository...       
+Auto-selecting single ABI x86_64
+total 16
+drwxr-xr-x 3 runner runner 4096 Oct 21 22:35 .
+drwxr-xr-x 3 runner runner 4096 Oct 21 22:34 ..
+drwxr-xr-x 2 runner runner 4096 Oct 21 22:35 smoke.avd
+-rw-r--r-- 1 runner runner   82 Oct 21 22:35 smoke.ini
+smoke
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root        72G   47G   25G  66% /

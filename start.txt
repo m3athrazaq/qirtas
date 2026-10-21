@@ -1,0 +1,9 @@
+Starting: Intent { cmp=com.m3athrazaq.qirtas/.MainActivity }
+  mCurrentFocus=Window{8ed9bc9 u0 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity}
+  mFocusedApp=ActivityRecord{f3b978b u0 com.m3athrazaq.qirtas/.MainActivity t8}
+  mCurrentFocus=Window{8ed9bc9 u0 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity}
+  mFocusedApp=ActivityRecord{f3b978b u0 com.m3athrazaq.qirtas/.MainActivity t8}
+pid=2014
+9222
+  mCurrentFocus=Window{436bad7 u0 com.android.launcher3/com.android.launcher3.uioverrides.QuickstepLauncher}
+  mFocusedApp=ActivityRecord{67b4484 u0 com.android.launcher3/.uioverrides.QuickstepLauncher t7}

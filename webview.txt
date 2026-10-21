@@ -1,0 +1,87 @@
+page: https://localhost/ قِرطاس
+[console.startGroupCollapsed] %cnative %cSystemBars.setStyle (#126974775) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cApp.addListener (#126974776) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cApp.addListener (#126974777) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cApp.getLaunchUrl (#126974778) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cApp.getLaunchUrl (#126974778) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cApp.addListener (#126974779) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.getSharedContent (#126974780) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cSystemBars.setStyle (#126974775) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.getSharedContent (#126974780) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {}
+[console.endGroup] console.groupEnd
+Runtime.enable: {"id":1,"result":{}}
+diagnostics: {
+ "ready": "complete",
+ "rootChildren": 1,
+ "sbItems": [
+  "بحث",
+  "القوالب",
+  "صفحة جديدة",
+  "المهملات",
+  "الإعدادات",
+  "سجّل الدخول للمزامنة"
+ ],
+ "fab": true,
+ "w": 412,
+ "h": 818,
+ "dpr": 2.625,
+ "ua": "Mozilla/5.0 (Linux; Android 14; Android SDK built for x86_64 Build/UE1A.230829.036.A1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/113.0.5672.136 Mobile Safari/537.36",
+ "calendar": "islamic-umalqura",
+ "hijriToday": "الأربعاء، ١٠ جمادى الأولى ١٤٤٨ هـ",
+ "safeVar": "0px",
+ "idb": "object",
+ "timing": {
+  "qirtas:start": 5426,
+  "qirtas:booted": 5907,
+  "qirtas:painted": 5969
+ },
+ "nav": {
+  "dcl": 5427,
+  "load": 5429
+ },
+ "bodyText": "ق\nقِرطاس\nبحث\nالقوالب\nالصفحات\n✍️\nأهلاً بك في قِرطاس\nصفحة جديدة\nالمهملات\nالإعدادات\nسجّل الدخول للمزامنة"
+}
+new page: ok
+slash menu open: true
+slash pick: قائمة مهاممهام بمربعات اختيار[
+page html: <p>سطر عربي ثم English line</p><ul><li><label><input aria-label="Task item checkbox for مهمة أولى" type="checkbox"><span>Task item checkbox for مهمة أولى</span></label><div><p>مهمة أولى</p></div></li></ul><p><br></p>
+[console.startGroupCollapsed] %cresult %cApp.addListener (#126974776) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"canGoBack":true}
+[console.endGroup] console.groupEnd
+after back: mCurrentFocus=Window{8ed9bc9 u0 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity} | route: #/
+templates: ok
+ramadan: ok
+[console.warning] TextSelection endpoint not pointing into a node with inline content (callout)
+[console.startGroupCollapsed] %cresult %cApp.addListener (#126974776) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"canGoBack":true}
+[console.endGroup] console.groupEnd
+after back from template page: mCurrentFocus=Window{8ed9bc9 u0 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity}
+[console.startGroupCollapsed] %cresult %cApp.addListener (#126974776) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"canGoBack":true}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cApp.exitApp (#126974781) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cApp.exitApp (#126974781) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+after back on home: mCurrentFocus=Window{436bad7 u0 com.android.launcher3/com.android.launcher3.uioverrides.QuickstepLauncher}
+done
+exit=0

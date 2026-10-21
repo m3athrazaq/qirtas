@@ -1,0 +1,105 @@
+--------- beginning of main
+W/chromium( 2014): [WARNING:dns_config_service_android.cc(115)] Failed to read DnsConfig.
+D/Capacitor( 2014): Starting BridgeActivity
+D/Capacitor( 2014): Registering plugin instance: CapacitorCookies
+D/Capacitor( 2014): Registering plugin instance: WebView
+D/Capacitor( 2014): Registering plugin instance: CapacitorHttp
+D/Capacitor( 2014): Registering plugin instance: SystemBars
+D/Capacitor( 2014): Registering plugin instance: QirtasNative
+D/Capacitor( 2014): Registering plugin instance: App
+D/Capacitor( 2014): Registering plugin instance: Filesystem
+D/Capacitor( 2014): Registering plugin instance: Keyboard
+D/Capacitor( 2014): Registering plugin instance: Share
+W/Capacitor( 2014): Unable to read file at path public/plugins
+D/Capacitor( 2014): Loading app at https://localhost
+D/Capacitor( 2014): App started
+D/Capacitor( 2014): App resumed
+D/Capacitor( 2014): Handling local request: https://localhost/
+D/Capacitor( 2014): App paused
+D/Capacitor( 2014): App stopped
+D/Capacitor( 2014): Saving instance state!
+D/Capacitor( 2014): App destroyed
+D/Capacitor( 2014): Starting BridgeActivity
+D/Capacitor( 2014): Registering plugin instance: CapacitorCookies
+D/Capacitor( 2014): Registering plugin instance: WebView
+D/Capacitor( 2014): Registering plugin instance: CapacitorHttp
+D/Capacitor( 2014): Registering plugin instance: SystemBars
+D/Capacitor( 2014): Registering plugin instance: QirtasNative
+D/Capacitor( 2014): Registering plugin instance: App
+D/Capacitor( 2014): Registering plugin instance: Filesystem
+D/Capacitor( 2014): Registering plugin instance: Keyboard
+D/Capacitor( 2014): Registering plugin instance: Share
+W/Capacitor( 2014): Unable to read file at path public/plugins
+D/Capacitor( 2014): Loading app at https://localhost
+D/Capacitor( 2014): Handling local request: https://localhost/
+D/Capacitor( 2014): App started
+D/Capacitor( 2014): App resumed
+D/Capacitor( 2014): Handling local request: https://localhost/assets/index-C9iGY7aq.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/ids-JaoMMfXR.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/colors-3Pqge7iV.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/assets-DE9ZJ_h5.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/preload-helper-CRzLMJPS.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/dist-Cr2P28NI.js
+W/chromium( 2014): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+D/Capacitor( 2014): Handling local request: https://localhost/assets/index-KKKxiAbQ.css
+D/Capacitor( 2014): Handling local request: https://localhost/splash-mark.svg
+D/Capacitor( 2014): Handling local request: https://localhost/assets/index-C9iGY7aq.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/colors-3Pqge7iV.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/ids-JaoMMfXR.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/assets-DE9ZJ_h5.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/dist-Cr2P28NI.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/preload-helper-CRzLMJPS.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/index-KKKxiAbQ.css
+D/Capacitor( 2014): Handling local request: https://localhost/splash-mark.svg
+D/Capacitor( 2014): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2014): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2014): Handling local request: https://localhost/assets/esm-CiksWkj8.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/esm-CiksWkj8.js
+D/Capacitor( 2014): Handling local request: https://localhost/assets/markazi-text-arabic-wght-normal-zEmVoUHK.woff2
+D/Capacitor( 2014): Handling local request: https://localhost/assets/readex-pro-arabic-wght-normal-DiwT_uOQ.woff2
+D/Capacitor( 2014): Handling local request: https://localhost/assets/readex-pro-latin-wght-normal--ekFhJJC.woff2
+D/Capacitor( 2014): Handling local request: https://localhost/assets/markazi-text-arabic-wght-normal-zEmVoUHK.woff2
+D/Capacitor( 2014): Handling local request: https://localhost/assets/readex-pro-arabic-wght-normal-DiwT_uOQ.woff2
+D/Capacitor( 2014): Handling local request: https://localhost/assets/readex-pro-latin-wght-normal--ekFhJJC.woff2
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 63864457, pluginId: SystemBars, methodName: setStyle, methodData: {"style":"LIGHT"}
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 63864458, pluginId: App, methodName: addListener, methodData: {"eventName":"backButton"}
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 63864459, pluginId: App, methodName: addListener, methodData: {"eventName":"appUrlOpen"}
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 63864460, pluginId: App, methodName: getLaunchUrl, methodData: {}
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 126974775, pluginId: SystemBars, methodName: setStyle, methodData: {"style":"LIGHT"}
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 126974776, pluginId: App, methodName: addListener, methodData: {"eventName":"backButton"}
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 126974777, pluginId: App, methodName: addListener, methodData: {"eventName":"appUrlOpen"}
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 126974778, pluginId: App, methodName: getLaunchUrl, methodData: {}
+I/Capacitor/Console( 2014): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 126974779, pluginId: App, methodName: addListener, methodData: {"eventName":"resume"}
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 126974780, pluginId: QirtasNative, methodName: getSharedContent, methodData: {}
+I/Capacitor/Console( 2014): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2014): File:  - Line 333 - Msg: {}
+D/Capacitor( 2014): Handling local request: https://localhost/assets/markazi-text-latin-wght-normal-XVaf1yc4.woff2
+D/Capacitor( 2014): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2014): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2014): Handling local request: https://localhost/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2
+D/Capacitor( 2014): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2014): File:  - Line 333 - Msg: {"canGoBack":true}
+D/Capacitor( 2014): Handling local request: https://localhost/favicon.svg
+W/Capacitor/Console( 2014): File: https://localhost/assets/index-C9iGY7aq.js - Line 89 - Msg: TextSelection endpoint not pointing into a node with inline content (callout)
+D/Capacitor( 2014): Handling local request: https://localhost/assets/DatabaseView-DlrZIIrQ.js
+D/Capacitor( 2014): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2014): File:  - Line 333 - Msg: {"canGoBack":true}
+D/Capacitor( 2014): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2014): File:  - Line 333 - Msg: {"canGoBack":true}
+I/Capacitor/Console( 2014): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2014): callback: 126974781, pluginId: App, methodName: exitApp, methodData: {}
+I/Capacitor/Console( 2014): File:  - Line 333 - Msg: undefined
+D/Capacitor( 2014): App paused
+D/Capacitor( 2014): App stopped
+D/Capacitor( 2014): App destroyed
