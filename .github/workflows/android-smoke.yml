@@ -10,8 +10,8 @@ permissions:
 
 jobs:
   smoke:
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -20,7 +20,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -45,12 +45,15 @@ jobs:
       - name: Run on an emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 35
+          api-level: 34
           arch: x86_64
           target: google_apis
-          profile: pixel_7
+          profile: pixel_6
+          ram-size: 4096M
+          disk-size: 6000M
+          emulator-boot-timeout: 1200
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -no-metrics
           script: bash e2e/android-smoke.sh
 
       - name: Save results to the ci-smoke branch
@@ -59,6 +62,7 @@ jobs:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p smoke && cd smoke
+          date -u > ran-at.txt
           git init -q && git checkout -q -b ci-smoke
           git add -A
           git -c user.name=qirtas-ci -c user.email=ci@users.noreply.github.com commit -qm "smoke ${GITHUB_RUN_NUMBER}" || true

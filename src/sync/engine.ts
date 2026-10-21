@@ -46,7 +46,11 @@ export class SyncEngine {
   private perDocCount = new Map<string, { n: number; maxId: number }>()
   private live = false
   private pollTimer: ReturnType<typeof setInterval> | null = null
+  private catchUpTimer: ReturnType<typeof setTimeout> | null = null
   private lastPull = 0
+  /** Rows already applied from the live channel but not yet covered by the pull bookmark. */
+  private seen = new Set<number>()
+  private pulling: Promise<void> | null = null
   onPresence: (users: PresenceUser[]) => void = () => {}
   onMembersChanged: () => void = () => {}
   private me: PresenceUser
@@ -90,16 +94,18 @@ export class SyncEngine {
     window.removeEventListener('offline', this.onOffline)
     document.removeEventListener('visibilitychange', this.onVisible)
     this.stopPolling()
+    if (this.catchUpTimer) clearTimeout(this.catchUpTimer)
     if (this.channel) void this.sb.removeChannel(this.channel)
     this.channel = null
   }
 
   // Without a live connection (blocked websockets, flaky network) keep checking every so often.
-  private startPolling() {
-    if (this.pollTimer || this.stopped) return
+  private startPolling(every = 20000) {
+    this.stopPolling()
+    if (this.stopped) return
     this.pollTimer = setInterval(() => {
       if (document.visibilityState === 'visible') void this.pull().catch(() => this.status('offline'))
-    }, 20000)
+    }, every)
   }
 
   private stopPolling() {
@@ -179,7 +185,13 @@ export class SyncEngine {
 
   // ---------------- incoming
 
-  async pull() {
+  /** Fetch everything after the bookmark. Concurrent calls share one run. */
+  pull(): Promise<void> {
+    if (!this.pulling) this.pulling = this.doPull().finally(() => (this.pulling = null))
+    return this.pulling
+  }
+
+  private async doPull() {
     this.lastPull = Date.now()
     if (!this.live) this.status('syncing')
     for (;;) {
@@ -195,13 +207,27 @@ export class SyncEngine {
       for (const r of rows) await this.apply(r)
       if (rows.length < 500) break
     }
+    for (const id of this.seen) if (id <= this.lastId) this.seen.delete(id)
     this.saveLast()
     this.status('synced')
     void this.compact()
   }
 
-  private async apply(r: Row) {
-    if (r.id > this.lastId) this.lastId = r.id
+  /** Pull a little later (after live changes settle) so the bookmark moves forward. */
+  private schedulePull(ms: number) {
+    if (this.catchUpTimer) clearTimeout(this.catchUpTimer)
+    this.catchUpTimer = setTimeout(() => {
+      this.catchUpTimer = null
+      if (!this.stopped) void this.pull().catch(() => this.status('offline'))
+    }, ms)
+  }
+
+  // Rows from a pull move the bookmark; rows from the live channel don't (one could have been
+  // missed while reconnecting, and the next pull must still fetch it).
+  private async apply(r: Row, live = false) {
+    if (!live && r.id > this.lastId) this.lastId = r.id
+    if (this.seen.has(r.id)) return
+    if (live) this.seen.add(r.id)
     const c = this.perDocCount.get(r.doc_id) ?? { n: 0, maxId: 0 }
     c.n++
     c.maxId = Math.max(c.maxId, r.id)
@@ -214,7 +240,7 @@ export class SyncEngine {
     } catch {
       /* malformed update: skip */
     }
-    this.saveLast()
+    if (!live) this.saveLast()
   }
 
   private saveLast() {
@@ -239,7 +265,11 @@ export class SyncEngine {
   private subscribe() {
     const ch = this.sb.channel(`ws-${this.wsId}`, { config: { presence: { key: this.clientId } } })
     ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'doc_updates', filter: `workspace_id=eq.${this.wsId}` }, (payload) => {
-      void this.apply(payload.new as Row)
+      const row = payload.new as Partial<Row>
+      // Very large rows arrive without their data: fetch them normally
+      if (typeof row?.id !== 'number' || typeof row.data !== 'string') return this.schedulePull(200)
+      void this.apply(row as Row, true)
+      this.schedulePull(5000)
     })
     // Someone changed the members (a role, a removal): let the session re-check
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'members', filter: `workspace_id=eq.${this.wsId}` }, () => {
@@ -254,14 +284,14 @@ export class SyncEngine {
     ch.subscribe((status) => {
       if (status === 'SUBSCRIBED') {
         this.live = true
-        this.stopPolling()
+        this.startPolling(60000) // light catch-up while live
         void ch.track(this.me)
         // catch anything that landed while we were connecting
         void this.pull().catch(() => this.status('offline'))
       } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
         // the live channel retries by itself; meanwhile fall back to checking periodically
         this.live = false
-        this.startPolling()
+        this.startPolling(20000)
       }
     })
     this.channel = ch
