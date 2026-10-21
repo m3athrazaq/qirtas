@@ -41,7 +41,7 @@ jobs:
         run: |
           mkdir -p smoke
           {
-            npm ci && npm i --no-save playwright@1.63.0 &&
+            npm ci &&
             npx vite build && npx cap sync android &&
             (cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon)
           } > smoke/build.txt 2>&1
