@@ -1,0 +1,40 @@
+name: Sync test
+
+# Manual end-to-end check against the real Supabase project: two temporary accounts sign up,
+# share a workspace, edit live, swap an image, then delete themselves.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build web app
+        run: npx vite build
+
+      - name: Install a test browser
+        run: |
+          npm i --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      - name: Run the test
+        env:
+          BASE_URL: http://127.0.0.1:4173/
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4173 --strictPort > preview.log 2>&1 &
+          sleep 4
+          node e2e/sync.e2e.cjs

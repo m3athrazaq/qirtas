@@ -6,6 +6,7 @@ import * as Y from 'yjs'
 import { getDoc, ORIGIN_REMOTE, pageDocId, setSyncHook } from '../data/docs'
 import { allDocIds, kvGet, kvSet, outboxAdd, outboxAll, outboxDelete } from '../data/idb'
 import { useStore } from '../data/store'
+import type { Workspace } from '../data/workspace'
 import { uid } from '../lib/ids'
 import { fromB64, toB64 } from './supabase'
 
@@ -25,6 +26,12 @@ export interface PresenceUser {
   color: string
 }
 
+/** The stored documents that belong to a workspace: its own document and its pages'. */
+export async function workspaceDocIds(w: Workspace): Promise<string[]> {
+  const stored = new Set(await allDocIds())
+  return [`ws:${w.id}`, ...[...w.pages.keys()].map(pageDocId)].filter((d) => stored.has(d))
+}
+
 const COLORS = ['#2a47a8', '#1f6f6b', '#b5443a', '#7650ad', '#c2621b', '#2b7a4b', '#ad437c']
 
 export class SyncEngine {
@@ -37,6 +44,9 @@ export class SyncEngine {
   private pending: Promise<unknown> = Promise.resolve()
   private stopped = false
   private perDocCount = new Map<string, { n: number; maxId: number }>()
+  private live = false
+  private pollTimer: ReturnType<typeof setInterval> | null = null
+  private lastPull = 0
   onPresence: (users: PresenceUser[]) => void = () => {}
   private me: PresenceUser
 
@@ -61,6 +71,7 @@ export class SyncEngine {
     if (this.role !== 'viewer') setSyncHook((docId, update) => this.enqueue(docId, update))
     window.addEventListener('online', this.onOnline)
     window.addEventListener('offline', this.onOffline)
+    document.addEventListener('visibilitychange', this.onVisible)
     try {
       if (opts.upload) await this.uploadAll()
       await this.pull()
@@ -76,8 +87,30 @@ export class SyncEngine {
     setSyncHook(null)
     window.removeEventListener('online', this.onOnline)
     window.removeEventListener('offline', this.onOffline)
+    document.removeEventListener('visibilitychange', this.onVisible)
+    this.stopPolling()
     if (this.channel) void this.sb.removeChannel(this.channel)
     this.channel = null
+  }
+
+  // Without a live connection (blocked websockets, flaky network) keep checking every so often.
+  private startPolling() {
+    if (this.pollTimer || this.stopped) return
+    this.pollTimer = setInterval(() => {
+      if (document.visibilityState === 'visible') void this.pull().catch(() => this.status('offline'))
+    }, 20000)
+  }
+
+  private stopPolling() {
+    if (this.pollTimer) clearInterval(this.pollTimer)
+    this.pollTimer = null
+  }
+
+  // Coming back to the app (phones pause background tabs): catch up straight away.
+  private onVisible = () => {
+    if (document.visibilityState !== 'visible' || this.stopped) return
+    if (Date.now() - this.lastPull > 15000) void this.pull().catch(() => this.status('offline'))
+    void this.flush()
   }
 
   private onOnline = () => {
@@ -134,7 +167,9 @@ export class SyncEngine {
 
   /** First link of a device's workspace: send the full state of every document. */
   private async uploadAll() {
-    const ids = (await allDocIds()).filter((d) => d === `ws:${this.wsId}` || d.startsWith('pg:'))
+    const w = useStore.getState().ws
+    if (!w || w.id !== this.wsId) return
+    const ids = await workspaceDocIds(w)
     const rows: { workspace_id: string; doc_id: string; data: string; client_id: string }[] = []
     for (const docId of ids) {
       const doc = await getDoc(docId)
@@ -149,7 +184,8 @@ export class SyncEngine {
   // ---------------- incoming
 
   async pull() {
-    this.status('syncing')
+    this.lastPull = Date.now()
+    if (!this.live) this.status('syncing')
     for (;;) {
       const { data, error } = await this.sb
         .from('doc_updates')
@@ -217,10 +253,16 @@ export class SyncEngine {
     })
     ch.subscribe((status) => {
       if (status === 'SUBSCRIBED') {
+        this.live = true
+        this.stopPolling()
         void ch.track(this.me)
         // catch anything that landed while we were connecting
         void this.pull().catch(() => this.status('offline'))
-      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') this.status('offline')
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+        // the live channel retries by itself; meanwhile fall back to checking periodically
+        this.live = false
+        this.startPolling()
+      }
     })
     this.channel = ch
   }

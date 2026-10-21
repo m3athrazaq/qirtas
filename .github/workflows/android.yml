@@ -3,7 +3,7 @@ name: Android APK
 on:
   push:
     branches: [main]
-    paths-ignore: ['**.md', 'supabase/**', 'docs/**']
+    paths-ignore: ['**.md', 'supabase/**', 'docs/**', 'e2e/**', '.github/workflows/sync-test.yml']
   workflow_dispatch:
 
 permissions:
@@ -58,12 +58,6 @@ jobs:
           ./gradlew assembleRelease --no-daemon --stacktrace
           mkdir -p ../out
           cp app/build/outputs/apk/release/*.apk "../out/qirtas-1.0.${GITHUB_RUN_NUMBER}.apk"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: qirtas-apk
-          path: out/*.apk
-          retention-days: 30
 
       - name: Publish release
         if: env.SIGNED == '1'

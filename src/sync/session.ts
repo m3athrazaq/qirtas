@@ -3,12 +3,12 @@ import type { User } from '@supabase/supabase-js'
 import * as Y from 'yjs'
 import { create } from 'zustand'
 import { setAssetUploadHook, setRemoteAssetResolver } from '../data/assets'
-import { allDocIds, getAsset, kvGet, kvSet, putAsset, wipeAll } from '../data/idb'
+import { getAsset, kvGet, kvSet, putAsset, wipeAll } from '../data/idb'
 import { flushWrites, getDoc, resetDocs } from '../data/docs'
 import { useStore } from '../data/store'
 import { getActor, setActor } from '../data/workspace'
 import { setServerAi } from '../ai/client'
-import { SyncEngine, type PresenceUser, type Role } from './engine'
+import { SyncEngine, workspaceDocIds, type PresenceUser, type Role } from './engine'
 import { SUPABASE_KEY, SUPABASE_URL } from './config'
 import { supa, toB64 } from './supabase'
 
@@ -170,8 +170,13 @@ async function uploadPendingAssets(wsId: string) {
 async function mergeLocalInto(targetId: string) {
   const sb = supa()!
   const w = useStore.getState().ws!
+  // Untouched starter pages stay behind, so the account doesn't get a second copy of them
+  const starters = [...w.pages.keys()].filter(
+    (id) => w.pages.get(id)?.get('seed') && !w.descendants(id).some((d) => !w.pages.get(d)?.get('seed')),
+  )
+  for (const id of starters) if (w.pages.has(id)) await w.purgePage(id)
   await flushWrites()
-  const ids = (await allDocIds()).filter((d) => d === `ws:${w.id}` || d.startsWith('pg:'))
+  const ids = await workspaceDocIds(w)
   const rows = []
   for (const docId of ids) {
     const doc = await getDoc(docId)

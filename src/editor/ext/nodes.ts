@@ -197,9 +197,22 @@ export const DatabaseBlock = Node.create({
 
 export const LocalImage = Image.extend({
   draggable: true,
+  parseHTML() {
+    return [{ tag: 'img[src]' }, { tag: 'img[data-asset]' }]
+  },
   addAttributes() {
     return {
       ...this.parent?.(),
+      // Pictures kept on the device are "asset:<id>"; in plain HTML they travel as data-asset
+      // so the browser never tries to load that address.
+      src: {
+        default: null,
+        parseHTML: (el) => (el.getAttribute('data-asset') ? `asset:${el.getAttribute('data-asset')}` : el.getAttribute('src')),
+        renderHTML: (a) => {
+          const src = a.src as string | null
+          return src?.startsWith('asset:') ? { 'data-asset': src.slice(6) } : { src }
+        },
+      },
       width: {
         default: 100,
         parseHTML: (el) => Number(el.getAttribute('data-width')) || 100,

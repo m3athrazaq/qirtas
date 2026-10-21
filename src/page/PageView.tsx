@@ -45,7 +45,11 @@ export function PageView({ pageId, inPeek = false }: { pageId: string; inPeek?: 
   const isDb = page.type === 'database'
   const focusEditor = () => {
     const ed = getActiveEditor(pageId) ?? editor
-    if (ed && !ed.isDestroyed) ed.chain().focus('start').run()
+    if (!ed || ed.isDestroyed) return
+    // Focus right away so a fast next keystroke lands in the page, not the title
+    // (the editor's own focus command waits for the next frame).
+    ed.view.focus()
+    ed.chain().focus('start').run()
   }
 
   const toDatabase = (type: ViewType) => {
