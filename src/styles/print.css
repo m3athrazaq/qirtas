@@ -1,0 +1,95 @@
+@media print {
+  @page {
+    margin: 18mm 16mm;
+  }
+
+  html,
+  body,
+  #root,
+  .app,
+  .main,
+  .scroller {
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+    background: #fff !important;
+  }
+
+  :root {
+    --paper: #fff;
+    --ink: #111;
+    --ink-2: #444;
+    --ink-3: #777;
+  }
+
+  .sb-wrap,
+  .topbar,
+  .head-actions,
+  .cover-actions,
+  .drag-handle,
+  .kb-bar,
+  .toasts,
+  .start-with,
+  .db-tools,
+  .view-add,
+  .new-row,
+  .new-card,
+  .col-add,
+  .row-more,
+  .open-row,
+  .cal-add,
+  .fab,
+  .modal-backdrop,
+  .sheet-backdrop,
+  .popover,
+  .floating {
+    display: none !important;
+  }
+
+  .page {
+    padding-bottom: 0;
+  }
+
+  .page.has-margin .page-col::before {
+    display: none;
+  }
+
+  .page-col {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .cover {
+    height: 120px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .prose {
+    min-height: 0;
+    padding-bottom: 0 !important;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3 {
+    break-after: avoid;
+  }
+
+  .callout,
+  .tag,
+  .date-chip > span,
+  .prose span[style] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .table-scroll,
+  .board-scroll {
+    overflow: visible !important;
+  }
+
+  .db-table {
+    width: 100% !important;
+  }
+}

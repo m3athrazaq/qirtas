@@ -1,0 +1,143 @@
+/* قِرطاس — design tokens
+   Paper: white page on a ledger-grey desk. Ink: blue-black. Accent: lapis.
+   Rubric red is reserved for the notebook margin and for "today". */
+
+:root {
+  --font-ui: 'Readex Pro Variable', 'Readex Pro', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-naskh: 'Markazi Text Variable', 'Markazi Text', 'Noto Naskh Arabic', 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --paper: #ffffff;
+  --paper-2: #f4f5f2;
+  --paper-3: #eaece7;
+  --ink: #1b2232;
+  --ink-2: #535a6b;
+  --ink-3: #8b91a0;
+  --rule: #e4e6ea;
+  --rule-2: #d2d5dc;
+  --lapis: #2a47a8;
+  --lapis-ink: #ffffff;
+  --lapis-soft: rgba(42, 71, 168, 0.1);
+  --lapis-softer: rgba(42, 71, 168, 0.06);
+  --rubric: #c9473c;
+  --margin-line: rgba(201, 71, 60, 0.42);
+  --hover: rgba(27, 34, 50, 0.05);
+  --press: rgba(27, 34, 50, 0.09);
+  --scrim: rgba(17, 21, 31, 0.32);
+  --shadow-pop: 0 0 0 1px rgba(27, 34, 50, 0.06), 0 6px 16px rgba(20, 25, 40, 0.1), 0 18px 48px rgba(20, 25, 40, 0.12);
+  --shadow-card: 0 1px 0 rgba(27, 34, 50, 0.05);
+  --radius: 8px;
+  --radius-s: 5px;
+  --radius-l: 12px;
+
+  /* inline text colors */
+  --tc-gray: #77767c;
+  --tc-brown: #8b5a36;
+  --tc-orange: #c2621b;
+  --tc-yellow: #a07a00;
+  --tc-green: #2b7a4b;
+  --tc-blue: #2a5fb8;
+  --tc-purple: #7650ad;
+  --tc-pink: #ad437c;
+  --tc-red: #c0392e;
+
+  /* highlight backgrounds */
+  --hl-gray: #ecebe8;
+  --hl-brown: #f1e5d9;
+  --hl-orange: #fbe4d0;
+  --hl-yellow: #faefc0;
+  --hl-green: #dbeedf;
+  --hl-blue: #dce7f8;
+  --hl-purple: #ebe1f6;
+  --hl-pink: #f6dfeb;
+  --hl-red: #fbdcd8;
+
+  /* select / status tags */
+  --tag-gray-bg: #e8e8e5;
+  --tag-gray-fg: #4b4a47;
+  --tag-brown-bg: #eee0d3;
+  --tag-brown-fg: #6a4123;
+  --tag-orange-bg: #f9dfc6;
+  --tag-orange-fg: #8c4210;
+  --tag-yellow-bg: #f6e9ad;
+  --tag-yellow-fg: #6e5300;
+  --tag-green-bg: #d3ebd9;
+  --tag-green-fg: #1e5c38;
+  --tag-blue-bg: #d6e3f7;
+  --tag-blue-fg: #1f478c;
+  --tag-purple-bg: #e5dbf3;
+  --tag-purple-fg: #563483;
+  --tag-pink-bg: #f4d8e6;
+  --tag-pink-fg: #84305c;
+  --tag-red-bg: #f8d5d0;
+  --tag-red-fg: #902a21;
+
+  --kb-h: 50px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --paper: #161922;
+  --paper-2: #1c202b;
+  --paper-3: #252a37;
+  --ink: #e7e9ef;
+  --ink-2: #a6acba;
+  --ink-3: #6f7587;
+  --rule: #2a2f3c;
+  --rule-2: #363c4b;
+  --lapis: #8ea7ff;
+  --lapis-ink: #0f1424;
+  --lapis-soft: rgba(142, 167, 255, 0.16);
+  --lapis-softer: rgba(142, 167, 255, 0.08);
+  --rubric: #e2685d;
+  --margin-line: rgba(226, 104, 93, 0.38);
+  --hover: rgba(231, 233, 239, 0.06);
+  --press: rgba(231, 233, 239, 0.1);
+  --scrim: rgba(5, 7, 12, 0.6);
+  --shadow-pop: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.45), 0 24px 56px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.25);
+
+  --tc-gray: #9b9aa1;
+  --tc-brown: #c49a77;
+  --tc-orange: #eb9150;
+  --tc-yellow: #dcbc4c;
+  --tc-green: #69c08a;
+  --tc-blue: #7fa8ee;
+  --tc-purple: #b394e3;
+  --tc-pink: #e687b8;
+  --tc-red: #f07f72;
+
+  --hl-gray: #2f323a;
+  --hl-brown: #3c3027;
+  --hl-orange: #47321f;
+  --hl-yellow: #453c1c;
+  --hl-green: #213a2b;
+  --hl-blue: #22324f;
+  --hl-purple: #33284a;
+  --hl-pink: #43273a;
+  --hl-red: #4a2725;
+
+  --tag-gray-bg: #353841;
+  --tag-gray-fg: #cfd0d6;
+  --tag-brown-bg: #4a382b;
+  --tag-brown-fg: #e5c9b0;
+  --tag-orange-bg: #563a22;
+  --tag-orange-fg: #f6c79d;
+  --tag-yellow-bg: #54481c;
+  --tag-yellow-fg: #f1dd8e;
+  --tag-green-bg: #23452f;
+  --tag-green-fg: #a9e2bd;
+  --tag-blue-bg: #253b60;
+  --tag-blue-fg: #b9cff8;
+  --tag-purple-bg: #3b2c58;
+  --tag-purple-fg: #d6c2f4;
+  --tag-pink-bg: #522c45;
+  --tag-pink-fg: #f3bbd8;
+  --tag-red-bg: #5a2c28;
+  --tag-red-fg: #f8bcb4;
+
+  color-scheme: dark;
+}

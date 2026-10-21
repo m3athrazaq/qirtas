@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">قِرطاس</string>
+    <string name="title_activity_main">قِرطاس</string>
+    <string name="package_name">com.m3athrazaq.qirtas</string>
+    <string name="custom_url_scheme">com.m3athrazaq.qirtas</string>
+    <string name="share_label">حفظ في قِرطاس</string>
+    <string name="shortcut_new">صفحة جديدة</string>
+    <string name="shortcut_search">بحث</string>
+    <string name="shortcut_inbox">صندوق الوارد</string>
+</resources>
