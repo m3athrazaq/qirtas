@@ -11,16 +11,14 @@ permissions:
 jobs:
   smoke:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 50
     steps:
-      - name: Check hardware acceleration
+      - name: Enable hardware acceleration
         run: |
-          echo "::notice title=Runner::cpus=$(nproc) mem=$(free -m | awk '/Mem/{print $2}')MB kvm=$(ls -l /dev/kvm 2>&1 | tr -s ' ') virt=$(grep -Ec '(vmx|svm)' /proc/cpuinfo)"
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-          if [ ! -e /dev/kvm ]; then echo "::error title=No KVM::This runner has no hardware acceleration for the emulator"; exit 1; fi
-          echo "::notice title=KVM::$(ls -l /dev/kvm | tr -s ' ')"
+          ls -l /dev/kvm
 
       - uses: actions/checkout@v4
 
@@ -34,30 +32,45 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Install
-        run: |
-          npm ci
-          npm i --no-save playwright@1.63.0
-
       - name: Build debug APK
         run: |
-          npx vite build
-          npx cap sync android
-          cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+          mkdir -p smoke
+          {
+            npm ci && npm i --no-save playwright@1.63.0 &&
+            npx vite build && npx cap sync android &&
+            (cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon)
+          } > smoke/build.txt 2>&1
+          status=$?
+          tail -40 smoke/build.txt
+          exit $status
 
-      - name: Run on an emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          arch: x86_64
-          target: google_apis
-          profile: pixel_6
-          ram-size: 4096M
-          disk-size: 6000M
-          emulator-boot-timeout: 1200
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -no-metrics
-          script: bash e2e/android-smoke.sh
+      - name: Start the emulator
+        run: |
+          set -x
+          SDK="$ANDROID_HOME"
+          export PATH="$SDK/cmdline-tools/latest/bin:$SDK/emulator:$SDK/platform-tools:$PATH"
+          IMG="system-images;android-34;google_apis;x86_64"
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager --install emulator platform-tools "$IMG" > smoke/sdk.txt 2>&1
+          echo no | avdmanager create avd -n smoke -k "$IMG" -d pixel_6 --force > smoke/avd.txt 2>&1
+          nohup emulator -avd smoke -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -accel on -cores 2 -memory 3072 -camera-back none -camera-front none > smoke/emulator.txt 2>&1 &
+          adb start-server
+          timeout 300 adb wait-for-device || { echo "no device"; exit 1; }
+          start=$(date +%s)
+          until [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; do
+            sleep 5
+            if [ $(( $(date +%s) - start )) -gt 1500 ]; then echo "boot timeout" | tee -a smoke/emulator.txt; exit 1; fi
+          done
+          echo "booted in $(( $(date +%s) - start ))s" | tee smoke/boot.txt
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
+          adb shell dumpsys package com.google.android.webview | grep -m1 versionName >> smoke/boot.txt || true
+
+      - name: Drive the app
+        run: |
+          export PATH="$ANDROID_HOME/platform-tools:$PATH"
+          bash e2e/android-smoke.sh
 
       - name: Save results to the ci-smoke branch
         if: always()
