@@ -1,6 +1,7 @@
-// Supabase Edge Function: the writing assistant for signed-in users.
-// It checks the user's monthly allowance, then streams the answer from the Claude API.
+// Supabase Edge Function "ai": the writing assistant for signed-in users.
+// Counts the caller's monthly uses, then streams the answer from the Claude API.
 // Secrets: ANTHROPIC_API_KEY (required), AI_MONTHLY_LIMIT (optional, default 300).
+// It acts as the caller (their own login), so it needs no secret Supabase key.
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const cors = {
@@ -15,25 +16,36 @@ function json(status: number, body: unknown) {
   return new Response(JSON.stringify(body), { status, headers: { ...cors, 'content-type': 'application/json' } })
 }
 
+/** The project's public key: from the request, else from the function's environment. */
+function publicKey(req: Request): string {
+  const fromRequest = req.headers.get('apikey')
+  if (fromRequest) return fromRequest
+  try {
+    const keys = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS') ?? '{}') as Record<string, string>
+    const first = keys.default ?? Object.values(keys)[0]
+    if (first) return first
+  } catch {
+    /* not set */
+  }
+  return Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   if (req.method !== 'POST') return json(405, { error: { message: 'method not allowed' } })
 
   const apiKey = Deno.env.get('ANTHROPIC_API_KEY')
-  if (!apiKey) return json(500, { error: { message: 'ANTHROPIC_API_KEY is not set' } })
+  if (!apiKey) return json(503, { error: { message: 'ANTHROPIC_API_KEY is not set', code: 'noserver' } })
 
-  const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '')
-  const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
-  const { data: userData } = await admin.auth.getUser(token)
-  const user = userData?.user
-  if (!user) return json(401, { error: { message: 'unauthorized' } })
-
-  const limit = Number(Deno.env.get('AI_MONTHLY_LIMIT') ?? '300')
-  const month = new Date().toISOString().slice(0, 7)
-  const { data: usage } = await admin.from('ai_usage').select('count').eq('user_id', user.id).eq('month', month).maybeSingle()
-  const used = usage?.count ?? 0
-  if (used >= limit) return json(429, { error: { message: 'quota' } })
-  await admin.from('ai_usage').upsert({ user_id: user.id, month, count: used + 1 })
+  const auth = req.headers.get('Authorization') ?? ''
+  const token = auth.replace(/^Bearer\s+/i, '')
+  if (!token) return json(401, { error: { message: 'unauthorized' } })
+  const sb = createClient(Deno.env.get('SUPABASE_URL')!, publicKey(req), {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  })
+  const { data: userData } = await sb.auth.getUser(token)
+  if (!userData?.user) return json(401, { error: { message: 'unauthorized' } })
 
   let body: Record<string, unknown>
   try {
@@ -41,6 +53,12 @@ Deno.serve(async (req) => {
   } catch {
     return json(400, { error: { message: 'bad request' } })
   }
+
+  const limit = Number(Deno.env.get('AI_MONTHLY_LIMIT') ?? '300')
+  const { data: used, error } = await sb.rpc('ai_count_use')
+  if (error) return json(500, { error: { message: error.message } })
+  if (Number(used) > limit) return json(429, { error: { message: 'quota', code: 'quota' } })
+
   const model = MODELS.includes(String(body.model)) ? String(body.model) : MODELS[0]
   const payload = {
     model,

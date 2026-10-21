@@ -84,6 +84,8 @@ export async function streamAi(prompt: string, onText: (full: string) => void, s
     throw new AiError('network', (e as Error).message)
   }
   if (res.status === 429 && serverAi && !aiKey) throw new AiError('quota', 'quota')
+  // The server assistant isn't set up yet (function not deployed, or no API key on the server)
+  if ((res.status === 404 || res.status === 503) && serverAi && !aiKey) throw new AiError('nokey', 'server assistant unavailable')
   if (!res.ok || !res.body) {
     let msg = `${res.status}`
     try {

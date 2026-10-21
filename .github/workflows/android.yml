@@ -3,6 +3,7 @@ name: Android APK
 on:
   push:
     branches: [main]
+    paths-ignore: ['**.md', 'supabase/**', 'docs/**']
   workflow_dispatch:
 
 permissions:
@@ -34,30 +35,26 @@ jobs:
 
       - name: Build web app
         run: npx vite build
-        env:
-          VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
 
       - name: Copy into the Android project
         run: npx cap sync android
 
-      - name: Prepare signing key
-        env:
-          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: |
-          if [ -n "$KEYSTORE_B64" ]; then
-            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/qirtas.jks"
-            echo "QIRTAS_KEYSTORE=$RUNNER_TEMP/qirtas.jks" >> "$GITHUB_ENV"
-          fi
-
+      # The release key lives in android/signing (it is itself encrypted with its password);
+      # the password comes from the repository secret ANDROID_KEYSTORE_PASSWORD.
       - name: Build APK
         working-directory: android
         env:
           QIRTAS_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          QIRTAS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          QIRTAS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
+          if [ -n "$QIRTAS_KEYSTORE_PASSWORD" ]; then
+            export QIRTAS_KEYSTORE="$PWD/signing/qirtas-release.p12"
+            export QIRTAS_KEY_ALIAS=qirtas
+            export QIRTAS_KEY_PASSWORD="$QIRTAS_KEYSTORE_PASSWORD"
+            echo "SIGNED=1" >> "$GITHUB_ENV"
+          else
+            echo "::warning title=Test build only::The secret ANDROID_KEYSTORE_PASSWORD is missing, so this APK is signed with a throwaway debug key and no release is published."
+          fi
           ./gradlew assembleRelease --no-daemon --stacktrace
           mkdir -p ../out
           cp app/build/outputs/apk/release/*.apk "../out/qirtas-1.0.${GITHUB_RUN_NUMBER}.apk"
@@ -69,6 +66,7 @@ jobs:
           retention-days: 30
 
       - name: Publish release
+        if: env.SIGNED == '1'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
