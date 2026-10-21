@@ -57,7 +57,7 @@ jobs:
           # avdmanager and the emulator must agree on where AVDs live
           export ANDROID_EMULATOR_HOME="$HOME/.android" ANDROID_AVD_HOME="$HOME/.android/avd"
           mkdir -p "$ANDROID_AVD_HOME"
-          IMG="system-images;android-34;google_apis;x86_64"
+          IMG="system-images;android-34;default;x86_64"  # plain AOSP: no Google services eating the 2 CPUs
           yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager --install emulator platform-tools "$IMG" > smoke/sdk.txt 2>&1
           echo no | avdmanager create avd -n smoke -k "$IMG" -d pixel_6 --force -p "$ANDROID_AVD_HOME/smoke.avd" > smoke/avd.txt 2>&1
@@ -79,7 +79,7 @@ jobs:
           adb shell settings put global window_animation_scale 0
           adb shell settings put global transition_animation_scale 0
           adb shell settings put global animator_duration_scale 0
-          adb shell dumpsys package com.google.android.webview | grep -m1 versionName >> smoke/boot.txt || true
+          (adb shell dumpsys package com.google.android.webview; adb shell dumpsys package com.android.webview) | grep -m2 versionName >> smoke/boot.txt || true
 
       - name: Drive the app
         run: |

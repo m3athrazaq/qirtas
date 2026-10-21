@@ -82,7 +82,7 @@ async function evaluate(c, expression, timeout) {
       console.log(`[log.${m.params.entry.level}] ${m.params.entry.text.slice(0, 300)}`)
     }
   })
-  await c.send('Runtime.enable') // replays earlier console messages and errors
+  console.log('Runtime.enable:', JSON.stringify(await c.send('Runtime.enable', {}, 30000)).slice(0, 120)) // replays earlier console messages and errors
   await c.send('Log.enable')
   await sleep(1500)
 
@@ -106,7 +106,7 @@ async function evaluate(c, expression, timeout) {
         bodyText: document.body.innerText.slice(0, 200),
       }
     })()`,
-    20000,
+    45000,
   )
   console.log('diagnostics:', JSON.stringify(diag, null, 1))
   shot('02-state')
