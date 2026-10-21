@@ -7,9 +7,17 @@
     <meta name="description" content="قِرطاس: ملاحظاتك ومهامك ومشاريعك بالعربية، مع تقويم هجري وبحث يفهم العربية." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>قِرطاس</title>
+    <style>
+      /* First paint, before the app loads: the same disc as the Android launch screen */
+      html, body { margin: 0; background: #f4f5f2; }
+      @media (prefers-color-scheme: dark) { html, body { background: #1c202b; } }
+      .boot-mark { position: fixed; inset: 0; display: grid; place-items: center; }
+      .boot-mark img { width: 192px; height: 192px; max-width: 46vmin; max-height: 46vmin; }
+      @media (min-width: 761px) { .boot-mark img { width: 88px; height: 88px; } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="boot-mark" aria-hidden="true"><img src="./splash-mark.svg" alt="" /></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

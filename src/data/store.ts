@@ -21,7 +21,7 @@ export interface Settings {
 const SETTINGS_KEY = 'qirtas.settings'
 
 const defaultSettings: Settings = {
-  lang: navigator.language?.startsWith('en') ? 'en' : 'ar',
+  lang: 'ar', // Arabic first; English is one tap away in the settings
   theme: 'system',
   calendar: 'hijri',
   numerals: 'arab',

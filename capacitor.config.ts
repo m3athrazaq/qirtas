@@ -14,14 +14,6 @@ const config: CapacitorConfig = {
       insetsHandling: 'css',
       initialViewportFitValueHint: 'cover',
     },
-    SplashScreen: {
-      launchAutoHide: false,
-      backgroundColor: '#f4f5f2',
-      showSpinner: false,
-    },
-    Keyboard: {
-      resizeOnFullScreen: true,
-    },
   },
 }
 

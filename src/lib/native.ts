@@ -9,7 +9,6 @@ import { t } from './i18n'
 export async function initNative() {
   if (!isNative()) return
   const { App } = await import('@capacitor/app')
-  const { SplashScreen } = await import('@capacitor/splash-screen')
   const { SystemBars, SystemBarsStyle } = await import('@capacitor/core')
 
   const paintBars = async (theme: string) => {
@@ -46,7 +45,6 @@ export async function initNative() {
 
   void App.addListener('resume', () => void checkShared())
   void checkShared()
-  setTimeout(() => void SplashScreen.hide(), 100)
 }
 
 function handleUrl(url: string) {

@@ -3,4 +3,5 @@
     <color name="ic_launcher_background">#1B2232</color>
     <color name="qirtas_paper">#F4F5F2</color>
     <color name="qirtas_ink">#1B2232</color>
+    <color name="qirtas_window">#F4F5F2</color>
 </resources>
