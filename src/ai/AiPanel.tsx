@@ -3,7 +3,7 @@ import type { Editor } from '@tiptap/react'
 import { marked } from 'marked'
 import { ArrowUp, Loader2, RotateCcw, Sparkles, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useStore } from '../data/store'
+import { openSettingsAt } from '../shell/SettingsDialog'
 import { markdownToJson } from '../lib/exporter'
 import { t } from '../lib/i18n'
 import { Popover } from '../ui/Popover'
@@ -66,7 +66,6 @@ function AiPanelInner({ editor, from, to, initial }: { editor: Editor; from: num
   const [error, setError] = useState<string | null>(null)
   const [last, setLast] = useState<{ action: AiAction; custom?: string } | null>(null)
   const abort = useRef<AbortController | null>(null)
-  const openModal = useStore((s) => s.openModal)
   const hasSelection = from < to
 
   const anchor = useMemo(() => {
@@ -162,7 +161,7 @@ function AiPanelInner({ editor, from, to, initial }: { editor: Editor; from: num
                     className="btn"
                     onClick={() => {
                       close()
-                      openModal('settings')
+                      openSettingsAt('ai')
                     }}
                   >
                     {t('settings')}

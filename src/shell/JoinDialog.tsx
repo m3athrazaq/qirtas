@@ -2,6 +2,7 @@ import { Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { navigate } from '../data/nav'
 import { useStore } from '../data/store'
+import { openSettingsAt } from './SettingsDialog'
 import { t } from '../lib/i18n'
 import { syncAvailable } from '../sync/config'
 import { acceptInvite, inviteInfo, useSession } from '../sync/session'
@@ -10,7 +11,6 @@ import { Modal } from '../ui/Modal'
 export function JoinDialog() {
   const route = useStore((s) => s.route)
   const user = useSession((s) => s.user)
-  const openModal = useStore((s) => s.openModal)
   const token = route.name === 'join' ? route.token : null
   const [info, setInfo] = useState<{ name: string; role: string } | null | 'invalid'>(null)
   const [busy, setBusy] = useState(false)
@@ -33,7 +33,7 @@ export function JoinDialog() {
         ) : !user ? (
           <>
             <p>{t('signInToJoin')}</p>
-            <button type="button" className="btn btn-primary" onClick={() => openModal('settings')}>
+            <button type="button" className="btn btn-primary" onClick={() => openSettingsAt('account')}>
               {t('signIn')}
             </button>
           </>

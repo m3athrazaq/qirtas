@@ -1,6 +1,7 @@
 import { Copy, Link2, LogOut, Users, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useStore } from '../data/store'
+import { openSettingsAt } from './SettingsDialog'
 import { t } from '../lib/i18n'
 import { copyText } from '../lib/platform'
 import { syncAvailable } from '../sync/config'
@@ -23,7 +24,6 @@ import { Modal } from '../ui/Modal'
 export function ShareDialog() {
   const open = useStore((s) => s.modal === 'share')
   const close = useStore((s) => s.closeModal)
-  const openModal = useStore((s) => s.openModal)
   const user = useSession((s) => s.user)
   const role = useSession((s) => s.role)
   return (
@@ -33,7 +33,7 @@ export function ShareDialog() {
           <Users size={26} className="muted" />
           <p>{t('shareNeedsAccount')}</p>
           {syncAvailable() && (
-            <button type="button" className="btn btn-primary" onClick={() => openModal('settings')}>
+            <button type="button" className="btn btn-primary" onClick={() => openSettingsAt('account')}>
               {t('signIn')}
             </button>
           )}

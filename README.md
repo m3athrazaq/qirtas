@@ -1,32 +1,55 @@
-# React + TypeScript + Vite
+# قِرطاس — Qirtas
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+دفتر ملاحظات ومهام عربي أولاً: صفحات بمحرر كتل، قواعد بيانات بعروض جدول ولوحة وتقويم هجري،
+بحث يفهم العربية، مساعد كتابة، مشاركة وتعاون مباشر، ويعمل دون اتصال على الويب والأندرويد.
 
-Currently, two official plugins are available:
+## المزايا
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **محرر كتل**: قائمة `/`، اختصارات Markdown (`#` `-` `[]` `>`)، صفحات متداخلة، سحب الكتل، ألوان وتمييز وروابط وكود، أيقونات وأغلفة، تصدير Markdown وPDF.
+- **اتجاه تلقائي لكل سطر**: العربي يمين والإنجليزي يسار في الصفحة نفسها.
+- **قواعد بيانات**: جدول ولوحة (Kanban) وتقويم؛ خصائص الحالة والأولوية والتاريخ والمسؤول والرقم والرابط؛ تصفية وترتيب؛ فتح أي صف كصفحة؛ تحويل قائمة إلى قاعدة بيانات.
+- **التقويم الهجري (أم القرى)**: الأسبوع يبدأ الأحد، وتاريخان معاً هجري وميلادي.
+- **بحث عربي**: يتجاهل الهمزات والتشكيل والتاء المربوطة والألف المقصورة والأرقام الهندية، مع إبراز النتائج (`Ctrl/⌘ K`).
+- **مساعد الكتابة**: تلخيص، إكمال، تدقيق إملائي ونحوي، تحويل اللهجة إلى فصحى، ترجمة، اختصار، وتحويل الملاحظة الصوتية إلى ملاحظة منظمة.
+- **مشاركة**: روابط دعوة بصلاحية تعديل أو عرض، وتعديل مباشر مع رؤية من يتصفح الصفحة.
+- **مزامنة ودون اتصال**: كل شيء يُحفظ على الجهاز أولاً ثم يُزامن (Yjs + Supabase).
+- **قوالب**: رمضان، ختمة القرآن، مشاريع، محاضرات، واجبات، محضر اجتماع، ميزانية شهرية، سفر، قراءة، عادات، يوميات، خطة أسبوعية.
+- **واجهة عربية وإنجليزية**، ووضع داكن.
 
-## React Compiler
+## البنية
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| المجلد | المحتوى |
+| --- | --- |
+| `src/editor` | المحرر (TipTap) وكتله وقائمة `/` وشريط التنسيق |
+| `src/database` | قواعد البيانات: الجدول واللوحة والتقويم والخصائص |
+| `src/data` | التخزين المحلي (IndexedDB + Yjs) ومساحة العمل والتنقل |
+| `src/sync` | الحسابات والمزامنة والمشاركة (Supabase) |
+| `src/ai` | مساعد الكتابة والملاحظات الصوتية |
+| `src/lib` | العربية والهجري والترجمة والتصدير |
+| `supabase/` | سكربت قاعدة البيانات ودالة المساعد |
+| `android/` | تطبيق الأندرويد (Capacitor) |
+| `e2e/` | اختبار شامل للمزامنة على الخادم الحقيقي |
 
-## Expanding the Oxlint configuration
+## التطوير
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev          # http://localhost:5173
+npm run build:web    # نسخة الويب في dist/
+npm run android      # بناء الويب ونسخه إلى مشروع الأندرويد
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+إعدادات Supabase العامة في `.env.production` (الرابط والمفتاح العام فقط). أثناء التطوير المحلي يعمل التطبيق دون حساب.
+
+## الإعداد لمرة واحدة
+
+1. **قاعدة البيانات**: شغّل `supabase/migrations/001_qirtas.sql` في Supabase ← SQL Editor.
+2. **التسجيل**: أطفئ «Confirm email» في Authentication ← Email (أو اربط خدمة بريد SMTP).
+3. **توقيع الأندرويد**: أضف السرّ `ANDROID_KEYSTORE_PASSWORD` في إعدادات المستودع. المفتاح نفسه في `android/signing/` ومقفل بكلمة المرور.
+4. **الويب**: اربط المستودع بـ Cloudflare Pages؛ أمر البناء `npm run build:web` والمجلد `dist`.
+5. **المساعد (اختياري)**: انشر `supabase/functions/ai` باسم `ai` وأضف السرّ `ANTHROPIC_API_KEY`.
+
+## النشر
+
+- كل دفع إلى `main` يبني ملف APK موقّعاً وينشره في صفحة **Releases** باسم `v1.0.<رقم>`.
+- سير العمل **Sync test** (يدوي) يختبر التسجيل والدعوة والتعديل المباشر والصور على مشروع Supabase الحقيقي بحسابين مؤقتين يحذفان نفسيهما.

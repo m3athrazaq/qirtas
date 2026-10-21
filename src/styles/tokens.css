@@ -73,8 +73,9 @@
   --tag-red-fg: #902a21;
 
   --kb-h: 50px;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* The Android app injects --safe-area-inset-*; browsers provide env() */
+  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
 
   color-scheme: light;
 }

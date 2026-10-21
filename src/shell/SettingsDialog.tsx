@@ -1,5 +1,5 @@
 import { Download, Upload } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { buildBackup, restoreBackup } from '../data/backup'
 import { resetDocs } from '../data/docs'
 import { wipeAll } from '../data/idb'
@@ -11,7 +11,16 @@ import { Modal } from '../ui/Modal'
 import { askConfirm, askText } from '../ui/dialogs'
 import { AccountSection } from '../sync/AccountSection'
 
-type Tab = 'general' | 'account' | 'ai' | 'data'
+export type SettingsTab = 'general' | 'account' | 'ai' | 'data'
+type Tab = SettingsTab
+
+let requestedTab: Tab | null = null
+/** Open the settings on a given tab (e.g. "Sign in" buttons go straight to the account tab). */
+export function openSettingsAt(tab: Tab) {
+  requestedTab = tab
+  useStore.getState().openModal('settings')
+}
+window.addEventListener('qirtas:settings', (e) => openSettingsAt(((e as CustomEvent).detail as Tab) ?? 'general'))
 
 export const APP_VERSION = '1.0.0'
 
@@ -36,6 +45,12 @@ export function SettingsDialog() {
   const toast = useStore((s) => s.toast)
   const [tab, setTab] = useState<Tab>('general')
   const set = (patch: Partial<Settings>) => setSettings(patch)
+  useEffect(() => {
+    if (open && requestedTab) {
+      setTab(requestedTab)
+      requestedTab = null
+    }
+  }, [open])
 
   return (
     <Modal open={open} onClose={close} title={t('settingsTitle')} width={640} className="settings-modal">

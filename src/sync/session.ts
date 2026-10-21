@@ -11,6 +11,7 @@ import { setServerAi } from '../ai/client'
 import { SyncEngine, workspaceDocIds, type PresenceUser, type Role } from './engine'
 import { SUPABASE_KEY, SUPABASE_URL } from './config'
 import { supa, toB64 } from './supabase'
+import { t } from '../lib/i18n'
 
 export interface WorkspaceInfo {
   id: string
@@ -51,6 +52,13 @@ export async function initSync() {
     if (event === 'SIGNED_OUT') {
       useSession.setState({ user: null, role: null, workspaces: [] })
       return
+    }
+    if (event === 'PASSWORD_RECOVERY') {
+      // Arrived from a "reset password" email: go straight to choosing a new one
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'account' }))
+        useStore.getState().toast(t('setNewPassword'))
+      }, 400)
     }
     if (session?.user && useSession.getState().user?.id !== session.user.id) void connect(session.user)
   })
@@ -207,7 +215,10 @@ export async function signUp(email: string, password: string, name: string) {
 }
 
 export async function resetPassword(email: string) {
-  const { error } = await supa()!.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname })
+  // The link in the email opens the web app (inside the Android app there's no address to return to,
+  // so Supabase falls back to the Site URL).
+  const base = appBaseUrl()
+  const { error } = await supa()!.auth.resetPasswordForEmail(email, base ? { redirectTo: `${base}/` } : undefined)
   if (error) throw error
 }
 
