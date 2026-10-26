@@ -1,0 +1,2 @@
+booted in 20s
+    versionName=113.0.5672.136

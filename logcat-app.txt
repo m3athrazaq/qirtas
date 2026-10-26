@@ -1,0 +1,68 @@
+--------- beginning of main
+W/chromium( 2140): [WARNING:dns_config_service_android.cc(115)] Failed to read DnsConfig.
+D/Capacitor( 2140): Starting BridgeActivity
+D/Capacitor( 2140): Registering plugin instance: CapacitorCookies
+D/Capacitor( 2140): Registering plugin instance: WebView
+D/Capacitor( 2140): Registering plugin instance: CapacitorHttp
+D/Capacitor( 2140): Registering plugin instance: SystemBars
+D/Capacitor( 2140): Registering plugin instance: QirtasNative
+D/Capacitor( 2140): Registering plugin instance: App
+D/Capacitor( 2140): Registering plugin instance: Filesystem
+D/Capacitor( 2140): Registering plugin instance: Keyboard
+D/Capacitor( 2140): Registering plugin instance: Share
+W/Capacitor( 2140): Unable to read file at path public/plugins
+D/Capacitor( 2140): Loading app at https://localhost
+D/Capacitor( 2140): App started
+D/Capacitor( 2140): App resumed
+D/Capacitor( 2140): Handling local request: https://localhost/
+W/chromium( 2140): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+E/Capacitor/Console( 2140): File:  - Line 6 - Msg: Error injecting safe area CSS: TypeError: Cannot read properties of null (reading 'style')
+E/Capacitor/Console( 2140): File:  - Line 6 - Msg: Error injecting safe area CSS: TypeError: Cannot read properties of null (reading 'style')
+E/Capacitor/Console( 2140): File:  - Line 6 - Msg: Error injecting safe area CSS: TypeError: Cannot read properties of null (reading 'style')
+D/Capacitor( 2140): Handling local request: https://localhost/assets/index-EiP0r_z2.js
+D/Capacitor( 2140): Handling local request: https://localhost/assets/nav-SD_8egqK.js
+D/Capacitor( 2140): Handling local request: https://localhost/assets/history-MMwPu4Kj.js
+D/Capacitor( 2140): Handling local request: https://localhost/assets/dist-Bpo2z7W5.js
+D/Capacitor( 2140): Handling local request: https://localhost/assets/preload-helper-CRzLMJPS.js
+D/Capacitor( 2140): Handling local request: https://localhost/assets/index-DLzCRIuF.css
+D/Capacitor( 2140): Handling local request: https://localhost/splash-mark.svg
+D/Capacitor( 2140): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2140): Handling local request: https://localhost/assets/esm-C13MJOv3.js
+D/Capacitor( 2140): Handling local request: https://localhost/assets/markazi-text-arabic-wght-normal-zEmVoUHK.woff2
+D/Capacitor( 2140): Handling local request: https://localhost/assets/readex-pro-arabic-wght-normal-DiwT_uOQ.woff2
+D/Capacitor( 2140): Handling local request: https://localhost/assets/readex-pro-latin-wght-normal--ekFhJJC.woff2
+D/Capacitor( 2140): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2140): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2140): callback: 15258781, pluginId: SystemBars, methodName: setStyle, methodData: {"style":"LIGHT"}
+I/Capacitor/Console( 2140): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2140): callback: 15258782, pluginId: App, methodName: addListener, methodData: {"eventName":"backButton"}
+I/Capacitor/Console( 2140): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2140): callback: 15258783, pluginId: App, methodName: addListener, methodData: {"eventName":"appUrlOpen"}
+I/Capacitor/Console( 2140): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2140): callback: 15258784, pluginId: App, methodName: getLaunchUrl, methodData: {}
+I/Capacitor/Console( 2140): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2140): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2140): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2140): callback: 15258785, pluginId: App, methodName: addListener, methodData: {"eventName":"resume"}
+I/Capacitor/Console( 2140): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2140): callback: 15258786, pluginId: QirtasNative, methodName: getSharedContent, methodData: {}
+I/Capacitor/Console( 2140): File:  - Line 333 - Msg: {}
+D/Capacitor( 2140): Handling local request: https://localhost/assets/markazi-text-latin-wght-normal-XVaf1yc4.woff2
+D/Capacitor( 2140): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2140): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2140): Handling local request: https://localhost/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2
+D/Capacitor( 2140): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2140): File:  - Line 333 - Msg: {"canGoBack":true}
+D/Capacitor( 2140): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2140): Handling local request: https://localhost/assets/DatabaseView-Bz1S7WZf.js
+D/Capacitor( 2140): Handling local request: https://localhost/favicon.svg
+W/Capacitor/Console( 2140): File: https://localhost/assets/history-MMwPu4Kj.js - Line 8 - Msg: TextSelection endpoint not pointing into a node with inline content (callout)
+I/Capacitor/Console( 2140): File:  - Line 333 - Msg: {"canGoBack":true}
+D/Capacitor( 2140): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2140): File:  - Line 333 - Msg: {"canGoBack":true}
+I/Capacitor/Console( 2140): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2140): callback: 15258787, pluginId: App, methodName: exitApp, methodData: {}
+D/Capacitor( 2140): App paused
+I/Capacitor/Console( 2140): File:  - Line 333 - Msg: undefined
+D/Capacitor( 2140): App stopped
+D/Capacitor( 2140): App destroyed
