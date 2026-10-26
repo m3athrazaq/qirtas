@@ -10,6 +10,7 @@ import { BlockHandle } from './BlockHandle'
 import { BubbleToolbar } from './BubbleToolbar'
 import { KeyboardBar } from './KeyboardBar'
 import { TableControls } from './TableControls'
+import { Quiet } from '../ui/ErrorBoundary'
 
 /** The live editor showing a page, if that page is open on screen. */
 export function getActiveEditor(pageId: string): Editor | undefined {
@@ -121,10 +122,26 @@ function EditorInner({ pageId, doc, editable, onReady }: { pageId: string; doc: 
   return (
     <div className="editor-wrap" data-editor-page={pageId}>
       <EditorContent editor={editor} className="editor" />
-      {editable && !isMobile && <BlockHandle editor={editor} />}
-      {editable && <BubbleToolbar editor={editor} />}
-      {editable && <TableControls editor={editor} />}
-      {editable && isMobile && <KeyboardBar editor={editor} />}
+      {editable && !isMobile && (
+        <Quiet>
+          <BlockHandle editor={editor} />
+        </Quiet>
+      )}
+      {editable && (
+        <Quiet>
+          <BubbleToolbar editor={editor} />
+        </Quiet>
+      )}
+      {editable && (
+        <Quiet>
+          <TableControls editor={editor} />
+        </Quiet>
+      )}
+      {editable && isMobile && (
+        <Quiet>
+          <KeyboardBar editor={editor} />
+        </Quiet>
+      )}
     </div>
   )
 }

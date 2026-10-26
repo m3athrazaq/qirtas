@@ -49,18 +49,17 @@ export function goBack() {
   else navigate(null)
 }
 
-// The last "open full page" (from a row preview or an inline database), so "minimize" can return
-let lastExpand: { target: string; idx: number } | null = null
-
-/** Open a row or an inline database as a full page, remembering where it was opened from. */
+/** Open a row or an inline database as a full page. The new history entry remembers it was opened
+ *  this way, so "minimize" can step back to where it came from. */
 export function expandTo(id: string) {
+  const before = stateIndex()
   navigate(id)
-  lastExpand = { target: id, idx: stateIndex() }
+  if (stateIndex() === before + 1) history.replaceState({ ...(history.state as object), expanded: id }, '')
 }
 
-/** True when the previous history entry is where this page was expanded from. */
+/** True when this history entry was made by expanding this page (the entry before it is where it came from). */
 export function cameFromExpand(id: string): boolean {
-  return lastExpand?.target === id && lastExpand.idx === stateIndex() && stateIndex() > 0
+  return (history.state as { expanded?: unknown } | null)?.expanded === id && stateIndex() > 0
 }
 
 /** Go back one step in history, then show this row's preview / scroll to this block. */

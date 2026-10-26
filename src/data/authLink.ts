@@ -19,13 +19,3 @@ export function takeAuthRedirect(): URLSearchParams | null {
   pending = null
   return p
 }
-
-/** The e-mail inside a session token, to show whose account a link signs into. */
-export function tokenEmail(token: string): string {
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
-    return typeof payload.email === 'string' ? payload.email : ''
-  } catch {
-    return ''
-  }
-}

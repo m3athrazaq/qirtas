@@ -2144,3 +2144,21 @@ button.sb-brand:hover {
   opacity: 0.35;
   pointer-events: none;
 }
+
+/* Shown only if drawing the app fails (ErrorBoundary) */
+.app-crash {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+  background: var(--paper);
+  color: var(--ink);
+}
+.app-crash p {
+  max-width: 420px;
+  line-height: 1.7;
+}

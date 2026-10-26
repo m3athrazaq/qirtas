@@ -1,6 +1,7 @@
 import * as Y from 'yjs'
 import { allAssets, dumpAll, putAsset } from './idb'
 import { flushWrites, getDoc } from './docs'
+import { ORIGIN_SYSTEM } from './history'
 import { useStore } from './store'
 
 function toB64(u: Uint8Array): string {
@@ -40,7 +41,8 @@ export async function restoreBackup(json: string): Promise<number> {
   let n = 0
   for (const [docId, b64] of Object.entries(data.docs)) {
     const target = docId.startsWith('ws:') && ws ? ws.doc : await getDoc(docId)
-    Y.applyUpdate(target, fromB64(b64))
+    // Not a step for undo: undoing it would take every restored page out of the tree (not to the trash)
+    Y.applyUpdate(target, fromB64(b64), ORIGIN_SYSTEM)
     n++
   }
   for (const a of data.assets ?? []) {

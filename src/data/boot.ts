@@ -1,4 +1,5 @@
 import { installMarkdownHooks } from '../lib/exporter'
+import { isTypingTarget, shortcutLetter } from '../lib/keys'
 import { setLang, t } from '../lib/i18n'
 import { todayIso } from '../lib/hijri'
 import { b, callout, code, date, doc, h2, p, pageLink, setPageContent, tasks } from '../templates/build'
@@ -130,22 +131,21 @@ export async function boot() {
 
   window.addEventListener('keydown', (e) => {
     const mod = e.metaKey || e.ctrlKey
-    // Physical keys, so the shortcuts also work with the Arabic keyboard layout
-    if (mod && e.code === 'KeyK') {
+    // The letter the layout types, or the physical key for Arabic: the shortcuts work with both
+    const key = shortcutLetter(e)
+    if (mod && key === 'k') {
       e.preventDefault()
       const st = useStore.getState()
       st.modal === 'search' ? st.closeModal() : st.openModal('search')
-    } else if (mod && e.code === 'Backslash') {
+    } else if (mod && (e.key === '\\' || e.code === 'Backslash')) {
       e.preventDefault()
       useStore.setState((s) => ({ sidebarOpen: !s.sidebarOpen }))
-    } else if (mod && !e.altKey && (e.code === 'KeyZ' || e.code === 'KeyY')) {
+    } else if (mod && !e.altKey && (key === 'z' || key === 'y')) {
       // Inside the page the editor handles it; text fields keep their own undo
-      if (e.defaultPrevented) return
-      const el = e.target as HTMLElement | null
-      if (el?.closest?.('input, textarea, select, [contenteditable="true"]')) return
+      if (e.defaultPrevented || isTypingTarget(e.target)) return
       if (useStore.getState().wsRole === 'viewer') return
       e.preventDefault()
-      if (e.code === 'KeyY' || e.shiftKey) historyRedo()
+      if (key === 'y' || e.shiftKey) historyRedo()
       else historyUndo()
     }
   })
