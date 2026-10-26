@@ -3,6 +3,7 @@ import { navigate } from '../data/nav'
 import { useStore, ws } from '../data/store'
 import { closeAi, useAi } from '../ai/aiBus'
 import { closePagePicker, usePicker } from '../ui/pickerBus'
+import { minimizePage, minimizeTarget } from '../shell/pageOps'
 import { isNative, QirtasNative } from './platform'
 import { t } from './i18n'
 
@@ -34,6 +35,8 @@ export async function initNative() {
     if (st.peek) return useStore.setState({ peek: null })
     if (st.route.name === 'page') {
       const page = st.pages[st.route.id]
+      // A row or inline database opened full size goes back to its preview / its page (like the top bar)
+      if (page && minimizeTarget(page, st.pages)) return minimizePage(page)
       return navigate(page?.parentId && page.type !== 'row' ? page.parentId : null)
     }
     void App.exitApp()
