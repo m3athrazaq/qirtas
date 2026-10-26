@@ -12,6 +12,8 @@ import { t } from '../../lib/i18n'
 import { AutoDirection } from './bidi'
 import { BlockColor, Callout, DatabaseBlock, DateChip, LocalImage, PageLink, PageMention } from './nodes'
 import { SlashCommand } from './slash'
+import { PageHistory } from './history'
+import { pageUndoManager } from '../../data/history'
 
 /** Extensions that define the document schema (shared by the editor and headless conversions). */
 export function schemaExtensions(): AnyExtension[] {
@@ -48,10 +50,12 @@ export function schemaExtensions(): AnyExtension[] {
   ]
 }
 
-export function editorExtensions(ydoc: Y.Doc): AnyExtension[] {
+export function editorExtensions(ydoc: Y.Doc, pageId: string): AnyExtension[] {
   return [
     ...schemaExtensions(),
-    Collaboration.configure({ document: ydoc, field: 'default' }),
+    // The page's history lives for the whole session, not just while this editor is open
+    Collaboration.configure({ document: ydoc, field: 'default', yUndoOptions: { undoManager: pageUndoManager(pageId, ydoc) } }),
+    PageHistory.configure({ pageId }),
     AutoDirection,
     SlashCommand,
     Placeholder.configure({

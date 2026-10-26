@@ -1,5 +1,6 @@
 import type { JSONContent } from '@tiptap/core'
 import type { Editor } from '@tiptap/react'
+import DOMPurify from 'dompurify'
 import { marked } from 'marked'
 import { ArrowUp, Loader2, RotateCcw, Sparkles, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -12,15 +13,27 @@ import { closeAi, useAi, type AiAction } from './aiBus'
 import { AiError, buildPrompt, streamAi } from './client'
 import { VoicePanel } from './VoicePanel'
 
-function sanitize(html: string): string {
-  const doc = new DOMParser().parseFromString(html, 'text/html')
-  doc.querySelectorAll('script,style,iframe,object,embed,link,meta').forEach((n) => n.remove())
-  doc.querySelectorAll('*').forEach((el) => {
-    ;[...el.attributes].forEach((a) => {
-      if (a.name.startsWith('on') || (a.name === 'href' && /^\s*javascript:/i.test(a.value))) el.removeAttribute(a.name)
-    })
-  })
-  return doc.body.innerHTML
+// The assistant's answer is shown as formatted text before it's inserted. Model output is untrusted:
+// keep only plain formatting tags, and only web/mail links (DOMPurify also drops scripts, handlers,
+// SVG/MathML and every non-safe URL scheme).
+const PREVIEW_TAGS = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'del', 'code', 'pre', 'blockquote', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'input', 'span']
+const PREVIEW_ATTRS = ['href', 'type', 'checked', 'disabled', 'dir']
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if (node.tagName === 'A') {
+    const href = node.getAttribute('href') ?? ''
+    if (!/^(https?:|mailto:)/i.test(href)) node.removeAttribute('href')
+    node.setAttribute('rel', 'noopener noreferrer')
+    node.setAttribute('target', '_blank')
+  }
+  // Task-list checkboxes only, and never interactive
+  if (node.tagName === 'INPUT') {
+    if (node.getAttribute('type') !== 'checkbox') node.remove()
+    else node.setAttribute('disabled', '')
+  }
+})
+
+export function sanitize(html: string): string {
+  return DOMPurify.sanitize(html, { ALLOWED_TAGS: PREVIEW_TAGS, ALLOWED_ATTR: [...PREVIEW_ATTRS, 'rel', 'target'], ALLOW_DATA_ATTR: false })
 }
 
 export function selectionMarkdown(editor: Editor, from: number, to: number): string {

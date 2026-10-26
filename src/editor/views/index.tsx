@@ -119,7 +119,7 @@ export function DateChipView({ node, updateAttributes, selected, editor }: NodeV
 export function DatabaseBlockView({ node, selected }: NodeViewProps) {
   const id = node.attrs.databaseId as string
   return (
-    <NodeViewWrapper className={'db-block' + (selected ? ' is-selected' : '')} contentEditable={false}>
+    <NodeViewWrapper className={'db-block' + (selected ? ' is-selected' : '')} contentEditable={false} data-database-id={id}>
       <Suspense fallback={<div className="db-loading">{t('loading')}</div>}>
         <DatabaseView dbId={id} inline />
       </Suspense>

@@ -24,7 +24,15 @@ export const BlockHandle = memo(function BlockHandle({ editor }: { editor: Edito
   const Sub = rtl ? ChevronLeft : ChevronRight
   // Stable objects: a new one on every render would re-create the handle and hide it
   const positionConfig = useMemo(() => ({ placement: (rtl ? 'right-start' : 'left-start') as 'right-start' | 'left-start', strategy: 'absolute' as const, middleware: [offset(14)] }), [rtl])
-  const nested = useMemo(() => ({ edgeDetection: (rtl ? 'right' : 'left') as 'right' | 'left' }), [rtl])
+  // Lines inside lists, quotes, callouts and toggles get their own handle; a table moves as a whole
+  // (its rows and columns have their own handles, see TableControls)
+  const nested = useMemo(
+    () => ({
+      edgeDetection: (rtl ? 'right' : 'left') as 'right' | 'left',
+      allowedContainers: ['bulletList', 'orderedList', 'taskList', 'listItem', 'taskItem', 'blockquote', 'callout', 'details', 'detailsContent'],
+    }),
+    [rtl],
+  )
 
   const addBelow = () => {
     const { node, pos } = current.current

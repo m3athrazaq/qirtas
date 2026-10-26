@@ -3,6 +3,7 @@
 import * as Y from 'yjs'
 import { compareOrder, orderBetween, uid } from '../lib/ids'
 import { destroyDoc, getDoc, pageDocId } from './docs'
+import { ORIGIN_SYSTEM } from './history'
 import type { Cover, PageFont, PageMeta, PageType, PropDef, PropValue, ViewDef } from './types'
 
 type YPage = Y.Map<unknown>
@@ -206,12 +207,12 @@ export class Workspace {
 
   /** Pages created by the welcome guide carry a "seed" flag until the user changes them. */
   markSeeded(ids: string[]) {
-    this.doc.transact(() => ids.forEach((id) => this.pages.get(id)?.set('seed', true)))
+    this.doc.transact(() => ids.forEach((id) => this.pages.get(id)?.set('seed', true)), ORIGIN_SYSTEM)
   }
 
   touchSeed(id: string) {
     const m = this.pages.get(id)
-    if (m?.get('seed')) m.set('seed', false)
+    if (m?.get('seed')) this.doc.transact(() => m.set('seed', false), ORIGIN_SYSTEM)
   }
 
   /** True when the workspace only holds the untouched welcome pages. */
@@ -240,10 +241,11 @@ export class Workspace {
     const m = this.pages.get(id)
     if (!m) return
     if ((m.get('text') as string) === text) return
+    // Search text follows the page content; it isn't a change of its own for undo
     this.doc.transact(() => {
       m.set('text', text.slice(0, 60000))
       this.touch(m)
-    })
+    }, ORIGIN_SYSTEM)
   }
 
   setProp(rowId: string, propId: string, value: PropValue) {
@@ -351,7 +353,8 @@ export class Workspace {
 
   async purgePage(id: string) {
     const ids = [id, ...this.descendants(id)]
-    this.doc.transact(() => ids.forEach((x) => this.pages.delete(x)))
+    // Permanent: the content is destroyed with it, so undo can't bring it back
+    this.doc.transact(() => ids.forEach((x) => this.pages.delete(x)), ORIGIN_SYSTEM)
     await Promise.all(ids.map((x) => destroyDoc(pageDocId(x))))
   }
 

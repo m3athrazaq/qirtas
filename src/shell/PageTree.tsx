@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronLeft, ChevronRight, Copy, Database, FileText, FolderInput, MoreHorizontal, Plus, Star, StarOff, Trash2 } from 'lucide-react'
+import type { VirtualElement } from '@floating-ui/dom'
 import { memo, useMemo, useState } from 'react'
 import { navigate } from '../data/nav'
 import { useStore, ws } from '../data/store'
@@ -8,6 +9,12 @@ import { compareOrder } from '../lib/ids'
 import { t } from '../lib/i18n'
 import { requestPagePicker } from '../ui/pickerBus'
 import { MenuItem, MenuSep, Popover } from '../ui/Popover'
+import { trashPage } from './pageOps'
+
+/** An anchor at the mouse pointer, for menus opened with a right click. */
+export function pointAnchor(x: number, y: number): VirtualElement {
+  return { getBoundingClientRect: () => ({ x, y, left: x, top: y, right: x, bottom: y, width: 0, height: 0 }) as DOMRect }
+}
 
 const EXP_KEY = 'qirtas.expanded'
 function loadExpanded(): Set<string> {
@@ -80,7 +87,7 @@ const TreeItem = memo(function TreeItem({
 }) {
   const activeId = useStore((s) => (s.route.name === 'page' ? s.route.id : null))
   const rtl = useStore((s) => s.settings.lang === 'ar')
-  const [menu, setMenu] = useState<Element | null>(null)
+  const [menu, setMenu] = useState<Element | VirtualElement | null>(null)
   const [drop, setDrop] = useState<DropPos | null>(null)
   const kids = index.get(page.id) ?? []
   const open = expanded.has(page.id)
@@ -95,10 +102,21 @@ const TreeItem = memo(function TreeItem({
   return (
     <div role="treeitem" aria-expanded={open}>
       <div
-        className={'tree-row' + (activeId === page.id ? ' is-active' : '') + (drop ? ` drop-${drop}` : '')}
+        className={'tree-row' + (activeId === page.id ? ' is-active' : '') + (menu ? ' is-menu-open' : '') + (drop ? ` drop-${drop}` : '')}
         style={{ paddingInlineStart: 6 + depth * 14 }}
         draggable={useStore.getState().wsRole !== 'viewer'}
+        onContextMenu={(e) => {
+          // Right click opens the same menu as the ⋯ button, at the pointer
+          if (useStore.getState().wsRole === 'viewer') return
+          e.preventDefault()
+          setMenu(pointAnchor(e.clientX, e.clientY))
+        }}
         onDragStart={(e) => {
+          // A press on the ⋯ / + buttons that moves a little is a click, not a drag
+          if ((document.elementFromPoint(e.clientX, e.clientY) as Element | null)?.closest('.tree-actions')) {
+            e.preventDefault()
+            return
+          }
           dragId = page.id
           e.dataTransfer.effectAllowed = 'move'
           e.dataTransfer.setData('text/plain', page.title)
@@ -182,10 +200,9 @@ const TreeItem = memo(function TreeItem({
   )
 })
 
-export function PageMenu({ page, anchor, onClose }: { page: PageMeta; anchor: Element; onClose: () => void }) {
+export function PageMenu({ page, anchor, onClose }: { page: PageMeta; anchor: Element | VirtualElement; onClose: () => void }) {
   const favorites = useStore((s) => s.favorites)
   const fav = favorites.includes(page.id)
-  const st = useStore.getState()
   return (
     <Popover anchor={anchor} open onClose={onClose} sheet>
       <div className="menu-list">
@@ -221,9 +238,7 @@ export function PageMenu({ page, anchor, onClose }: { page: PageMeta; anchor: El
           danger
           onClick={() => {
             onClose()
-            ws().trashPage(page.id)
-            if (st.route.name === 'page' && st.route.id === page.id) navigate(page.parentId)
-            st.toast(t('movedToTrash'), { label: t('undo'), run: () => ws().restorePage(page.id) })
+            trashPage(page)
           }}
         />
       </div>

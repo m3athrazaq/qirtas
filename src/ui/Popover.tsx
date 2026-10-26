@@ -24,8 +24,15 @@ export function Popover({ anchor, open, onClose, placement = 'bottom-start', chi
   useLayoutEffect(() => {
     if (!open || asSheet || !anchor || !ref.current) return
     const el = ref.current
-    const update = () =>
-      computePosition(anchor, el, {
+    let placed = false
+    const update = () => {
+      // An anchor that shows only on hover (a row's ⋯ button) collapses when the mouse leaves it:
+      // keep the menu where it is instead of letting it fly to the corner of the screen
+      if (anchor instanceof Element) {
+        const r = anchor.getBoundingClientRect()
+        if (placed && (!anchor.isConnected || (r.width === 0 && r.height === 0))) return
+      }
+      return computePosition(anchor, el, {
         placement,
         strategy: 'fixed',
         middleware: [
@@ -40,8 +47,10 @@ export function Popover({ anchor, open, onClose, placement = 'bottom-start', chi
           }),
         ],
       }).then(({ x, y }) => {
+        placed = true
         Object.assign(el.style, { left: `${x}px`, top: `${y}px`, visibility: 'visible' })
       })
+    }
     const isEl = anchor instanceof Element
     const cleanup = isEl ? autoUpdate(anchor as Element, el, update) : (update(), () => {})
     return cleanup

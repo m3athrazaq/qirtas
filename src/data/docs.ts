@@ -31,6 +31,13 @@ export function setSyncHook(fn: SyncHook | null) {
   syncHook = fn
 }
 
+const destroyListeners = new Set<(docId: string | null) => void>()
+/** Notified when a doc is destroyed (`null`: every doc, when the workspace is reset). */
+export function onDocDestroy(fn: (docId: string | null) => void) {
+  destroyListeners.add(fn)
+  return () => destroyListeners.delete(fn)
+}
+
 const docListeners = new Set<(docId: string) => void>()
 /** Notified when a doc finishes loading (used by the sync engine). */
 export function onDocLoaded(fn: (docId: string) => void) {
@@ -104,6 +111,7 @@ export function loadedDocIds(): string[] {
 }
 
 export async function destroyDoc(docId: string) {
+  destroyListeners.forEach((fn) => fn(docId))
   const e = docs.get(docId)
   if (e) {
     e.doc.destroy()
@@ -114,6 +122,7 @@ export async function destroyDoc(docId: string) {
 }
 
 export function resetDocs() {
+  destroyListeners.forEach((fn) => fn(null))
   docs.forEach((e) => e.doc.destroy())
   docs.clear()
   pending.clear()

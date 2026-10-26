@@ -129,7 +129,15 @@ export function CellView({ row, prop }: { row: PageMeta; prop: PropDef }) {
       )
     case 'url':
       return v ? (
-        <a className="cell-url" href={String(v)} target="_blank" rel="noopener noreferrer" dir="ltr" onClick={(e) => e.stopPropagation()}>
+        <a
+          className="cell-url"
+          // Only web and mail links open; anything else (javascript:, data:…) shows as plain text
+          href={/^(https?|mailto):/i.test(String(v)) ? String(v) : undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          dir="ltr"
+          onClick={(e) => e.stopPropagation()}
+        >
           {String(v).replace(/^https?:\/\//, '')}
         </a>
       ) : null

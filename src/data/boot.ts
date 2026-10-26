@@ -2,7 +2,9 @@ import { installMarkdownHooks } from '../lib/exporter'
 import { setLang, t } from '../lib/i18n'
 import { todayIso } from '../lib/hijri'
 import { b, callout, code, date, doc, h2, p, pageLink, setPageContent, tasks } from '../templates/build'
+import { captureAuthRedirect } from './authLink'
 import { setSyncHook } from './docs'
+import { attachWorkspaceHistory, historyRedo, historyUndo } from './history'
 import { kvGet, kvSet, outboxAdd } from './idb'
 import { initRouter, navigate, takePendingAction } from './nav'
 import { useStore, type Settings } from './store'
@@ -61,6 +63,8 @@ async function seedWelcome(w: Workspace) {
 }
 
 export async function boot() {
+  // Before the router sees the address: a sign-in link must not be lost or applied by accident
+  captureAuthRedirect()
   const store = useStore.getState()
   setLang(store.settings.lang)
   applyAppearance(store.settings)
@@ -85,7 +89,7 @@ export async function boot() {
   setActor(user ?? { id: 'local', name: store.settings.userName })
   const role = await kvGet<string>(`sync:role:${wsId}`)
   if (user && role && role !== 'viewer' && (await kvGet(`sync:linked:${wsId}`))) {
-    setSyncHook((docId, update) => void outboxAdd(docId, update))
+    setSyncHook((docId, update) => void outboxAdd(docId, update, wsId))
   }
   const w = await Workspace.open(wsId)
   installMarkdownHooks()
@@ -94,6 +98,8 @@ export async function boot() {
   let firstPage: string | null = null
   // A workspace that lives on the server fills in through sync; only brand-new local ones get the guide
   if (w.pages.size === 0 && !(await kvGet(`sync:remote:${wsId}`))) firstPage = await seedWelcome(w)
+  // From here on, the user's own changes can be undone (the welcome pages are not one of them)
+  attachWorkspaceHistory(w.pages)
 
   const actorId = () => getActor().id
   useStore.setState({
@@ -124,13 +130,23 @@ export async function boot() {
 
   window.addEventListener('keydown', (e) => {
     const mod = e.metaKey || e.ctrlKey
-    if (mod && e.key.toLowerCase() === 'k') {
+    // Physical keys, so the shortcuts also work with the Arabic keyboard layout
+    if (mod && e.code === 'KeyK') {
       e.preventDefault()
       const st = useStore.getState()
       st.modal === 'search' ? st.closeModal() : st.openModal('search')
-    } else if (mod && e.key === '\\') {
+    } else if (mod && e.code === 'Backslash') {
       e.preventDefault()
       useStore.setState((s) => ({ sidebarOpen: !s.sidebarOpen }))
+    } else if (mod && !e.altKey && (e.code === 'KeyZ' || e.code === 'KeyY')) {
+      // Inside the page the editor handles it; text fields keep their own undo
+      if (e.defaultPrevented) return
+      const el = e.target as HTMLElement | null
+      if (el?.closest?.('input, textarea, select, [contenteditable="true"]')) return
+      if (useStore.getState().wsRole === 'viewer') return
+      e.preventDefault()
+      if (e.code === 'KeyY' || e.shiftKey) historyRedo()
+      else historyUndo()
     }
   })
 }

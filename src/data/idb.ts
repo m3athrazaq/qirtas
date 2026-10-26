@@ -164,12 +164,14 @@ export interface OutboxItem {
   id?: number
   docId: string
   update: Uint8Array
+  /** The workspace the change was made in (missing on items queued by older versions). */
+  wsId?: string
 }
 
-export async function outboxAdd(docId: string, update: Uint8Array): Promise<void> {
+export async function outboxAdd(docId: string, update: Uint8Array, wsId: string): Promise<void> {
   const db = await openDb()
   const tx = db.transaction('outbox', 'readwrite')
-  tx.objectStore('outbox').add({ docId, update })
+  tx.objectStore('outbox').add({ docId, update, wsId })
   await done(tx)
 }
 
@@ -187,6 +189,12 @@ export async function outboxClear(): Promise<void> {
     tx.oncomplete = () => resolve()
     tx.onerror = () => reject(tx.error)
   })
+}
+
+/** Drop the queued changes of one workspace (older items without a workspace count as this one). */
+export async function outboxClearWorkspace(wsId: string): Promise<void> {
+  const ids = (await outboxAll()).filter((i) => !i.wsId || i.wsId === wsId).map((i) => i.id!)
+  await outboxDelete(ids.filter((x) => x !== undefined))
 }
 
 export async function outboxDelete(ids: number[]): Promise<void> {

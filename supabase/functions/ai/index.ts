@@ -11,6 +11,11 @@ const cors = {
 }
 
 const MODELS = ['claude-sonnet-5-5', 'claude-haiku-5-5']
+// Limits that keep one account from running up the bill (the app sends far less than this)
+const MAX_BODY_CHARS = 200_000
+const MAX_MESSAGES = 40
+const EFFORTS = ['low', 'medium']
+const THINKING = ['disabled', 'between_tools']
 
 function json(status: number, body: unknown) {
   return new Response(JSON.stringify(body), { status, headers: { ...cors, 'content-type': 'application/json' } })
@@ -49,25 +54,43 @@ Deno.serve(async (req) => {
 
   let body: Record<string, unknown>
   try {
-    body = await req.json()
+    const raw = await req.text()
+    if (raw.length > MAX_BODY_CHARS) return json(413, { error: { message: 'request too large' } })
+    body = JSON.parse(raw)
   } catch {
     return json(400, { error: { message: 'bad request' } })
   }
+  const messages = body.messages
+  if (
+    !Array.isArray(messages) ||
+    !messages.length ||
+    messages.length > MAX_MESSAGES ||
+    !messages.every((m) => m && (m.role === 'user' || m.role === 'assistant') && (typeof m.content === 'string' || Array.isArray(m.content)))
+  ) {
+    return json(400, { error: { message: 'bad request' } })
+  }
 
+  // ai_count_use returns the count including this call, so `>` allows exactly `limit` calls
   const limit = Number(Deno.env.get('AI_MONTHLY_LIMIT') ?? '300')
   const { data: used, error } = await sb.rpc('ai_count_use')
-  if (error) return json(500, { error: { message: error.message } })
+  if (error) {
+    console.error('ai_count_use failed', error)
+    return json(500, { error: { message: 'server error' } })
+  }
   if (Number(used) > limit) return json(429, { error: { message: 'quota', code: 'quota' } })
 
+  // Only settings the app itself uses are passed on; anything else falls back to the cheap default
   const model = MODELS.includes(String(body.model)) ? String(body.model) : MODELS[0]
+  const effort = (body.output_config as { effort?: unknown } | undefined)?.effort
+  const thinking = (body.thinking as { type?: unknown } | undefined)?.type
   const payload = {
     model,
     max_tokens: Math.min(Number(body.max_tokens) || 2048, 4096),
     stream: true,
-    system: typeof body.system === 'string' ? body.system : undefined,
-    messages: body.messages,
-    output_config: body.output_config,
-    thinking: body.thinking,
+    system: typeof body.system === 'string' ? body.system.slice(0, 20_000) : undefined,
+    messages,
+    output_config: { effort: EFFORTS.includes(String(effort)) ? String(effort) : 'low' },
+    thinking: { type: THINKING.includes(String(thinking)) ? String(thinking) : 'disabled' },
   }
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {

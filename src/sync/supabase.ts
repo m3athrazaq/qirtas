@@ -7,7 +7,8 @@ export function supa(): SupabaseClient | null {
   if (!syncAvailable()) return null
   if (!client) {
     client = createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'qirtas.auth' },
+      // Sessions from links in the address are handled by hand, after the user confirms (session.ts)
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'qirtas.auth' },
       realtime: { params: { eventsPerSecond: 20 } },
     })
   }

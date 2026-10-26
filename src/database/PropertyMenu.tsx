@@ -1,4 +1,4 @@
-import { ArrowDownWideNarrow, ArrowUpNarrowWide, ChevronLeft, ChevronRight, EyeOff, Trash2 } from 'lucide-react'
+import { ArrowDownWideNarrow, ArrowUpNarrowWide, BetweenVerticalEnd, BetweenVerticalStart, ChevronLeft, ChevronRight, Copy, EyeOff, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { defaultStatusOptions } from '../data/dbops'
 import { useStore, ws } from '../data/store'
@@ -7,11 +7,46 @@ import { t } from '../lib/i18n'
 import { uid } from '../lib/ids'
 import { MenuItem, MenuLabel, MenuSep, Popover } from '../ui/Popover'
 import { TYPE_ICONS } from './cells'
+import { propOrderWith } from './TableView'
 
 export const ADDABLE_TYPES: PropType[] = ['text', 'number', 'select', 'multi_select', 'status', 'date', 'person', 'checkbox', 'url', 'created_time', 'updated_time']
 const NUMBER_FORMATS: NumberFormat[] = ['plain', 'comma', 'percent', 'kwd', 'sar', 'aed', 'usd']
 
-export function PropertyMenu({ dbId, prop, view, anchor, onClose }: { dbId: string; prop: PropDef; view: ViewDef; anchor: Element | null; onClose: () => void }) {
+/** A copy of a property, with every row's value, right after the original. */
+function duplicateProperty(dbId: string, prop: PropDef, view: ViewDef) {
+  const w = ws()
+  const id = uid(6)
+  const schema = useStore.getState().pages[dbId]?.schema ?? []
+  w.doc.transact(() => {
+    w.updateSchema(dbId, (s) => {
+      const at = s.findIndex((p) => p.id === prop.id)
+      s.splice(at + 1, 0, { ...structuredClone(prop), id, name: prop.name + t('copySuffix') })
+      return s
+    })
+    for (const r of w.rowsOrdered(dbId)) {
+      const v = useStore.getState().pages[r.id]?.props?.[prop.id]
+      if (v !== undefined && v !== null) w.setProp(r.id, id, structuredClone(v))
+    }
+    w.updateView(dbId, view.id, { propOrder: propOrderWith(schema, view, id, prop.id, 'after') })
+  })
+}
+
+export function PropertyMenu({
+  dbId,
+  prop,
+  view,
+  anchor,
+  onClose,
+  onInsert,
+}: {
+  dbId: string
+  prop: PropDef
+  view: ViewDef
+  anchor: Element | null
+  onClose: () => void
+  /** Add a new property next to this one ("before" = towards the start of the row). */
+  onInsert?: (side: 'before' | 'after') => void
+}) {
   const [name, setName] = useState(prop.name)
   const [sub, setSub] = useState<null | 'type' | 'format'>(null)
   const rtl = useStore((s) => s.settings.lang === 'ar')
@@ -91,6 +126,42 @@ export function PropertyMenu({ dbId, prop, view, anchor, onClose }: { dbId: stri
             />
           )}
           {prop.type === 'number' && <MenuItem label={t('nf_plain')} hint={t(`nf_${prop.numberFormat ?? 'plain'}`)} trailing={<Sub size={14} />} onClick={() => setSub('format')} />}
+          {onInsert && (
+            <>
+              <MenuSep />
+              {/* The title column always comes first: new ones can only go after it */}
+              {(prop.type !== 'title' || !rtl) && (
+                <MenuItem
+                  icon={<BetweenVerticalEnd size={15} />}
+                  label={t('insertPropRight')}
+                  onClick={() => {
+                    onClose()
+                    onInsert(rtl ? 'before' : 'after')
+                  }}
+                />
+              )}
+              {(prop.type !== 'title' || rtl) && (
+                <MenuItem
+                  icon={<BetweenVerticalStart size={15} />}
+                  label={t('insertPropLeft')}
+                  onClick={() => {
+                    onClose()
+                    onInsert(rtl ? 'after' : 'before')
+                  }}
+                />
+              )}
+              {prop.type !== 'title' && (
+                <MenuItem
+                  icon={<Copy size={15} />}
+                  label={t('duplicateProperty')}
+                  onClick={() => {
+                    duplicateProperty(dbId, prop, view)
+                    onClose()
+                  }}
+                />
+              )}
+            </>
+          )}
           <MenuSep />
           <MenuItem icon={<ArrowUpNarrowWide size={15} />} label={t('sortAsc')} onClick={() => sort('asc')} />
           <MenuItem icon={<ArrowDownWideNarrow size={15} />} label={t('sortDesc')} onClick={() => sort('desc')} />

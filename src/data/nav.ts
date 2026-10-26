@@ -22,27 +22,81 @@ export function parseHash(): Route {
   return { name: 'home' }
 }
 
-export function navigate(id: string | null, opts: { replace?: boolean } = {}) {
+// What to show once the next route applies: a row's preview on top, or a block to scroll to
+let pendingPeek: string | null = null
+let pendingScroll: string | null = null
+
+const stateIndex = () => {
+  const idx = (history.state as { idx?: unknown } | null)?.idx
+  return typeof idx === 'number' ? idx : 0
+}
+
+export function navigate(id: string | null, opts: { replace?: boolean; peek?: string; scrollTo?: string } = {}) {
   const hash = id ? `#/p/${id}` : '#/'
-  if (location.hash === hash) return
-  if (opts.replace) history.replaceState(null, '', hash)
-  else history.pushState(null, '', hash)
+  pendingPeek = opts.peek ?? null
+  pendingScroll = opts.scrollTo ?? null
+  if (location.hash === hash) {
+    if (pendingPeek || pendingScroll) applyRoute()
+    return
+  }
+  if (opts.replace) history.replaceState({ idx: stateIndex() }, '', hash)
+  else history.pushState({ idx: stateIndex() + 1 }, '', hash)
   applyRoute()
 }
 
 export function goBack() {
-  if (history.length > 1) history.back()
+  if (stateIndex() > 0) history.back()
   else navigate(null)
 }
 
+// The last "open full page" (from a row preview or an inline database), so "minimize" can return
+let lastExpand: { target: string; idx: number } | null = null
+
+/** Open a row or an inline database as a full page, remembering where it was opened from. */
+export function expandTo(id: string) {
+  navigate(id)
+  lastExpand = { target: id, idx: stateIndex() }
+}
+
+/** True when the previous history entry is where this page was expanded from. */
+export function cameFromExpand(id: string): boolean {
+  return lastExpand?.target === id && lastExpand.idx === stateIndex() && stateIndex() > 0
+}
+
+/** Go back one step in history, then show this row's preview / scroll to this block. */
+export function backTo(opts: { peek?: string; scrollTo?: string }) {
+  pendingPeek = opts.peek ?? null
+  pendingScroll = opts.scrollTo ?? null
+  history.back()
+}
+
+/** The block a just-opened page should scroll to (cleared with clearPendingScroll once done). */
+export function pendingScrollTarget(): string | null {
+  return pendingScroll
+}
+
+export function clearPendingScroll() {
+  pendingScroll = null
+}
+
+const sameRoute = (a: Route, b: Route) =>
+  a.name === b.name && (a.name !== 'page' || a.id === (b as typeof a).id) && (a.name !== 'join' || a.token === (b as typeof a).token)
+
 function applyRoute() {
   const route = parseHash()
-  useStore.setState({ route, peek: null })
+  const cur = useStore.getState()
+  // Going back fires both popstate and hashchange: the second one must not undo the first
+  const same = sameRoute(cur.route, route)
+  const peek = pendingPeek ?? (same ? cur.peek : null)
+  pendingPeek = null
+  useStore.setState({ route: same ? cur.route : route, peek, navIndex: stateIndex() })
   if (route.name === 'page') pushRecent(route.id)
   if (useStore.getState().isMobile) useStore.setState({ sidebarOpen: false })
 }
 
 export function initRouter() {
+  // Number the entries so the app knows whether "back" stays inside it
+  if (typeof (history.state as { idx?: unknown } | null)?.idx !== 'number') history.replaceState({ idx: 0 }, '')
   window.addEventListener('popstate', applyRoute)
   window.addEventListener('hashchange', applyRoute)
   applyRoute()

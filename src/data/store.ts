@@ -68,6 +68,11 @@ interface State {
   isMobile: boolean
   syncStatus: 'local' | 'syncing' | 'synced' | 'offline'
   wsRole: 'owner' | 'editor' | 'viewer' | null
+  /** Undo/redo available for what's on screen (kept up to date by data/history). */
+  canUndo: boolean
+  canRedo: boolean
+  /** Position in the browser history since the app opened (0 = nothing to go back to). */
+  navIndex: number
   setSettings: (patch: Partial<Settings>) => void
   openModal: (m: Modal) => void
   closeModal: () => void
@@ -92,6 +97,9 @@ export const useStore = create<State>((set, get) => ({
   isMobile: false,
   syncStatus: 'local',
   wsRole: null,
+  canUndo: false,
+  canRedo: false,
+  navIndex: 0,
   setSettings: (patch) => {
     const settings = { ...get().settings, ...patch }
     try {

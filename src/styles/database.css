@@ -205,13 +205,18 @@
 
 .table-scroll {
   overflow-x: auto;
-  padding-inline-start: 30px;
-  margin-inline-start: -30px;
+  padding-inline-start: 54px;
+  margin-inline-start: -54px;
 }
 
 .db-table {
   border-collapse: collapse;
   table-layout: fixed;
+}
+
+/* Inside a page, page-table styles must not clip the row gutter (select box, ⋯ menu) */
+.prose table.db-table {
+  overflow: visible;
 }
 
 .db-table th {
@@ -356,10 +361,32 @@
   display: inline-flex;
 }
 
-.row-more {
+/* gutter beside the first cell: select the row, open its menu */
+.row-gutter {
   position: absolute;
-  inset-inline-start: -28px;
+  inset-inline-start: -52px;
   top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+  cursor: default;
+}
+
+.th-gutter {
+  top: 5px;
+}
+
+.row-check {
+  width: 15px;
+  height: 15px;
+  margin: 0 4px;
+  accent-color: var(--lapis);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.row-more {
   width: 24px;
   height: 24px;
   border-radius: 5px;
@@ -369,8 +396,37 @@
   opacity: 0;
 }
 
-.db-row:hover .row-more {
+.db-row:hover .row-more,
+.db-row:hover .row-check,
+.db-table thead tr:hover .row-check,
+.db-table.has-selection .row-check,
+.row-check:focus-visible,
+.row-more:focus-visible {
   opacity: 1;
+}
+
+.db-row.is-selected td {
+  background: var(--lapis-softer, var(--hover));
+}
+
+.sel-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 6px;
+  padding: 4px 6px 4px 10px;
+  width: fit-content;
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  background: var(--paper);
+  font-size: 13px;
+  position: sticky;
+  inset-inline-start: 0;
+}
+
+.sel-count {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
 }
 
 .row-more:hover {
@@ -1013,7 +1069,7 @@
     margin-inline-start: 0;
   }
 
-  .row-more {
+  .row-gutter {
     display: none;
   }
 }

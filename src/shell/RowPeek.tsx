@@ -1,7 +1,7 @@
 import { ArrowUpLeft, ArrowUpRight, MoreHorizontal, X } from 'lucide-react'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { navigate } from '../data/nav'
+import { expandTo } from '../data/nav'
 import { useStore } from '../data/store'
 import { RowMenu } from '../database/TableView'
 import { PageView } from '../page/PageView'
@@ -28,7 +28,7 @@ export function RowPeek() {
             className="btn-text"
             onClick={() => {
               close()
-              navigate(row.id)
+              expandTo(row.id)
             }}
           >
             <Open size={15} /> {t('openFull')}
