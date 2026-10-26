@@ -12,6 +12,7 @@ import App from './App'
 import { boot } from './data/boot'
 import { initNative } from './lib/native'
 import { isNative } from './lib/platform'
+import { AppBoundary } from './ui/ErrorBoundary'
 
 // Offline support and "install app" for the web version (the Android app ships its own files)
 if (import.meta.env.PROD && !import.meta.env.VITE_PREVIEW && !isNative() && 'serviceWorker' in navigator) {
@@ -26,7 +27,9 @@ boot()
     performance.mark('qirtas:booted')
     root.render(
       <StrictMode>
-        <App />
+        <AppBoundary>
+          <App />
+        </AppBoundary>
       </StrictMode>,
     )
     requestAnimationFrame(() => performance.mark('qirtas:painted'))

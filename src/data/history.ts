@@ -10,6 +10,7 @@ import type { EditorState } from '@tiptap/pm/state'
 import { defaultDeleteFilter, defaultProtectedNodes, redo as yRedo, undo as yUndo, ySyncPluginKey } from '@tiptap/y-tiptap'
 import * as Y from 'yjs'
 import { onDocDestroy } from './docs'
+import { isReachable } from '../shell/pageOps'
 import { navigate } from './nav'
 import { useStore } from './store'
 
@@ -76,16 +77,25 @@ const pageManagers = new Map<string, PageUndoManager>()
 const liveStates = new Map<string, Set<() => EditorState>>()
 let wsManager: Y.UndoManager | null = null
 
+/** A change in one history ends the step still open in the others: typing, renaming a page and typing
+ *  again are three steps, so they are undone in that order. */
+function closeOtherSteps(um: Y.UndoManager) {
+  pageManagers.forEach((m) => m !== um && m.stopCapturing())
+  if (wsManager && wsManager !== um) wsManager.stopCapturing()
+}
+
 function watch(um: Y.UndoManager) {
   um.on('stack-item-added', ({ stackItem, type }) => {
     stackItem.meta.set(SEQ, ++seq)
     if (type === 'undo' && !um.redoing) lastFresh = seq
+    closeOtherSteps(um)
     scheduleRefresh()
   })
   um.on('stack-item-updated', ({ stackItem }) => {
     // Typing that joins the previous step still counts as the latest change
     stackItem.meta.set(SEQ, ++seq)
     lastFresh = seq
+    closeOtherSteps(um)
     scheduleRefresh()
   })
   um.on('stack-item-popped', scheduleRefresh)
@@ -206,20 +216,15 @@ export const historyRedo = (pageId: string | null = historyPageId(), state?: Edi
 export const canUndo = (pageId: string | null = historyPageId()) => !!pick('undo', pageId, false)
 export const canRedo = (pageId: string | null = historyPageId()) => !!pick('redo', pageId, false)
 
-/** After undoing a structural change, don't leave the screen on a page that no longer exists. */
+/** After undoing a structural change, don't leave the screen on a page that is gone, or hidden
+ *  because a page above it went to the trash. */
 function leaveVanishedPage() {
   const s = useStore.getState()
-  if (s.peek) {
-    const row = s.pages[s.peek]
-    if (!row || row.deletedAt) useStore.setState({ peek: null })
-  }
-  if (s.route.name !== 'page') return
-  const id = s.route.id
-  const page = s.pages[id]
-  if (page && !page.deletedAt) return
-  // Walk up to the nearest page that still exists
-  let parent = page?.parentId ?? null
-  while (parent && (!s.pages[parent] || s.pages[parent].deletedAt)) parent = s.pages[parent]?.parentId ?? null
+  if (s.peek && !isReachable(s.peek, s.pages)) useStore.setState({ peek: null })
+  if (s.route.name !== 'page' || isReachable(s.route.id, s.pages)) return
+  // Walk up to the nearest page that can still be reached
+  let parent = s.pages[s.route.id]?.parentId ?? null
+  while (parent && !isReachable(parent, s.pages)) parent = s.pages[parent]?.parentId ?? null
   navigate(parent, { replace: true })
 }
 

@@ -1,6 +1,7 @@
 // Handles around a page table: a grip on each row and column (insert, copy, clear, delete) and
 // "+" bars along the bottom and the far side to add a row or column in one click.
 // On a computer they follow the mouse; on a phone they follow the cell being edited.
+import type { Transaction } from '@tiptap/pm/state'
 import { useEditorState, type Editor } from '@tiptap/react'
 import {
   BetweenHorizontalEnd,
@@ -36,6 +37,8 @@ import {
   insertCol,
   insertRow,
   lineHasSpans,
+  mapRef,
+  rowPos,
   sameRef,
   selectLine,
   tableSize,
@@ -47,13 +50,17 @@ import {
 type Box = { top: number; left: number; right: number; bottom: number; width: number; height: number }
 
 function measure(editor: Editor, wrap: HTMLElement, ref: CellRef) {
-  const dom = editor.view.nodeDOM(ref.tablePos) as HTMLElement | null
-  if (!dom || !dom.isConnected) return null
+  // Check the document first: a position left over from before an edit may point at anything
+  const doc = editor.state.doc
+  const pos = cellPos(doc, ref)
+  const rpos = rowPos(doc, ref)
+  if (pos === null || rpos === null) return null
+  const dom = editor.view.nodeDOM(ref.tablePos)
+  if (!(dom instanceof HTMLElement) || !dom.isConnected) return null
   const table = dom.tagName === 'TABLE' ? dom : dom.querySelector('table')
-  const pos = cellPos(editor.state.doc, ref)
-  const cell = pos === null ? null : (editor.view.nodeDOM(pos) as HTMLElement | null)
-  const row = cell?.parentElement
-  if (!table || !cell || !row) return null
+  const cell = editor.view.nodeDOM(pos)
+  const row = editor.view.nodeDOM(rpos)
+  if (!table || !(cell instanceof HTMLElement) || !(row instanceof HTMLElement)) return null
   const w = wrap.getBoundingClientRect()
   const rel = (el: Element): Box => {
     const r = el.getBoundingClientRect()
@@ -102,6 +109,23 @@ export const TableControls = memo(function TableControls({ editor }: { editor: E
       editor.off('update', schedule)
       window.removeEventListener('resize', schedule)
       el?.removeEventListener('scroll', schedule, true)
+    }
+  }, [editor])
+
+  // Edits above the table (yours, a collaborator's, undo) move it: keep pointing at the same cell
+  useEffect(() => {
+    const onTransaction = ({ transaction }: { transaction: Transaction }) => {
+      if (!transaction.docChanged) return
+      setHover((prev) => (prev ? mapRef(prev, transaction) : prev))
+      setMenu((prev) => {
+        if (!prev) return prev
+        const cell = mapRef(prev.cell, transaction)
+        return !cell ? null : cell === prev.cell ? prev : { ...prev, cell }
+      })
+    }
+    editor.on('transaction', onTransaction)
+    return () => {
+      editor.off('transaction', onTransaction)
     }
   }, [editor])
 

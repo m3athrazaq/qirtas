@@ -4,6 +4,7 @@ import { defaultRowProps, formatNumber, viewRows } from '../data/dbops'
 import { useCanEdit, useStore, ws } from '../data/store'
 import type { PageMeta, PropDef, ViewDef } from '../data/types'
 import { num } from '../lib/hijri'
+import { isTypingTarget } from '../lib/keys'
 import { t } from '../lib/i18n'
 import { MenuItem, MenuSep, Popover } from '../ui/Popover'
 import { trashPage } from '../shell/pageOps'
@@ -82,6 +83,7 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
     })
   }
 
+  const tableRef = useRef<HTMLDivElement>(null)
   // Delete removes the selected rows, Escape clears the selection
   const deleteRef = useRef(deleteSelected)
   deleteRef.current = deleteSelected
@@ -90,7 +92,14 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
     if (!hasSelection) return
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement | null
-      if (el?.closest?.('input, textarea, [contenteditable="true"]')) return
+      // Only when the keyboard isn't busy elsewhere: not typing, no dialog or menu on top, no row
+      // preview over this table, and the focus in this table or nowhere in particular
+      if (isTypingTarget(el)) return
+      const st = useStore.getState()
+      const table = tableRef.current
+      if (!table || st.modal || document.querySelector('.popover')) return
+      if (st.peek && !table.closest('.in-peek')) return
+      if (el && el !== document.body && !table.contains(el)) return
       if (e.key === 'Escape') setPicked(new Set())
       else if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault()
@@ -100,7 +109,6 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [hasSelection])
-  const tableRef = useRef<HTMLDivElement>(null)
   const OpenIcon = rtl ? ArrowUpLeft : ArrowUpRight
 
   useEffect(() => {

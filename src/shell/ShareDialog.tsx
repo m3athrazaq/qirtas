@@ -17,6 +17,7 @@ import {
   revokeInvite,
   setMemberRole,
   useSession,
+  type Invite,
   type Member,
 } from '../sync/session'
 import { Modal } from '../ui/Modal'
@@ -51,7 +52,9 @@ function ShareBody({ role }: { role: Role }) {
   const presence = useSession((s) => s.presence)
   const toast = useStore((s) => s.toast)
   const [members, setMembers] = useState<Member[]>([])
-  const [invites, setInvites] = useState<{ token: string; role: 'editor' | 'viewer' }[]>([])
+  const [invites, setInvites] = useState<Invite[]>([])
+  const settings = useStore((s) => s.settings)
+  const dateLocale = settings.lang === 'ar' ? `ar-u-nu-${settings.numerals}` : 'en'
   const [newRole, setNewRole] = useState<'editor' | 'viewer'>('editor')
   const isOwner = role === 'owner'
 
@@ -103,6 +106,11 @@ function ShareBody({ role }: { role: Role }) {
                     …{inv.token.slice(-8)}
                   </span>
                   <span className="muted small">{roleLabel(inv.role)}</span>
+                  {inv.expires_at && (
+                    <span className="muted small">
+                      {t('linkUntil', { date: new Date(inv.expires_at).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' }) })}
+                    </span>
+                  )}
                   <span className="spacer" />
                   <button
                     type="button"

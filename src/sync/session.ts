@@ -1,5 +1,5 @@
 // Accounts, workspaces, invitations and the sync engine's lifecycle.
-import type { User } from '@supabase/supabase-js'
+import { isAuthRetryableFetchError, type User } from '@supabase/supabase-js'
 import * as Y from 'yjs'
 import { create } from 'zustand'
 import { setAssetUploadHook, setRemoteAssetResolver } from '../data/assets'
@@ -13,7 +13,7 @@ import { SUPABASE_KEY, SUPABASE_URL } from './config'
 import { supa, toB64 } from './supabase'
 import { t } from '../lib/i18n'
 import { askConfirm } from '../ui/dialogs'
-import { takeAuthRedirect, tokenEmail } from '../data/authLink'
+import { takeAuthRedirect } from '../data/authLink'
 
 export interface WorkspaceInfo {
   id: string
@@ -55,6 +55,8 @@ export async function initSync() {
       useSession.setState({ user: null, role: null, workspaces: [] })
       return
     }
+    // A sign-in link is being checked: nothing connects until it passes (see applyAuthLink)
+    if (checkingLink) return
     if (event === 'PASSWORD_RECOVERY') {
       // Arrived from a "reset password" email: go straight to choosing a new one
       setTimeout(() => {
@@ -69,24 +71,36 @@ export async function initSync() {
   if (data.session?.user) await connectOnce(data.session.user)
 }
 
+let checkingLink = false
+
 /** A sign-in link from an e-mail (password reset): show whose account it is and ask first. */
 async function applyAuthLink() {
   const link = takeAuthRedirect()
   if (!link) return
   const sb = supa()!
-  if (link.get('error_description') || link.get('error')) {
-    useStore.getState().toast(t('authLinkFailed'))
-    return
-  }
+  const fail = () => useStore.getState().toast(t('authLinkFailed'))
+  if (link.get('error_description') || link.get('error')) return fail()
   const access_token = link.get('access_token')
   const refresh_token = link.get('refresh_token')
   if (!access_token || !refresh_token) return
-  const ok = await askConfirm(t('authLinkConfirm', { email: tokenEmail(access_token) || '—' }), { confirmLabel: t('signIn') })
-  if (!ok) return
-  const { error } = await sb.auth.setSession({ access_token, refresh_token })
-  if (error) {
-    useStore.getState().toast(t('authLinkFailed'))
-    return
+  checkingLink = true
+  try {
+    // Anyone can write a link: the server says whose token it is (it checks the signature and the
+    // expiry). A fake or expired token stops here; supabase-js would otherwise sign in with the
+    // link's refresh token, which can belong to a different account than the one shown.
+    const { data: owner, error: ownerError } = await sb.auth.getUser(access_token)
+    if (ownerError && isAuthRetryableFetchError(ownerError)) return useStore.getState().toast(t('authLinkOffline'))
+    if (ownerError || !owner.user) return fail()
+    const ok = await askConfirm(t('authLinkConfirm', { email: owner.user.email || '—' }), { confirmLabel: t('signIn') })
+    if (!ok) return
+    const { data, error } = await sb.auth.setSession({ access_token, refresh_token })
+    if (error || data.user?.id !== owner.user.id) {
+      // Signed into some other account after all: leave it before anything is shared with it
+      if (!error) await sb.auth.signOut({ scope: 'local' })
+      return fail()
+    }
+  } finally {
+    checkingLink = false
   }
   if (link.get('type') === 'recovery') {
     // Arrived from a "reset password" email: go straight to choosing a new one
@@ -397,12 +411,16 @@ export async function setMemberRole(wsId: string, userId: string, role: Role) {
   if (error) throw error
 }
 
-export async function removeMember(wsId: string, userId: string) {
-  const sb = supa()!
-  const { error } = await sb.from('members').delete().eq('workspace_id', wsId).eq('user_id', userId)
+async function deleteMembership(wsId: string, userId: string) {
+  const { error } = await supa()!.from('members').delete().eq('workspace_id', wsId).eq('user_id', userId)
   if (error) throw error
+}
+
+/** The owner removes someone. */
+export async function removeMember(wsId: string, userId: string) {
+  await deleteMembership(wsId, userId)
   // Invitation links work for anyone who has them: a removed member could rejoin with an old one
-  await sb.from('invites').update({ revoked: true }).eq('workspace_id', wsId).eq('revoked', false)
+  await supa()!.from('invites').update({ revoked: true }).eq('workspace_id', wsId).eq('revoked', false)
 }
 
 export async function createInvite(wsId: string, role: 'editor' | 'viewer'): Promise<string> {
@@ -411,9 +429,19 @@ export async function createInvite(wsId: string, role: 'editor' | 'viewer'): Pro
   return (data as { token: string }).token
 }
 
-export async function listInvites(wsId: string) {
-  const { data } = await supa()!.from('invites').select('token, role, created_at').eq('workspace_id', wsId).eq('revoked', false).order('created_at', { ascending: false })
-  return (data ?? []) as { token: string; role: 'editor' | 'viewer'; created_at: string }[]
+export interface Invite {
+  token: string
+  role: 'editor' | 'viewer'
+  created_at: string
+  /** Set once migration 002 has run; links stop working after it. */
+  expires_at?: string | null
+}
+
+export async function listInvites(wsId: string): Promise<Invite[]> {
+  // '*' rather than naming expires_at: the list keeps working before migration 002 adds that column
+  const { data } = await supa()!.from('invites').select('*').eq('workspace_id', wsId).eq('revoked', false).order('created_at', { ascending: false })
+  const now = Date.now()
+  return ((data ?? []) as Invite[]).filter((inv) => !inv.expires_at || Date.parse(inv.expires_at) > now)
 }
 
 export async function revokeInvite(token: string) {
@@ -435,7 +463,7 @@ export async function acceptInvite(token: string) {
 export async function leaveWorkspace(wsId: string) {
   const user = useSession.getState().user
   if (!user) return
-  await removeMember(wsId, user.id)
+  await deleteMembership(wsId, user.id)
   const rest = useSession.getState().workspaces.filter((x) => x.id !== wsId)
   if (rest[0]) await switchWorkspace(rest[0].id)
 }

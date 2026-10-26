@@ -198,9 +198,9 @@ export class Workspace {
   updatePage(id: string, patch: Partial<Pick<PageMeta, 'title' | 'icon' | 'cover' | 'coverY' | 'fullWidth' | 'font' | 'smallText' | 'inline' | 'schema' | 'views'>>) {
     const m = this.pages.get(id)
     if (!m) return
+    this.touchSeed(id)
     this.doc.transact(() => {
       Object.entries(patch).forEach(([k, v]) => m.set(k, v === undefined ? null : v))
-      if (m.get('seed')) m.set('seed', false)
       this.touch(m)
     })
   }
@@ -210,9 +210,18 @@ export class Workspace {
     this.doc.transact(() => ids.forEach((id) => this.pages.get(id)?.set('seed', true)), ORIGIN_SYSTEM)
   }
 
+  /** The page was changed by hand, so it is no longer an untouched welcome page. This stays out of
+   *  undo: undoing a rename must not make a page with new text look untouched again (isPristine
+   *  decides which pages are left behind, or deleted, when signing in). */
   touchSeed(id: string) {
     const m = this.pages.get(id)
-    if (m?.get('seed')) this.doc.transact(() => m.set('seed', false), ORIGIN_SYSTEM)
+    if (!m?.get('seed')) return
+    const clear = () => {
+      if (m.get('seed')) this.doc.transact(() => m.set('seed', false), ORIGIN_SYSTEM)
+    }
+    // Inside another change a nested transaction would join it (and its undo step): clear right after
+    if ((this.doc as unknown as { _transaction: unknown })._transaction) this.doc.once('afterTransaction', clear)
+    else clear()
   }
 
   /** True when the workspace only holds the untouched welcome pages. */
@@ -251,13 +260,13 @@ export class Workspace {
   setProp(rowId: string, propId: string, value: PropValue) {
     const m = this.pages.get(rowId)
     if (!m) return
+    this.touchSeed(rowId)
     this.doc.transact(() => {
       let props = m.get('props') as Y.Map<PropValue> | undefined
       if (!(props instanceof Y.Map)) {
         props = new Y.Map<PropValue>()
         m.set('props', props)
       }
-      if (m.get('seed')) m.set('seed', false)
       if (propId === 'title') m.set('title', String(value ?? ''))
       else if (value === null || value === undefined || (Array.isArray(value) && value.length === 0) || value === '') props.delete(propId)
       else props.set(propId, value)
