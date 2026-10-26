@@ -3,7 +3,7 @@ import type { User } from '@supabase/supabase-js'
 import * as Y from 'yjs'
 import { create } from 'zustand'
 import { setAssetUploadHook, setRemoteAssetResolver } from '../data/assets'
-import { getAsset, kvGet, kvSet, outboxClear, putAsset, wipeAll } from '../data/idb'
+import { getAsset, kvGet, kvSet, outboxClearWorkspace, putAsset, wipeAll } from '../data/idb'
 import { flushWrites, getDoc, resetDocs } from '../data/docs'
 import { useStore } from '../data/store'
 import { getActor, setActor } from '../data/workspace'
@@ -12,6 +12,8 @@ import { SyncEngine, workspaceDocIds, type PresenceUser, type Role } from './eng
 import { SUPABASE_KEY, SUPABASE_URL } from './config'
 import { supa, toB64 } from './supabase'
 import { t } from '../lib/i18n'
+import { askConfirm } from '../ui/dialogs'
+import { takeAuthRedirect, tokenEmail } from '../data/authLink'
 
 export interface WorkspaceInfo {
   id: string
@@ -62,8 +64,37 @@ export async function initSync() {
     }
     if (session?.user && useSession.getState().user?.id !== session.user.id) void connectOnce(session.user)
   })
+  await applyAuthLink()
   const { data } = await sb.auth.getSession()
   if (data.session?.user) await connectOnce(data.session.user)
+}
+
+/** A sign-in link from an e-mail (password reset): show whose account it is and ask first. */
+async function applyAuthLink() {
+  const link = takeAuthRedirect()
+  if (!link) return
+  const sb = supa()!
+  if (link.get('error_description') || link.get('error')) {
+    useStore.getState().toast(t('authLinkFailed'))
+    return
+  }
+  const access_token = link.get('access_token')
+  const refresh_token = link.get('refresh_token')
+  if (!access_token || !refresh_token) return
+  const ok = await askConfirm(t('authLinkConfirm', { email: tokenEmail(access_token) || '—' }), { confirmLabel: t('signIn') })
+  if (!ok) return
+  const { error } = await sb.auth.setSession({ access_token, refresh_token })
+  if (error) {
+    useStore.getState().toast(t('authLinkFailed'))
+    return
+  }
+  if (link.get('type') === 'recovery') {
+    // Arrived from a "reset password" email: go straight to choosing a new one
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'account' }))
+      useStore.getState().toast(t('setNewPassword'))
+    }, 400)
+  }
 }
 
 // The initial session is reported twice (auth event + getSession); connect only once per user.
@@ -178,7 +209,7 @@ async function startEngine(user: User, role: Role, upload: boolean) {
   const w = useStore.getState().ws!
   const name = displayName(user)
   engine?.stop()
-  if (role === 'viewer') await outboxClear() // a viewer's edits can't be sent
+  if (role === 'viewer') await outboxClearWorkspace(w.id) // a viewer's edits can't be sent (other workspaces' stay queued)
   engine = new SyncEngine(sb, w.id, role, { id: user.id, name })
   engine.onPresence = (users) => useSession.setState({ presence: users.filter((u) => u.userId !== user.id) })
   engine.onMembersChanged = () => void refreshMembership(user)
@@ -367,8 +398,11 @@ export async function setMemberRole(wsId: string, userId: string, role: Role) {
 }
 
 export async function removeMember(wsId: string, userId: string) {
-  const { error } = await supa()!.from('members').delete().eq('workspace_id', wsId).eq('user_id', userId)
+  const sb = supa()!
+  const { error } = await sb.from('members').delete().eq('workspace_id', wsId).eq('user_id', userId)
   if (error) throw error
+  // Invitation links work for anyone who has them: a removed member could rejoin with an old one
+  await sb.from('invites').update({ revoked: true }).eq('workspace_id', wsId).eq('revoked', false)
 }
 
 export async function createInvite(wsId: string, role: 'editor' | 'viewer'): Promise<string> {

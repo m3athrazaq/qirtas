@@ -7,6 +7,7 @@ import { num } from '../lib/hijri'
 import { syncAvailable } from '../sync/config'
 import { useSession } from '../sync/session'
 import { PageTree } from './PageTree'
+import { isReachable } from './pageOps'
 import { openSettingsAt } from './SettingsDialog'
 import { WorkspaceMenu } from './WorkspaceMenu'
 
@@ -32,8 +33,8 @@ export function Sidebar({ variant = 'side' }: { variant?: 'side' | 'home' }) {
     () =>
       variant === 'home'
         ? getRecent()
+            .filter((id) => isReachable(id, pages))
             .map((id) => pages[id])
-            .filter((p) => p && !p.deletedAt)
             .slice(0, 8)
         : [],
     [variant, pages],

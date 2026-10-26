@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { newView } from '../data/dbops'
-import { navigate } from '../data/nav'
+import { expandTo } from '../data/nav'
 import { useCanEdit, useStore, ws } from '../data/store'
 import type { FilterOp, FilterRule, PageMeta, PropDef, ViewDef, ViewType } from '../data/types'
 import { num } from '../lib/hijri'
@@ -75,7 +75,7 @@ export default function DatabaseView({ dbId, inline }: { dbId: string; inline?: 
       {inline && (
         <div className="db-title-row">
           <DbTitle db={db} />
-          <button type="button" className="btn-text" onClick={() => navigate(dbId)} title={t('openFull')}>
+          <button type="button" className="btn-text" onClick={() => expandTo(dbId)} title={t('openFull')}>
             <OpenIcon size={14} />
           </button>
         </div>

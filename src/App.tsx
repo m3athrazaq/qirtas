@@ -17,6 +17,7 @@ import { TopBar } from './shell/TopBar'
 import { TrashDialog } from './shell/TrashDialog'
 import { compareOrder } from './lib/ids'
 import { t } from './lib/i18n'
+import { isReachable } from './shell/pageOps'
 
 export default function App() {
   const ready = useStore((s) => s.ready)
@@ -30,7 +31,8 @@ export default function App() {
   useEffect(() => {
     if (!ready || isMobile || route.name !== 'home') return
     const pages = useStore.getState().pages
-    const recent = getRecent().find((id) => pages[id] && !pages[id].deletedAt)
+    // Not a page whose parent was just deleted
+    const recent = getRecent().find((id) => isReachable(id, pages))
     const first = Object.values(pages)
       .filter((p) => !p.parentId && !p.deletedAt && p.type !== 'row')
       .sort(compareOrder)[0]?.id

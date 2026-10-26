@@ -130,7 +130,7 @@ export class SyncEngine {
   // ---------------- outgoing
 
   private enqueue(docId: string, update: Uint8Array) {
-    this.pending = this.pending.then(() => outboxAdd(docId, update)).catch(() => {})
+    this.pending = this.pending.then(() => outboxAdd(docId, update, this.wsId)).catch(() => {})
     if (this.flushTimer) clearTimeout(this.flushTimer)
     this.flushTimer = setTimeout(() => void this.flush(), 350)
   }
@@ -142,7 +142,9 @@ export class SyncEngine {
     let again = false
     try {
       await this.pending
-      const items = await outboxAll()
+      // Only this workspace's changes: ones queued in another workspace (offline, then switched)
+      // wait until that workspace is open again, instead of landing here
+      const items = (await outboxAll()).filter((i) => !i.wsId || i.wsId === this.wsId)
       if (!items.length) return
       const byDoc = new Map<string, Uint8Array[]>()
       items.forEach((i) => {
@@ -162,7 +164,7 @@ export class SyncEngine {
       }
       await outboxDelete(items.map((i) => i.id!).filter((x) => x !== undefined))
       this.status('synced')
-      again = (await outboxAll()).length > 0
+      again = (await outboxAll()).some((i) => !i.wsId || i.wsId === this.wsId)
     } catch {
       this.status('offline')
       if (!this.stopped) this.flushTimer = setTimeout(() => void this.flush(), 6000)
@@ -179,7 +181,7 @@ export class SyncEngine {
     if (!w || w.id !== this.wsId) return
     for (const docId of await workspaceDocIds(w)) {
       const doc = await getDoc(docId)
-      await outboxAdd(docId, Y.encodeStateAsUpdate(doc))
+      await outboxAdd(docId, Y.encodeStateAsUpdate(doc), this.wsId)
     }
   }
 

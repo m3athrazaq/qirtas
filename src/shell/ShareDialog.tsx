@@ -165,6 +165,7 @@ function ShareBody({ role }: { role: Role }) {
                       title={t('remove')}
                       onClick={async () => {
                         await removeMember(ws.id, m.user_id)
+                        useStore.getState().toast(t('memberRemovedLinks'))
                         void reload()
                       }}
                     >

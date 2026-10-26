@@ -1,4 +1,5 @@
 import { NodeSelection } from '@tiptap/pm/state'
+import { CellSelection } from '@tiptap/pm/tables'
 import { useEditorState, type Editor } from '@tiptap/react'
 import { BubbleMenu } from '@tiptap/react/menus'
 import { Bold, ChevronDown, Code, Italic, Link as LinkIcon, Sparkles, Strikethrough, Underline, X } from 'lucide-react'
@@ -37,6 +38,8 @@ export const BubbleToolbar = memo(function BubbleToolbar({ editor }: { editor: E
   const shouldShow = useCallback(({ editor: e, state }: { editor: Editor; state: Editor['state'] }) => {
     if (!e.isEditable || state.selection.empty) return false
     if (state.selection instanceof NodeSelection) return false
+    // Whole rows/columns picked from the table handles have their own menu
+    if (state.selection instanceof CellSelection) return false
     if (e.isActive('codeBlock')) return false
     return true
   }, [])

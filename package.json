@@ -45,6 +45,7 @@
     "@tiptap/starter-kit": "^3.32.0",
     "@tiptap/suggestion": "^3.32.0",
     "@tiptap/y-tiptap": "^3.0.10",
+    "dompurify": "^3.4.17",
     "fractional-indexing": "^4.0.0",
     "lucide-react": "^1.61.0",
     "marked": "^17.0.6",

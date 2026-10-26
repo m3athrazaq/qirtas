@@ -1,4 +1,4 @@
-import { ArrowUpLeft, ArrowUpRight, Copy, MoreHorizontal, Plus, Trash2 } from 'lucide-react'
+import { ArrowUpLeft, ArrowUpRight, BetweenHorizontalEnd, BetweenHorizontalStart, Copy, MoreHorizontal, Plus, Trash2, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { defaultRowProps, formatNumber, viewRows } from '../data/dbops'
 import { useCanEdit, useStore, ws } from '../data/store'
@@ -6,12 +6,14 @@ import type { PageMeta, PropDef, ViewDef } from '../data/types'
 import { num } from '../lib/hijri'
 import { t } from '../lib/i18n'
 import { MenuItem, MenuSep, Popover } from '../ui/Popover'
+import { trashPage } from '../shell/pageOps'
 import { CellEditor, CellView, TYPE_ICONS } from './cells'
 import { AddPropertyMenu, PropertyMenu } from './PropertyMenu'
 
-export function orderedProps(schema: PropDef[], view: ViewDef): PropDef[] {
+/** Every property in this view's order (title first), hidden ones included. */
+function sortProps(schema: PropDef[], view: ViewDef): PropDef[] {
   const order = view.propOrder ?? []
-  const byOrder = [...schema].sort((a, b) => {
+  return [...schema].sort((a, b) => {
     if (a.type === 'title') return -1
     if (b.type === 'title') return 1
     const ia = order.indexOf(a.id)
@@ -21,13 +23,28 @@ export function orderedProps(schema: PropDef[], view: ViewDef): PropDef[] {
     if (ib === -1) return -1
     return ia - ib
   })
-  return byOrder.filter((p) => p.type === 'title' || !view.hidden.includes(p.id))
 }
 
-export function createRow(dbId: string, after?: string, props?: Record<string, unknown>): string {
+export function orderedProps(schema: PropDef[], view: ViewDef): PropDef[] {
+  return sortProps(schema, view).filter((p) => p.type === 'title' || !view.hidden.includes(p.id))
+}
+
+/** The view's property order with `newId` placed next to `refId`. */
+export function propOrderWith(schema: PropDef[], view: ViewDef, newId: string, refId: string, side: 'before' | 'after'): string[] {
+  const ids = sortProps(schema, view)
+    .filter((p) => p.type !== 'title' && p.id !== newId)
+    .map((p) => p.id)
+  const at = ids.indexOf(refId)
+  ids.splice(at === -1 ? (side === 'after' && refId !== 'title' ? ids.length : 0) : at + (side === 'after' ? 1 : 0), 0, newId)
+  return ids
+}
+
+/** A new row; `place` is the row to follow (or `{ before }` / `{ after }`). */
+export function createRow(dbId: string, place?: string | { before?: string; after?: string }, props?: Record<string, unknown>): string {
   const schema = useStore.getState().pages[dbId]?.schema ?? []
   const initial = { ...defaultRowProps(schema), ...(props as PageMeta['props']) }
-  return ws().createPage({ type: 'row', parentId: dbId, props: initial }, after ? { after } : {})
+  const where = typeof place === 'string' ? { after: place } : (place ?? {})
+  return ws().createPage({ type: 'row', parentId: dbId, props: initial }, where)
 }
 
 export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; rows: PageMeta[] }) {
@@ -40,8 +57,49 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
   const [editing, setEditing] = useState<{ rowId: string; propId: string; anchor: Element | null } | null>(null)
   const [pending, setPending] = useState<string | null>(null)
   const [headerMenu, setHeaderMenu] = useState<{ prop: PropDef; anchor: Element } | null>(null)
-  const [addProp, setAddProp] = useState<Element | null>(null)
+  const [addProp, setAddProp] = useState<{ anchor: Element; at?: { ref: string; side: 'before' | 'after' } } | null>(null)
   const [rowMenu, setRowMenu] = useState<{ row: PageMeta; anchor: Element } | null>(null)
+  const [picked, setPicked] = useState<Set<string>>(() => new Set())
+  // Only rows still on screen count as selected
+  const selected = useMemo(() => new Set(visibleRows.filter((r) => picked.has(r.id)).map((r) => r.id)), [picked, visibleRows])
+  const togglePick = (id: string) =>
+    setPicked((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  const allPicked = visibleRows.length > 0 && selected.size === visibleRows.length
+  const deleteSelected = () => {
+    const ids = [...selected]
+    if (!ids.length) return
+    const w = ws()
+    w.doc.transact(() => ids.forEach((id) => w.trashPage(id)))
+    setPicked(new Set())
+    useStore.getState().toast(t('rowsDeleted', { n: num(ids.length, settings.numerals) }), {
+      label: t('undo'),
+      run: () => w.doc.transact(() => ids.forEach((id) => w.restorePage(id))),
+    })
+  }
+
+  // Delete removes the selected rows, Escape clears the selection
+  const deleteRef = useRef(deleteSelected)
+  deleteRef.current = deleteSelected
+  const hasSelection = selected.size > 0
+  useEffect(() => {
+    if (!hasSelection) return
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null
+      if (el?.closest?.('input, textarea, [contenteditable="true"]')) return
+      if (e.key === 'Escape') setPicked(new Set())
+      else if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault()
+        deleteRef.current()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [hasSelection])
   const tableRef = useRef<HTMLDivElement>(null)
   const OpenIcon = rtl ? ArrowUpLeft : ArrowUpRight
 
@@ -83,7 +141,18 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
 
   return (
     <div className="table-scroll" ref={tableRef}>
-      <table className="db-table" style={{ width: totalWidth }}>
+      {selected.size > 0 && (
+        <div className="sel-bar" role="toolbar">
+          <span className="sel-count">{t('selectedCount', { n: num(selected.size, settings.numerals) })}</span>
+          <button type="button" className="btn-text is-danger" onClick={deleteSelected}>
+            <Trash2 size={14} /> {t('deleteSelected')}
+          </button>
+          <button type="button" className="icon-btn" title={t('clearSelection')} aria-label={t('clearSelection')} onClick={() => setPicked(new Set())}>
+            <X size={15} />
+          </button>
+        </div>
+      )}
+      <table className={'db-table' + (selected.size ? ' has-selection' : '')} style={{ width: totalWidth }}>
         <colgroup>
           {props.map((p) => (
             <col key={p.id} style={{ width: width(p) }} />
@@ -92,10 +161,21 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
         </colgroup>
         <thead>
           <tr>
-            {props.map((p) => {
+            {props.map((p, i) => {
               const Icon = TYPE_ICONS[p.type]
               return (
                 <th key={p.id} style={{ width: width(p) }}>
+                  {i === 0 && canEdit && visibleRows.length > 0 && (
+                    <label className="row-gutter th-gutter" title={t('selectAllRows')}>
+                      <input
+                        type="checkbox"
+                        className="row-check"
+                        checked={allPicked}
+                        aria-label={t('selectAllRows')}
+                        onChange={() => setPicked(allPicked ? new Set() : new Set(visibleRows.map((r) => r.id)))}
+                      />
+                    </label>
+                  )}
                   <button type="button" className="th-btn" onClick={(e) => canEdit && setHeaderMenu({ prop: p, anchor: e.currentTarget })}>
                     <Icon size={14} strokeWidth={1.6} />
                     <span className="th-name">{p.name}</span>
@@ -106,7 +186,7 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
             })}
             <th className="th-add">
               {canEdit && (
-                <button type="button" className="icon-btn" title={t('addProperty')} onClick={(e) => setAddProp(e.currentTarget)}>
+                <button type="button" className="icon-btn" title={t('addProperty')} onClick={(e) => setAddProp({ anchor: e.currentTarget })}>
                   <Plus size={16} />
                 </button>
               )}
@@ -115,7 +195,7 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
         </thead>
         <tbody>
           {visibleRows.map((row) => (
-            <tr key={row.id} className="db-row">
+            <tr key={row.id} className={'db-row' + (selected.has(row.id) ? ' is-selected' : '')}>
               {props.map((p, i) => (
                 <td
                   key={p.id}
@@ -131,17 +211,12 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
                   }}
                 >
                   {i === 0 && canEdit && (
-                    <button
-                      type="button"
-                      className="row-more"
-                      aria-label={t('more')}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setRowMenu({ row, anchor: e.currentTarget })
-                      }}
-                    >
-                      <MoreHorizontal size={15} />
-                    </button>
+                    <span className="row-gutter" onClick={(e) => e.stopPropagation()}>
+                      <input type="checkbox" className="row-check" checked={selected.has(row.id)} aria-label={t('selectRow')} title={t('selectRow')} onChange={() => togglePick(row.id)} />
+                      <button type="button" className="row-more" aria-label={t('more')} title={t('more')} onClick={(e) => setRowMenu({ row, anchor: e.currentTarget })}>
+                        <MoreHorizontal size={15} />
+                      </button>
+                    </span>
                   )}
                   <div className="td-inner">
                     {p.type === 'title' && row.icon && <span className="row-icon">{row.icon}</span>}
@@ -199,20 +274,45 @@ export function TableView({ db, view, rows }: { db: PageMeta; view: ViewDef; row
       {editing && editingRow && editingProp && (
         <CellEditor row={editingRow} prop={editingProp} anchor={editing.anchor} onClose={() => setEditing(null)} />
       )}
-      {headerMenu && <PropertyMenu dbId={db.id} prop={headerMenu.prop} view={view} anchor={headerMenu.anchor} onClose={() => setHeaderMenu(null)} />}
-      {addProp && <AddPropertyMenu dbId={db.id} anchor={addProp} onClose={() => setAddProp(null)} />}
+      {headerMenu && (
+        <PropertyMenu
+          dbId={db.id}
+          prop={headerMenu.prop}
+          view={view}
+          anchor={headerMenu.anchor}
+          onClose={() => setHeaderMenu(null)}
+          onInsert={(side) => setAddProp({ anchor: headerMenu.anchor, at: { ref: headerMenu.prop.id, side } })}
+        />
+      )}
+      {addProp && (
+        <AddPropertyMenu
+          dbId={db.id}
+          anchor={addProp.anchor}
+          onClose={() => setAddProp(null)}
+          onAdded={(id) => {
+            const at = addProp.at
+            if (at) ws().updateView(db.id, view.id, { propOrder: propOrderWith(schema, view, id, at.ref, at.side) })
+          }}
+        />
+      )}
       {rowMenu && (
         <Popover anchor={rowMenu.anchor} open onClose={() => setRowMenu(null)} sheet>
-          <RowMenu row={rowMenu.row} onClose={() => setRowMenu(null)} />
+          <RowMenu row={rowMenu.row} onClose={() => setRowMenu(null)} onCreated={setPending} />
         </Popover>
       )}
     </div>
   )
 }
 
-export function RowMenu({ row, onClose }: { row: PageMeta; onClose: () => void }) {
+export function RowMenu({ row, onClose, onCreated }: { row: PageMeta; onClose: () => void; onCreated?: (id: string) => void }) {
   const rtl = useStore((s) => s.settings.lang === 'ar')
   const OpenIcon = rtl ? ArrowUpLeft : ArrowUpRight
+  const insert = (side: 'before' | 'after') => {
+    if (!row.parentId) return
+    const id = createRow(row.parentId, { [side]: row.id })
+    onClose()
+    onCreated?.(id)
+  }
   return (
     <div className="menu-list">
       <MenuItem
@@ -223,6 +323,8 @@ export function RowMenu({ row, onClose }: { row: PageMeta; onClose: () => void }
           onClose()
         }}
       />
+      <MenuItem icon={<BetweenHorizontalStart size={15} />} label={t('insertRowAbove')} onClick={() => insert('before')} />
+      <MenuItem icon={<BetweenHorizontalEnd size={15} />} label={t('insertRowBelow')} onClick={() => insert('after')} />
       <MenuItem
         icon={<Copy size={15} />}
         label={t('duplicateRow')}
@@ -237,8 +339,8 @@ export function RowMenu({ row, onClose }: { row: PageMeta; onClose: () => void }
         label={t('deleteRow')}
         danger
         onClick={() => {
-          ws().trashPage(row.id)
           onClose()
+          trashPage(row)
         }}
       />
     </div>

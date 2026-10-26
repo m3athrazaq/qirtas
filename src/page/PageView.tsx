@@ -2,7 +2,7 @@ import type { Editor } from '@tiptap/react'
 import { CalendarDays, LayoutTemplate, SquareKanban, Table2 } from 'lucide-react'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { defaultRowProps, defaultSchema, defaultStatusOptions, newView } from '../data/dbops'
-import { navigate } from '../data/nav'
+import { clearPendingScroll, navigate, pendingScrollTarget } from '../data/nav'
 import { useCanEdit, useStore, ws } from '../data/store'
 import type { PropDef, ViewType } from '../data/types'
 import { getActiveEditor, PageEditor } from '../editor/PageEditor'
@@ -19,6 +19,23 @@ export function PageView({ pageId, inPeek = false }: { pageId: string; inPeek?: 
   const [editor, setEditor] = useState<Editor | null>(null)
   const [empty, setEmpty] = useState(false)
   const canEdit = useCanEdit()
+
+  // Back from a full-size database: bring its block into view
+  useEffect(() => {
+    if (inPeek) return
+    const id = pendingScrollTarget()
+    if (!id) return
+    let tries = 0
+    const timer = setInterval(() => {
+      const el = document.querySelector(`[data-database-id="${CSS.escape(id)}"]`)
+      if (el || ++tries > 20) {
+        clearInterval(timer)
+        clearPendingScroll()
+        el?.scrollIntoView({ block: 'center' })
+      }
+    }, 100)
+    return () => clearInterval(timer)
+  }, [pageId, inPeek])
 
   useEffect(() => {
     if (!editor) return

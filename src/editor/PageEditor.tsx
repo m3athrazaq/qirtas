@@ -9,6 +9,7 @@ import { insertImageFile, setEditorPage } from './actions'
 import { BlockHandle } from './BlockHandle'
 import { BubbleToolbar } from './BubbleToolbar'
 import { KeyboardBar } from './KeyboardBar'
+import { TableControls } from './TableControls'
 
 /** The live editor showing a page, if that page is open on screen. */
 export function getActiveEditor(pageId: string): Editor | undefined {
@@ -38,7 +39,7 @@ function EditorInner({ pageId, doc, editable, onReady }: { pageId: string; doc: 
 
   const editor = useEditor(
     {
-      extensions: editorExtensions(doc),
+      extensions: editorExtensions(doc, pageId),
       editable,
       immediatelyRender: true,
       shouldRerenderOnTransaction: false,
@@ -122,6 +123,7 @@ function EditorInner({ pageId, doc, editable, onReady }: { pageId: string; doc: 
       <EditorContent editor={editor} className="editor" />
       {editable && !isMobile && <BlockHandle editor={editor} />}
       {editable && <BubbleToolbar editor={editor} />}
+      {editable && <TableControls editor={editor} />}
       {editable && isMobile && <KeyboardBar editor={editor} />}
     </div>
   )

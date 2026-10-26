@@ -608,8 +608,15 @@ mark {
   gap: 1px;
 }
 
-.tree-row:hover .tree-actions {
+.tree-row:hover .tree-actions,
+.tree-row.is-menu-open .tree-actions {
   display: flex;
+}
+
+/* The row whose menu is open stays highlighted while the mouse is on the menu */
+.tree-row.is-menu-open {
+  background: var(--hover);
+  color: var(--ink);
 }
 
 .tree-actions .icon-btn {
@@ -2124,3 +2131,16 @@ button.sb-brand:hover {
 
 .sb-item.sb-signin { color: var(--lapis); }
 .sb-item.sb-signin svg { color: var(--lapis); }
+
+/* ---------- undo / redo in the top bar ---------- */
+
+.tb-history {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}

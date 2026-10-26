@@ -7,14 +7,18 @@ import {
   FileDown,
   FolderInput,
   Link2,
+  Minimize2,
   MoreHorizontal,
   Printer,
+  Redo2,
   Search,
   Share2,
   Star,
   Trash2,
+  Undo2,
 } from 'lucide-react'
 import { Fragment, useState } from 'react'
+import { historyRedo, historyUndo } from '../data/history'
 import { goBack, navigate, pageUrl } from '../data/nav'
 import { useStore, ws } from '../data/store'
 import type { PageFont, PageMeta } from '../data/types'
@@ -26,6 +30,9 @@ import { copyText } from '../lib/platform'
 import { requestPagePicker } from '../ui/pickerBus'
 import { useSession } from '../sync/session'
 import { MenuItem, MenuLabel, MenuSep, Popover } from '../ui/Popover'
+import { minimizePage, minimizeTarget, trashPage } from './pageOps'
+
+const MOD = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+'
 
 function useCrumbs(page: PageMeta | undefined) {
   const pages = useStore((s) => s.pages)
@@ -53,20 +60,39 @@ export function TopBar({ pageId }: { pageId: string | null }) {
   const fav = !!pageId && favorites.includes(pageId)
   const viewers = useSession((s) => s.presence).filter((p) => p.pageId === pageId)
   const role = useStore((s) => s.wsRole)
+  const pages = useStore((s) => s.pages)
+  const canUndo = useStore((s) => s.canUndo)
+  const canRedo = useStore((s) => s.canRedo)
+  const navIndex = useStore((s) => s.navIndex)
+  const canEdit = role !== 'viewer'
+  // A row or inline database opened full size can go back to its smaller view
+  const mini = page ? minimizeTarget(page, pages) : null
 
   return (
     <header className="topbar">
       <div className="tb-start">
         {isMobile ? (
-          <button type="button" className="icon-btn" onClick={() => (page?.parentId ? navigate(page.parentId) : goBack())} aria-label={t('back')}>
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={() => (page && mini ? minimizePage(page) : page?.parentId ? navigate(page.parentId) : goBack())}
+            aria-label={t('back')}
+          >
             <Back size={20} />
           </button>
         ) : (
-          !sidebarOpen && (
-            <button type="button" className="icon-btn" onClick={() => useStore.setState({ sidebarOpen: true })} title={t('openSidebar')}>
-              <Expand size={18} />
-            </button>
-          )
+          <>
+            {!sidebarOpen && (
+              <button type="button" className="icon-btn" onClick={() => useStore.setState({ sidebarOpen: true })} title={t('openSidebar')}>
+                <Expand size={18} />
+              </button>
+            )}
+            {navIndex > 0 && (
+              <button type="button" className="icon-btn" onClick={goBack} title={`${t('back')} (Alt+←)`} aria-label={t('back')}>
+                <Back size={18} />
+              </button>
+            )}
+          </>
         )}
         <nav className="crumbs" aria-label="breadcrumbs">
           {(isMobile ? crumbs.slice(-1) : crumbs).map((c, i, arr) => (
@@ -94,6 +120,38 @@ export function TopBar({ pageId }: { pageId: string | null }) {
         {isMobile && (
           <button type="button" className="icon-btn" onClick={() => useStore.getState().openModal('search')} aria-label={t('search')}>
             <Search size={19} />
+          </button>
+        )}
+        {page && canEdit && (!isMobile || canUndo || canRedo) && (
+          <span className="tb-history">
+            <button
+              type="button"
+              className="icon-btn"
+              disabled={!canUndo}
+              title={`${t('undo')} (${MOD}Z)`}
+              aria-label={t('undo')}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => historyUndo()}
+            >
+              <Undo2 size={18} className="flip-rtl" />
+            </button>
+            <button
+              type="button"
+              className="icon-btn"
+              disabled={!canRedo}
+              title={`${t('redo')} (${MOD}Y)`}
+              aria-label={t('redo')}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => historyRedo()}
+            >
+              <Redo2 size={18} className="flip-rtl" />
+            </button>
+          </span>
+        )}
+        {page && mini && (
+          <button type="button" className={isMobile ? 'icon-btn' : 'btn-text'} title={t('minimizeHint')} aria-label={t('minimize')} onClick={() => minimizePage(page)}>
+            <Minimize2 size={isMobile ? 18 : 15} />
+            {!isMobile && ` ${t('minimize')}`}
           </button>
         )}
         {page && (
@@ -212,9 +270,7 @@ function PageActions({ page, anchor, onClose }: { page: PageMeta; anchor: Elemen
           danger
           onClick={() => {
             onClose()
-            ws().trashPage(page.id)
-            navigate(page.parentId && page.type !== 'row' ? page.parentId : null)
-            st.toast(t('movedToTrash'), { label: t('undo'), run: () => ws().restorePage(page.id) })
+            trashPage(page)
           }}
         />
         )}

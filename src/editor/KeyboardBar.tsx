@@ -11,22 +11,30 @@ import {
   Plus,
   Redo2,
   Sparkles,
+  Table2,
   Type,
   Undo2,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useStore } from '../data/store'
 import { t } from '../lib/i18n'
 import { openAi } from '../ai/aiBus'
 import { Popover } from '../ui/Popover'
 import { ColorMenu } from './ColorMenu'
 import { TurnIntoMenu } from './TurnIntoMenu'
+import { TableMenu } from './TableControls'
+import { cellAtSelection, type CellRef } from './tableActions'
 
 /** Formatting bar that sits on top of the phone keyboard while writing. */
 export function KeyboardBar({ editor }: { editor: Editor }) {
   const [bottom, setBottom] = useState(0)
-  const [panel, setPanel] = useState<null | 'turn' | 'color'>(null)
+  const [panel, setPanel] = useState<null | 'turn' | 'color' | 'table'>(null)
+  const [tableCell, setTableCell] = useState<CellRef | null>(null)
   const turnRef = useRef<HTMLButtonElement>(null)
   const colorRef = useRef<HTMLButtonElement>(null)
+  const tableRef = useRef<HTMLButtonElement>(null)
+  const canUndo = useStore((s) => s.canUndo)
+  const canRedo = useStore((s) => s.canRedo)
 
   const st = useEditorState({
     editor,
@@ -37,6 +45,7 @@ export function KeyboardBar({ editor }: { editor: Editor }) {
       task: e.isActive('taskList'),
       bullet: e.isActive('bulletList'),
       inList: e.isActive('listItem') || e.isActive('taskItem'),
+      inTable: e.isActive('table'),
     }),
   })
 
@@ -69,7 +78,31 @@ export function KeyboardBar({ editor }: { editor: Editor }) {
 
   return (
     <div className="kb-bar" style={{ bottom }} onMouseDown={keep} onPointerDown={keep}>
+      {/* Undo and redo stay in reach, outside the scrolling part */}
+      <div className="kb-fixed">
+        <button type="button" className="kb-btn" title={t('undo')} aria-label={t('undo')} disabled={!canUndo} onClick={() => editor.commands.undo()}>
+          <Undo2 size={19} className="flip-rtl" />
+        </button>
+        <button type="button" className="kb-btn" title={t('redo')} aria-label={t('redo')} disabled={!canRedo} onClick={() => editor.commands.redo()}>
+          <Redo2 size={19} className="flip-rtl" />
+        </button>
+      </div>
       <div className="kb-scroll">
+        {st.inTable && (
+          <button
+            type="button"
+            ref={tableRef}
+            className="kb-btn is-accent"
+            title={t('tTableActions')}
+            aria-label={t('tTableActions')}
+            onClick={() => {
+              setTableCell(cellAtSelection(editor.state))
+              setPanel('table')
+            }}
+          >
+            <Table2 size={19} />
+          </button>
+        )}
         <button
           type="button"
           className="kb-btn"
@@ -109,12 +142,6 @@ export function KeyboardBar({ editor }: { editor: Editor }) {
         <button type="button" className="kb-btn" title={t('outdent')} disabled={!st.inList} onClick={() => editor.chain().focus().liftListItem(listItemType).run()}>
           <IndentDecrease size={19} className="flip-rtl" />
         </button>
-        <button type="button" className="kb-btn" title={t('undo')} onClick={() => editor.chain().focus().undo().run()}>
-          <Undo2 size={19} className="flip-rtl" />
-        </button>
-        <button type="button" className="kb-btn" title={t('redo')} onClick={() => editor.chain().focus().redo().run()}>
-          <Redo2 size={19} className="flip-rtl" />
-        </button>
       </div>
       <button type="button" className="kb-btn kb-hide" title={t('hideKeyboard')} onClick={() => editor.commands.blur()}>
         <KeyboardOff size={19} />
@@ -124,6 +151,9 @@ export function KeyboardBar({ editor }: { editor: Editor }) {
       </Popover>
       <Popover anchor={colorRef.current} open={panel === 'color'} onClose={() => setPanel(null)} sheet>
         <ColorMenu editor={editor} onDone={() => setPanel(null)} />
+      </Popover>
+      <Popover anchor={tableRef.current} open={panel === 'table' && !!tableCell} onClose={() => setPanel(null)} sheet>
+        {tableCell && <TableMenu editor={editor} cell={tableCell} kind="cell" rtl={editor.view.dom.getAttribute('dir') !== 'ltr'} onClose={() => setPanel(null)} />}
       </Popover>
     </div>
   )
