@@ -45,7 +45,8 @@ function EditorInner({ pageId, doc, editable, onReady }: { pageId: string; doc: 
       immediatelyRender: true,
       shouldRerenderOnTransaction: false,
       editorProps: {
-        attributes: { dir: lang === 'ar' ? 'rtl' : 'ltr', class: 'prose', spellcheck: 'true' },
+        // No spellcheck here: it follows the setting on <html> (see applyAppearance)
+        attributes: { dir: lang === 'ar' ? 'rtl' : 'ltr', class: 'prose' },
         handlePaste: (view, event) => {
           const files = [...(event.clipboardData?.files ?? [])].filter((f) => f.type.startsWith('image/'))
           if (!files.length) return false

@@ -12,6 +12,8 @@ export interface Settings {
   numerals: 'arab' | 'latn'
   weekStart: number
   marginLine: boolean
+  /** Red underline under misspelled words (off by default: on Android, tapping one closes the keyboard). */
+  spellcheck: boolean
   userName: string
   aiKey: string
   aiModel: 'fast' | 'smart'
@@ -27,6 +29,7 @@ const defaultSettings: Settings = {
   numerals: 'arab',
   weekStart: 0,
   marginLine: true,
+  spellcheck: false,
   userName: '',
   aiKey: '',
   aiModel: 'smart',
