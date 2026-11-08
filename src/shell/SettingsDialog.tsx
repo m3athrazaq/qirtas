@@ -127,6 +127,9 @@ export function SettingsDialog() {
               <Row label={t('marginLine')} desc={t('marginLineDesc')}>
                 <input type="checkbox" className="switch" checked={settings.marginLine} onChange={(e) => set({ marginLine: e.target.checked })} />
               </Row>
+              <Row label={t('spellcheck')} desc={t('spellcheckDesc')}>
+                <input type="checkbox" className="switch" checked={settings.spellcheck} onChange={(e) => set({ spellcheck: e.target.checked })} />
+              </Row>
               <Row label={t('yourName')}>
                 <input className="input" dir="auto" value={settings.userName} onChange={(e) => set({ userName: e.target.value })} />
               </Row>

@@ -20,6 +20,8 @@ export function applyAppearance(s: Settings) {
   const html = document.documentElement
   html.lang = s.lang
   html.dir = s.lang === 'ar' ? 'rtl' : 'ltr'
+  // Every text field inherits this (the editor, titles, table cells, search…)
+  html.spellcheck = s.spellcheck
   const theme = resolveTheme(s.theme)
   html.dataset.theme = theme
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#14171f' : '#f4f5f2')
