@@ -12,8 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: node e2e/probe.cjs
+      - name: Network check
+        run: |
+          H=ktdmwlwvdhbcvffplkkl.supabase.co
+          echo "== dig $H"; dig $H | grep -E "status:|IN" || true
+          echo "== getent"; getent hosts $H || echo "no address"
+          echo "== other projects resolve?"; getent hosts supabase.co api.supabase.com || true
+          echo "== https"; curl -sS -m 20 -o /dev/null -w "%{http_code}\n" "https://$H/auth/v1/health" -H "apikey: sb_publishable_rP3VDhQE-ZolnbBBpn2LGQ_FLFFAWBW" || true
