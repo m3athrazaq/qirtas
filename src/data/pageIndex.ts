@@ -108,6 +108,18 @@ function indexDoc(doc: Y.Doc): Omit<PageIndexEntry, 'stamp'> {
 const same = (a: Omit<PageIndexEntry, 'stamp'>, b: Omit<PageIndexEntry, 'stamp'>) =>
   JSON.stringify([a.tasks, a.reminders, a.links]) === JSON.stringify([b.tasks, b.reminders, b.links])
 
+/** During the first pass, entries are collected here and published a few dozen at a time (one
+ *  store update per page would redraw the lists for every page of a large workspace). */
+let batch: Record<string, PageIndexEntry> | null = null
+
+function flushBatch() {
+  if (!batch || !Object.keys(batch).length) return
+  const add = batch
+  batch = {}
+  usePageIndex.setState((s) => ({ entries: { ...s.entries, ...add } }))
+  scheduleSave()
+}
+
 function put(pageId: string, doc: Y.Doc) {
   const page = useStore.getState().pages[pageId]
   if (!page) return
@@ -117,9 +129,13 @@ function put(pageId: string, doc: Y.Doc) {
   } catch {
     return
   }
-  const cur = usePageIndex.getState().entries[pageId]
+  const cur = batch?.[pageId] ?? usePageIndex.getState().entries[pageId]
   const stamp = page.updatedAt
   if (cur && cur.stamp === stamp && same(cur, next)) return
+  if (batch) {
+    batch[pageId] = { stamp, ...next }
+    return
+  }
   usePageIndex.setState((s) => ({ entries: { ...s.entries, [pageId]: { stamp, ...next } } }))
   scheduleSave()
 }
@@ -233,15 +249,22 @@ export async function startPageIndex() {
   const pages = Object.values(useStore.getState().pages).filter((p) => !p.deletedAt && p.type !== 'database')
   const dirty = readDirty()
   let i = 0
-  for (const p of pages) {
-    const cur = usePageIndex.getState().entries[p.id]
-    if (cur && cur.stamp === p.updatedAt && !dirty.has(p.id)) continue
-    try {
-      await indexStored(p.id)
-    } catch {
-      /* unreadable page: skipped */
+  batch = {}
+  try {
+    for (const p of pages) {
+      const cur = usePageIndex.getState().entries[p.id]
+      if (cur && cur.stamp === p.updatedAt && !dirty.has(p.id)) continue
+      try {
+        await indexStored(p.id)
+      } catch {
+        /* unreadable page: skipped */
+      }
+      if (++i % 8 === 0) await breathe()
+      if (i % 40 === 0) flushBatch()
     }
-    if (++i % 8 === 0) await breathe()
+  } finally {
+    flushBatch()
+    batch = null
   }
   usePageIndex.setState({ ready: true })
   void saveNow()

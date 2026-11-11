@@ -4,6 +4,7 @@ import * as Y from 'yjs'
 import { compareOrder, orderBetween, uid } from '../lib/ids'
 import { destroyDoc, getDoc, pageDocId } from './docs'
 import { ORIGIN_SYSTEM } from './history'
+import { fixedBase, fixedGen, notePurged } from './purged'
 import type { Cover, PageFont, PageMeta, PageType, PropDef, PropValue, ViewDef } from './types'
 
 type YPage = Y.Map<unknown>
@@ -363,7 +364,15 @@ export class Workspace {
   async purgePage(id: string) {
     const ids = [id, ...this.descendants(id)]
     // Permanent: the content is destroyed with it, so undo can't bring it back
-    this.doc.transact(() => ids.forEach((x) => this.pages.delete(x)), ORIGIN_SYSTEM)
+    this.doc.transact(() => {
+      ids.forEach((x) => this.pages.delete(x))
+      // A page the app keeps under a fixed id is made under a new one next time (see purged.ts)
+      for (const x of ids) {
+        const base = fixedBase(x)
+        if (base) this.meta.set(`gen:${base}`, Math.max(Number(this.meta.get(`gen:${base}`)) || 0, fixedGen(x)) + 1)
+      }
+    }, ORIGIN_SYSTEM)
+    notePurged(this.id, ids.map(pageDocId))
     await Promise.all(ids.map((x) => destroyDoc(pageDocId(x))))
   }
 

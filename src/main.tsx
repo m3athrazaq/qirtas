@@ -12,7 +12,7 @@ import App from './App'
 import { boot } from './data/boot'
 import './data/install' // listens for the browser's "can be installed" from the very start
 import { useStore } from './data/store'
-import { offerUpdate } from './data/update'
+import { offerUpdate, reloadWhenSafe } from './data/update'
 import { initNative } from './lib/native'
 import { isNative } from './lib/platform'
 import { AppBoundary } from './ui/ErrorBoundary'
@@ -24,6 +24,8 @@ if (import.meta.env.PROD && !import.meta.env.VITE_PREVIEW && !isNative() && 'ser
       immediate: true,
       // A new version waits until it can take over without a reload in the middle of typing
       onNeedRefresh: () => offerUpdate(() => update(true)),
+      // …and every open window reloads at its own safe moment, not the instant it takes over
+      onNeedReload: () => reloadWhenSafe(),
       // An app left open for days still hears about new versions
       onRegisteredSW: (_url, registration) => {
         if (registration) setInterval(() => void registration.update().catch(() => {}), 60 * 60 * 1000)

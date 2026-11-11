@@ -2,7 +2,7 @@
 // Putting a backup back into the workspace is in restore.ts.
 import * as Y from 'yjs'
 import { allAssets, dumpAll } from './idb'
-import { flushWrites, loadedDocIds, peekDoc, unsavedUpdates } from './docs'
+import { flushWrites, loadedDocIds, onDocDestroy, onDocUpdate, peekDoc, unsavedUpdates } from './docs'
 import { useStore } from './store'
 
 export function toB64(u: Uint8Array): string {
@@ -51,19 +51,35 @@ export function mergeDocUpdates(list: Uint8Array[]): Uint8Array {
   }
 }
 
-/** The current state of every document on this device (all workspaces), one update per document. */
-export async function collectDocs(): Promise<Map<string, Uint8Array>> {
+/** The device store could not be read, so a backup would hold only what is open in memory. */
+export class IncompleteBackupError extends Error {}
+
+const partialSets = new WeakSet<Map<string, Uint8Array>>()
+/** Was this collection made from memory only (the device store unreadable)? */
+export const isPartial = (docs: Map<string, Uint8Array>) => partialSets.has(docs)
+
+/** The current state of every document on this device (all workspaces), one update per document.
+ *  When the device store can't be read it throws IncompleteBackupError, unless allowPartial: then
+ *  what is open in memory is returned, marked (isPartial). Automatic backups and restore points
+ *  never take a partial collection: it would replace (and later rotate out) a complete one. */
+export async function collectDocs(opts: { allowPartial?: boolean } = {}): Promise<Map<string, Uint8Array>> {
   await flushWrites()
+  // The restore point and the daily file are made seconds apart at start: one read serves both
+  if (recent && recent.gen === changes && Date.now() - recent.at < 60_000) return recent.docs
+  const gen = changes
   const byDoc = new Map<string, Uint8Array[]>()
   const push = (id: string, u: Uint8Array) => {
     const l = byDoc.get(id)
     if (l) l.push(u)
     else byDoc.set(id, [u])
   }
+  let incomplete = false
   try {
     for (const u of await dumpAll()) push(u.docId, u.update)
-  } catch {
+  } catch (err) {
+    if (!opts.allowPartial) throw new IncompleteBackupError(String((err as Error)?.message ?? err))
     // The device store can't be read: save at least what is open in memory
+    incomplete = true
     for (const id of loadedDocIds()) {
       const doc = peekDoc(id)
       if (doc) push(id, Y.encodeStateAsUpdate(doc))
@@ -73,8 +89,16 @@ export async function collectDocs(): Promise<Map<string, Uint8Array>> {
   unsavedUpdates().forEach((list, id) => list.forEach((u) => push(id, u)))
   const out = new Map<string, Uint8Array>()
   byDoc.forEach((list, id) => out.set(id, mergeDocUpdates(list)))
+  if (incomplete) partialSets.add(out)
+  else if (gen === changes) recent = { at: Date.now(), gen, docs: out }
   return out
 }
+
+/** Any change to a document makes the shared collection stale. */
+let changes = 0
+let recent: { at: number; gen: number; docs: Map<string, Uint8Array> } | null = null
+onDocUpdate(() => void changes++)
+onDocDestroy(() => void changes++)
 
 /** How many pages of a workspace document are not in the trash, and the workspace's name. */
 export function describeWorkspace(update: Uint8Array): { pages: number; name: string } {
@@ -98,12 +122,16 @@ export interface BackupInfo {
   docs: number
   assets: number
   pages: number
+  /** Only what was open in memory: the device store could not be read. */
+  partial: boolean
+  /** The pictures were left out (too large for an automatic backup). */
+  assetsSkipped: boolean
 }
 
 /** The backup file as a list of text pieces (plain ASCII apart from the first), so a large backup
  *  never has to exist as one string and can be written piece by piece. */
-export async function buildBackupParts(opts: { assets?: boolean; docs?: Map<string, Uint8Array> } = {}): Promise<{ parts: string[]; info: BackupInfo }> {
-  const docs = opts.docs ?? (await collectDocs())
+export async function buildBackupParts(opts: { assets?: boolean; docs?: Map<string, Uint8Array>; maxAssetBytes?: number } = {}): Promise<{ parts: string[]; info: BackupInfo }> {
+  const docs = opts.docs ?? (await collectDocs({ allowPartial: true }))
   const st = useStore.getState()
   const wsId = st.ws?.id
   const wsUpdate = wsId ? docs.get(`ws:${wsId}`) : undefined
@@ -125,12 +153,18 @@ export async function buildBackupParts(opts: { assets?: boolean; docs?: Map<stri
   })
   parts.push('},"assets":[')
   let assets = 0
+  let assetsSkipped = false
   if (opts.assets !== false) {
     let list: Awaited<ReturnType<typeof allAssets>> = []
     try {
       list = await allAssets()
     } catch {
       /* pictures unreadable: the text is still worth saving */
+    }
+    // Pictures go into the file as text, in memory: past a size, a phone could run out of it
+    if (opts.maxAssetBytes !== undefined && list.reduce((n, a) => n + (a.blob?.size ?? 0), 0) > opts.maxAssetBytes) {
+      assetsSkipped = true
+      list = []
     }
     for (const a of list) {
       try {
@@ -146,10 +180,10 @@ export async function buildBackupParts(opts: { assets?: boolean; docs?: Map<stri
   let bytes = 0
   // Everything after the first piece is ASCII: its length is its size
   parts.forEach((p, i) => (bytes += i === 0 ? new Blob([p]).size : p.length))
-  return { parts, info: { bytes, docs: docs.size, assets, pages } }
+  return { parts, info: { bytes, docs: docs.size, assets, pages, partial: isPartial(docs), assetsSkipped } }
 }
 
-export async function buildBackupBlob(opts: { assets?: boolean; docs?: Map<string, Uint8Array> } = {}): Promise<{ blob: Blob; info: BackupInfo }> {
+export async function buildBackupBlob(opts: { assets?: boolean; docs?: Map<string, Uint8Array>; maxAssetBytes?: number } = {}): Promise<{ blob: Blob; info: BackupInfo }> {
   const { parts, info } = await buildBackupParts(opts)
   return { blob: new Blob(parts, { type: 'application/json' }), info }
 }

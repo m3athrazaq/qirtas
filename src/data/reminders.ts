@@ -158,8 +158,12 @@ async function syncNative() {
     .filter((r) => !r.done && r.at > now + 3000)
     .slice(0, 60)
   const want = new Map(wanted.map((r) => [nid(r), r]))
-  // Only the reminders' own notifications (the settings' test one is left alone)
-  const pending = (await LocalNotifications.getPending()).notifications.filter((p) => !!(p.extra as { pageId?: string } | undefined)?.pageId)
+  // Only this workspace's reminders (another workspace's stay scheduled; the settings' test is left alone)
+  const wsId = st.ws?.id ?? ''
+  const pending = (await LocalNotifications.getPending()).notifications.filter((p) => {
+    const x = p.extra as { pageId?: string; wsId?: string } | undefined
+    return !!x?.pageId && (!x.wsId || x.wsId === wsId)
+  })
   const stale = pending.filter((p) => {
     const w = want.get(p.id)
     return !w || (p.extra as { at?: number } | undefined)?.at !== w.at || p.title !== label(w)
@@ -175,7 +179,7 @@ async function syncNative() {
         body: r.text ? r.pageTitle : t('reminder'),
         schedule: { at: new Date(r.at), allowWhileIdle: true },
         channelId: CHANNEL,
-        extra: { pageId: r.pageId, key: r.key, at: r.at },
+        extra: { pageId: r.pageId, key: r.key, at: r.at, wsId },
       })),
     })
   }

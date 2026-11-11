@@ -5,7 +5,9 @@ import { create } from 'zustand'
 import { setAssetUploadHook, setRemoteAssetResolver } from '../data/assets'
 import { getAsset, kvGet, kvSet, outboxAll, outboxClearWorkspace, putAsset, wipeAll } from '../data/idb'
 import { flushWrites, getDoc, hasUnsaved, resetDocs } from '../data/docs'
+import { anyRevived, forgetPurged, purgedDocs } from '../data/purged'
 import { takeSnapshot } from '../data/snapshots'
+import { forgetBackupDevice } from '../data/autobackup'
 import { wipeVault } from '../data/vault'
 import { useStore } from '../data/store'
 import { getActor, setActor } from '../data/workspace'
@@ -227,6 +229,32 @@ async function connect(user: User) {
 
 let hooksReady = false
 
+let refetchTimer: ReturnType<typeof setTimeout> | null = null
+function refetchSoon(ms = 1000) {
+  if (refetchTimer) return
+  refetchTimer = setTimeout(() => {
+    refetchTimer = null
+    void refetchRevived()
+  }, ms)
+}
+
+/** Pages deleted for good on this device that are in the workspace again: fetch their whole history. */
+async function refetchRevived() {
+  const w = useStore.getState().ws
+  if (!engine || !w) return
+  let failed = false
+  for (const docId of purgedDocs(w.id)) {
+    if (!w.pages.has(docId.slice(3))) continue
+    try {
+      await engine.refetchDoc(docId)
+      forgetPurged(w.id, docId)
+    } catch {
+      failed = true
+    }
+  }
+  if (failed) refetchSoon(60_000) // offline or the server failed: again in a minute
+}
+
 async function startEngine(user: User, role: Role, upload: boolean) {
   const sb = supa()!
   const w = useStore.getState().ws!
@@ -241,8 +269,13 @@ async function startEngine(user: User, role: Role, upload: boolean) {
   await engine.start({ upload })
   const route = useStore.getState().route
   engine.setPage(route.name === 'page' ? route.id : null)
+  void refetchRevived()
   if (hooksReady) return
   hooksReady = true
+  // A page deleted for good here that comes back (a restore): its whole history first
+  useStore.subscribe((s, prev) => {
+    if (s.pages !== prev.pages && s.ws && anyRevived(s.ws.id, s.pages)) refetchSoon()
+  })
   useStore.subscribe((s, prev) => {
     if (s.route !== prev.route) engine?.setPage(s.route.name === 'page' ? s.route.id : null)
   })
@@ -418,6 +451,7 @@ export async function signOut() {
   resetDocs()
   await wipeAll()
   await wipeVault().catch(() => {})
+  forgetBackupDevice() // the files written so far stay out of the next account's rotation
   localStorage.removeItem('qirtas.recent')
   location.hash = '#/'
   location.reload()

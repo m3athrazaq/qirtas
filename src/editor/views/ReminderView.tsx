@@ -3,7 +3,7 @@ import { NodeViewWrapper, type NodeViewProps } from '@tiptap/react'
 import { Bell, BellOff, Check, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useStore } from '../../data/store'
-import { dateToIso, isoToDate } from '../../lib/hijri'
+import { localIso } from '../../lib/hijri'
 import { t } from '../../lib/i18n'
 import { formatWhen } from '../../lib/when'
 import { DatePicker } from '../../ui/DatePicker'
@@ -94,13 +94,13 @@ export function ReminderPanel({
   onClose: () => void
 }) {
   const base = at ? new Date(at) : new Date(reminderPresets()[0].at)
-  const iso = dateToIso(base)
+  // All in local time: the day shown is the local day of the reminder, and a new day or time keeps the other part
+  const iso = localIso(base.getTime())
   const time = `${pad(base.getHours())}:${pad(base.getMinutes())}`
   const combine = (dayIso: string, hhmm: string) => {
-    const d = isoToDate(dayIso)
+    const [y, mo, d] = dayIso.split('-').map(Number)
     const [h, m] = hhmm.split(':').map(Number)
-    d.setHours(h || 0, m || 0, 0, 0)
-    return d.getTime()
+    return new Date(y, mo - 1, d, h || 0, m || 0, 0, 0).getTime()
   }
   return (
     <div className="reminder-panel">

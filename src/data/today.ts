@@ -5,18 +5,24 @@
 // by two workspaces would mix their content.
 import { formatGregorian, formatHijri, todayIso, WEEKDAYS_AR, WEEKDAYS_EN, weekday } from '../lib/hijri'
 import { t } from '../lib/i18n'
+import * as Y from 'yjs'
+import { getDoc, pageDocId } from './docs'
 import { ORIGIN_SYSTEM } from './history'
+import { kvGet } from './idb'
 import { navigate } from './nav'
 import { useStore, ws } from './store'
+import { withGen } from './purged'
 import type { PageMeta } from './types'
 
 const tag = () => (useStore.getState().ws?.id ?? 'local').replace(/[^A-Za-z0-9]/g, '').slice(0, 12)
-export const journalId = () => `journal-${tag()}`
-export const templatesId = () => `templates-${tag()}`
-export const dayPageId = (iso: string) => `day-${tag()}-${iso}`
+/** A fixed id, with the generation that "delete forever" moved it to (see purged.ts). */
+const fixed = (base: string) => withGen(base, Number(useStore.getState().ws?.meta.get(`gen:${base}`)) || 0)
+export const journalId = () => fixed(`journal-${tag()}`)
+export const templatesId = () => fixed(`templates-${tag()}`)
+export const dayPageId = (iso: string) => fixed(`day-${tag()}-${iso}`)
 /** The day a journal page is for (also for pages that came from another workspace, after signing in). */
-export const dayOfPage = (id: string): string | null => /^day-[A-Za-z0-9]+-(\d{4}-\d{2}-\d{2})$/.exec(id)?.[1] ?? null
-const isShelf = (id: string) => /^templates-[A-Za-z0-9]+$/.test(id)
+export const dayOfPage = (id: string): string | null => /^day-[A-Za-z0-9]+-(\d{4}-\d{2}-\d{2})(?:-g\d+)?$/.exec(id)?.[1] ?? null
+const isShelf = (id: string) => /^templates-[A-Za-z0-9]+(?:-g\d+)?$/.test(id)
 
 export function dayTitle(iso: string): string {
   const s = useStore.getState().settings
@@ -28,7 +34,10 @@ export function dayTitle(iso: string): string {
 
 /** A page with a fixed id that the app keeps for the user (the journal, the template shelf): made
  *  when missing, taken out of the trash when it is there. Not an undo step. */
-function ensureFixedPage(id: string, init: { title: string; icon: string; parentId: string | null }, atStart = true): boolean {
+async function ensureFixedPage(id: string, init: { title: string; icon: string; parentId: string | null }, atStart = true): Promise<boolean> {
+  // Made fresh on a device that hasn't heard from the server yet, it would compete with the one
+  // another device made (and could reset its title or place): wait a moment for the first sync
+  if (!useStore.getState().pages[id]) await settleSync()
   const st = useStore.getState()
   const w = ws()
   const cur = st.pages[id]
@@ -41,6 +50,22 @@ function ensureFixedPage(id: string, init: { title: string; icon: string; parent
   return true
 }
 
+/** In a workspace that syncs, wait (a few seconds at most) for the first sync of this session. */
+async function settleSync() {
+  const st = useStore.getState()
+  if (!st.ws || st.syncStatus === 'synced' || st.syncStatus === 'offline') return
+  if (!(await kvGet(`sync:linked:${st.ws.id}`).catch(() => null))) return
+  await new Promise<void>((resolve) => {
+    const done = () => {
+      clearTimeout(timer)
+      stop()
+      resolve()
+    }
+    const timer = setTimeout(done, 5000)
+    const stop = useStore.subscribe((s) => (s.syncStatus === 'synced' || s.syncStatus === 'offline') && done())
+  })
+}
+
 /** This workspace's page with that fixed id, else one like it that came along from another
  *  workspace when signing in merged the pages (so the user doesn't get a second journal). */
 function findFixed(own: string, like: (p: PageMeta) => boolean): string {
@@ -51,25 +76,47 @@ function findFixed(own: string, like: (p: PageMeta) => boolean): string {
 
 /** The page of a day (today when not given), created on first use. Null in a read-only workspace that has none. */
 export async function ensureDayPage(iso = todayIso()): Promise<string | null> {
-  const journal = findFixed(journalId(), (p) => !p.parentId && /^journal-[A-Za-z0-9]+$/.test(p.id))
+  const journal = findFixed(journalId(), (p) => !p.parentId && /^journal-[A-Za-z0-9]+(?:-g\d+)?$/.test(p.id))
   const id = findFixed(dayPageId(iso), (p) => dayOfPage(p.id) === iso)
   const day = useStore.getState().pages[id]
   // The journal is there (and out of the trash) for a new day page, or one that still sits in it
-  if ((!day || day.parentId === journal) && !ensureFixedPage(journal, { title: t('journal'), icon: '📓', parentId: null })) return null
-  if (!ensureFixedPage(id, { title: dayTitle(iso), icon: '', parentId: journal })) return null
+  if ((!day || day.parentId === journal) && !(await ensureFixedPage(journal, { title: t('journal'), icon: '📓', parentId: null }))) return null
+  if (!(await ensureFixedPage(id, { title: dayTitle(iso), icon: '', parentId: journal }))) return null
   return id
 }
 
 /** Keep a copy of a page (with its sub-pages) on the "My templates" shelf. */
 export async function saveAsTemplate(pageId: string): Promise<boolean> {
   const shelf = findFixed(templatesId(), (p) => !p.parentId && isShelf(p.id))
-  if (!ensureFixedPage(shelf, { title: t('myTemplates'), icon: '🗂️', parentId: null }, false)) return false
+  if (!(await ensureFixedPage(shelf, { title: t('myTemplates'), icon: '🗂️', parentId: null }, false))) return false
   return !!(await ws().duplicatePage(pageId, '', shelf))
 }
 
-/** A new page from one of the user's templates, at the top level. */
+/** A new page from one of the user's templates, at the top level. Its reminders start unset: the
+ *  template's times are in the past by now. */
 export async function pageFromTemplate(templateId: string): Promise<string | null> {
-  return ws().duplicatePage(templateId, '', null)
+  const w = ws()
+  const id = await w.duplicatePage(templateId, '', null)
+  if (!id) return null
+  for (const pageId of [id, ...w.descendants(id)]) {
+    const doc = await getDoc(pageDocId(pageId))
+    const reminders: Y.XmlElement[] = []
+    const walk = (n: Y.XmlFragment | Y.XmlElement) =>
+      n.toArray().forEach((c) => {
+        if (!(c instanceof Y.XmlElement)) return
+        if (c.nodeName === 'reminder') reminders.push(c)
+        walk(c)
+      })
+    walk(doc.getXmlFragment('default'))
+    if (reminders.length)
+      doc.transact(() => {
+        for (const r of reminders) {
+          r.setAttribute('at', null as unknown as string)
+          r.setAttribute('done', false as unknown as string)
+        }
+      }, ORIGIN_SYSTEM)
+  }
+  return id
 }
 
 /** The user's own templates: the pages on the shelf (or shelves, after a merge). */

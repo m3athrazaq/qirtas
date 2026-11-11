@@ -3,9 +3,10 @@
 import type { JSONContent } from '@tiptap/core'
 import { yXmlFragmentToProsemirrorJSON } from '@tiptap/y-tiptap'
 import * as Y from 'yjs'
-import { getDoc, onDocDestroy, onDocLoaded, onDocUpdate, pageDocId, peekDoc } from './docs'
+import { getDoc, onDocDestroy, onDocLoaded, onDocUpdate, ORIGIN_IDB, ORIGIN_REMOTE, ORIGIN_TAB, pageDocId, peekDoc } from './docs'
+import { ORIGIN_SYSTEM } from './history'
 import { useStore } from './store'
-import { deleteVersions, fingerprint, listVersions, loadVersion, saveVersion, versionsToDrop, type VersionMeta, type VersionReason } from './vault'
+import { deleteVersions, fingerprint, listVersions, loadVersion, saveVersion, versionPages, versionsOverCap, versionsToDrop, type VersionMeta, type VersionReason } from './vault'
 
 /** At least this long between two automatic versions of a page. */
 export const VERSION_GAP = 10 * 60_000
@@ -141,6 +142,20 @@ function captureDirty() {
   })
 }
 
+/** Pages that had content on this device (loaded with some, or written here). */
+const hadContent = new Set<string>()
+
+async function capVersions() {
+  try {
+    const all: VersionMeta[] = []
+    ;(await versionPages()).forEach((list) => all.push(...list))
+    const drop = versionsOverCap(all)
+    if (drop.length) await deleteVersions(drop)
+  } catch {
+    /* vault unavailable */
+  }
+}
+
 let started = false
 export function startVersionCapture() {
   if (started) return
@@ -152,11 +167,26 @@ export function startVersionCapture() {
     const doc = peekDoc(docId)
     if (!doc || isEmpty(doc)) return
     const pageId = docId.slice(3)
+    hadContent.add(pageId)
     void store(pageId, 'first', shoot(pageId, doc))
   })
-  onDocUpdate((docId) => {
-    if (docId.startsWith('pg:')) onChange(docId.slice(3))
+  onDocUpdate((docId, doc, origin) => {
+    if (!docId.startsWith('pg:')) return
+    const pageId = docId.slice(3)
+    // Not versioned here: another tab of this browser (it keeps its own versions in the same vault),
+    // the app's own writes (a restore files its own versions), and what other devices send into a
+    // page that was empty here (a new device filling up, page after page)
+    if (origin === ORIGIN_TAB || origin === ORIGIN_IDB || origin === ORIGIN_SYSTEM) return
+    if (origin === ORIGIN_REMOTE && !hadContent.has(pageId)) {
+      if (!isEmpty(doc)) hadContent.add(pageId)
+      return
+    }
+    hadContent.add(pageId)
+    onChange(pageId)
   })
+  // All versions together stay under a size, so the history never crowds out the pages themselves
+  setTimeout(() => void capVersions(), 90_000)
+  setInterval(() => void capVersions(), 6 * 3600_000)
   onDocDestroy((docId) => {
     const drop = (id: string) => {
       const t = tracks.get(id)
