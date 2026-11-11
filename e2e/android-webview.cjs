@@ -182,6 +182,61 @@ async function evaluate(c, expression, timeout) {
     }
     adb('input keyevent 4') // closes the settings
     await sleep(1200)
+
+    // Today's page, a reminder handed to Android, and a notification on the screen
+    const pick = (sel, text) =>
+      evaluate(c, `(() => { const b = [...document.querySelectorAll(${JSON.stringify(sel)})].find((x) => x.textContent.trim().includes(${JSON.stringify(text)})); if (!b) return 'missing ${text}'; b.click(); return 'ok' })()`, 10000)
+    console.log('today:', await pick('button.sb-item', 'اليوم'))
+    await sleep(2500)
+    console.log('today route:', await evaluate(c, `location.hash`, 5000))
+    shot('11-today')
+    await newParagraph('موعد المراجعة ')
+    await sleep(400)
+    await type('/')
+    await sleep(1200)
+    await type('تذكير')
+    await sleep(900)
+    console.log('slash reminder:', await evaluate(c, `(() => { const el = document.querySelector('.slash-menu .is-active, .slash .is-active, .slash-item.is-active'); if (!el) return 'no active item'; el.click(); return el.textContent.trim().slice(0, 30) })()`, 5000))
+    await sleep(1500)
+    console.log('reminder panel open:', await evaluate(c, `!!document.querySelector('.reminder-panel')`, 5000))
+    shot('12-reminder-panel')
+    console.log('preset:', await pick('.reminder-presets .chip-btn', 'بعد ساعة'))
+    await sleep(5000)
+    console.log('notification permission:', JSON.stringify(await evaluate(c, `window.Capacitor.Plugins.LocalNotifications.checkPermissions()`, 10000)))
+    console.log('pending reminders:', JSON.stringify(await evaluate(c, `window.Capacitor.Plugins.LocalNotifications.getPending().then((r) => r.notifications.map((n) => ({ id: n.id, title: n.title, body: n.body, at: n.schedule && n.schedule.at })))`, 10000)))
+    try {
+      console.log('alarms:', adb('dumpsys alarm').split('\n').filter((l) => l.includes('com.m3athrazaq.qirtas')).slice(0, 4).map((l) => l.trim()).join(' | '))
+    } catch (e) {
+      console.log('alarms check failed:', e.message.slice(0, 200))
+    }
+    shot('13-reminder-chip')
+    adb('input keyevent 4') // closes the keyboard
+    await sleep(800)
+    // The "test" button in the settings shows a notification a moment later
+    await evaluate(c, `window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'general' }))`, 5000)
+    await sleep(2000)
+    console.log('test notification:', await pick('.settings-body button', 'تجربة'))
+    await sleep(4000)
+    try {
+      const lines = adb('dumpsys notification --noredact').split('\n')
+      const i = lines.findIndex((l) => l.includes('pkg=com.m3athrazaq.qirtas'))
+      console.log('posted notification:', i < 0 ? 'none' : lines.slice(i, i + 12).map((l) => l.trim()).filter((l) => /pkg=|channel|icon|android.title|android.text/.test(l)).join(' | '))
+    } catch (e) {
+      console.log('notification check failed:', e.message.slice(0, 200))
+    }
+    try {
+      adb('cmd statusbar expand-notifications')
+      await sleep(1500)
+      shot('14-notification')
+      adb('cmd statusbar collapse')
+      await sleep(800)
+    } catch (e) {
+      console.log('shade failed:', e.message.slice(0, 120))
+    }
+    adb('input keyevent 4') // closes the settings
+    await sleep(1200)
+    adb('input keyevent 4') // back to the home screen
+    await sleep(1200)
     adb('input keyevent 4') // back on the home screen leaves the app
     await sleep(1500)
     console.log('after back on home:', focusApp().trim())

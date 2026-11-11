@@ -46,13 +46,14 @@ async function dailyCheck() {
     // Nothing of the user's yet: no point keeping copies of the welcome pages
     if (!st.ws || st.ws.isPristine()) return
     let previous: string | null = null
+    const build = `${__APP_VERSION__}+${__BUILD_ID__}`
     try {
       previous = localStorage.getItem(VERSION_KEY)
-      localStorage.setItem(VERSION_KEY, __APP_VERSION__)
+      localStorage.setItem(VERSION_KEY, build)
     } catch {
       /* storage unavailable */
     }
-    if (previous && previous !== __APP_VERSION__) {
+    if (previous && previous !== build) {
       await takeSnapshot('before-update')
       return
     }

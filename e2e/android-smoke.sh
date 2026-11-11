@@ -7,6 +7,8 @@ APK=android/app/build/outputs/apk/debug/app-debug.apk
 PKG=com.m3athrazaq.qirtas
 adb install -r "$APK" > smoke/install.txt 2>&1
 adb logcat -c
+# Reminders: allow notifications as a user would when asked
+adb shell pm grant "$PKG" android.permission.POST_NOTIFICATIONS > /dev/null 2>&1 || true
 adb shell am start -n "$PKG/.MainActivity" > smoke/start.txt 2>&1
 sleep 8
 adb exec-out screencap -p > smoke/01a-launch-8s.png

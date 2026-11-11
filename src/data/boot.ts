@@ -3,6 +3,9 @@ import { isTypingTarget, shortcutLetter } from '../lib/keys'
 import { setLang, t } from '../lib/i18n'
 import { todayIso } from '../lib/hijri'
 import { b, callout, code, date, doc, h2, p, pageLink, setPageContent, tasks } from '../templates/build'
+import { runAction, type AppAction } from './actions'
+import { startPageIndex } from './pageIndex'
+import { startReminders } from './reminders'
 import { captureAuthRedirect } from './authLink'
 import { grantFolderAccess, noteNudgeShown, startBackupSchedule } from './autobackup'
 import { onSaveHealth, setSyncHook } from './docs'
@@ -67,6 +70,10 @@ async function seedWelcome(w: Workspace) {
   w.markSeeded([welcome, child])
   return welcome
 }
+
+const ALT_ACTIONS: Record<string, AppAction> = { t: 'today', n: 'new', q: 'capture', m: 'tasks' }
+// Option+letter types a character on a Mac: no Alt shortcuts there
+const IS_MAC = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
 
 /** Restore points, automatic backups, and keeping the browser from clearing the data by itself. */
 function startSafetyNet() {
@@ -165,10 +172,16 @@ export async function boot() {
   initRouter()
   if (firstPage && !useStore.getState().isMobile) navigate(firstPage, { replace: true })
   const action = takePendingAction()
-  if (action === 'new') navigate(w.createPage({ parentId: null }), { replace: true })
-  else if (action === 'search') useStore.getState().openModal('search')
+  if (action) {
+    history.replaceState(history.state, '', location.pathname + location.search)
+    runAction(action)
+  }
+  window.addEventListener('qirtas:action', (e) => runAction((e as CustomEvent<AppAction>).detail))
   void import('../sync/session').then((m) => m.initSync()).catch(() => {})
   startSafetyNet()
+  // Tasks, dates, reminders and links of every page, for "Today", "My tasks" and the notifications
+  void startPageIndex()
+  startReminders(() => useStore.getState().openModal('tasks'))
 
   window.addEventListener('keydown', (e) => {
     const mod = e.metaKey || e.ctrlKey
@@ -181,6 +194,16 @@ export async function boot() {
     } else if (mod && (e.key === '\\' || e.code === 'Backslash')) {
       e.preventDefault()
       useStore.setState((s) => ({ sidebarOpen: !s.sidebarOpen }))
+    } else if (mod && !e.altKey && !e.shiftKey && (e.key === '/' || e.code === 'Slash')) {
+      e.preventDefault()
+      const st = useStore.getState()
+      if (st.modal === 'shortcuts') st.closeModal()
+      else st.openModal('shortcuts')
+    } else if (e.altKey && !mod && !e.shiftKey && ALT_ACTIONS[key] && !IS_MAC) {
+      // Alt+letter: today, new page, quick note, tasks (not while a dialog is asking something)
+      if (document.querySelector('.dialog, .modal-backdrop.is-top')) return
+      e.preventDefault()
+      runAction(ALT_ACTIONS[key])
     } else if (mod && !e.altKey && (key === 'z' || key === 'y')) {
       // Inside the page the editor handles it; text fields keep their own undo
       if (e.defaultPrevented || isTypingTarget(e.target)) return

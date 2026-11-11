@@ -1,8 +1,10 @@
 import { useStore, type Route } from './store'
 
 const RECENT_KEY = 'qirtas.recent'
-let pendingAction: 'new' | 'search' | null = null
-/** A shortcut from the installed web app ("new page" / "search") waiting to run. */
+export type AddressAction = 'new' | 'search' | 'today' | 'capture' | 'tasks'
+const ADDRESS_ACTIONS: AddressAction[] = ['new', 'search', 'today', 'capture', 'tasks']
+let pendingAction: AddressAction | null = null
+/** A shortcut from the installed web app ("new page", "today"…) waiting to run. */
 export function takePendingAction() {
   const a = pendingAction
   pendingAction = null
@@ -13,8 +15,8 @@ export function parseHash(): Route {
   const h = location.hash.replace(/^#\/?/, '')
   const m = h.match(/^p\/([A-Za-z0-9_-]+)/)
   if (m) return { name: 'page', id: m[1] }
-  if (h === 'new' || h === 'search') {
-    pendingAction = h
+  if ((ADDRESS_ACTIONS as string[]).includes(h)) {
+    pendingAction = h as AddressAction
     return { name: 'home' }
   }
   const j = h.match(/^join\/([A-Za-z0-9]+)/)
@@ -91,7 +93,14 @@ function applyRoute() {
   useStore.setState({ route: same ? cur.route : route, peek, navIndex: stateIndex() })
   if (route.name === 'page') pushRecent(route.id)
   if (useStore.getState().isMobile) useStore.setState({ sidebarOpen: false })
+  // An app shortcut used while the app is already open: run it, and don't keep it in the address
+  if (pendingAction && cur.ready && started) {
+    history.replaceState(history.state, '', location.pathname + location.search)
+    window.dispatchEvent(new CustomEvent('qirtas:action', { detail: takePendingAction() }))
+  }
 }
+
+let started = false
 
 export function initRouter() {
   // Number the entries so the app knows whether "back" stays inside it
@@ -99,6 +108,7 @@ export function initRouter() {
   window.addEventListener('popstate', applyRoute)
   window.addEventListener('hashchange', applyRoute)
   applyRoute()
+  started = true
 }
 
 export function getRecent(): string[] {

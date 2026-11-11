@@ -1,9 +1,13 @@
 // Custom blocks: callout, sub-page link, inline page mention, Hijri/Gregorian date chip,
 // inline database, and images stored on the device.
 import { Extension, mergeAttributes, Node } from '@tiptap/core'
+import type { Slice } from '@tiptap/pm/model'
+import { Plugin, PluginKey } from '@tiptap/pm/state'
 import Image from '@tiptap/extension-image'
 import { ReactNodeViewRenderer } from '@tiptap/react'
+import { uid } from '../../lib/ids'
 import { CalloutView, DatabaseBlockView, DateChipView, ImageView, PageLinkView, PageMentionView } from '../views'
+import { ReminderView } from '../views/ReminderView'
 import { markdownHooks } from './markdownHooks'
 
 declare module '@tiptap/core' {
@@ -162,6 +166,84 @@ export const DateChip = Node.create({
     return markdownHooks.date(node.attrs?.date as string)
   },
 })
+
+/** A reminder: a moment at which the app notifies you. Sits in the text like a date chip; inside a
+ *  task it belongs to that task (checking the task silences it). */
+export const Reminder = Node.create({
+  name: 'reminder',
+  group: 'inline',
+  inline: true,
+  atom: true,
+  selectable: true,
+  addAttributes() {
+    return {
+      id: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('data-id'),
+        renderHTML: (a) => (a.id ? { 'data-id': a.id } : {}),
+      },
+      at: {
+        default: null,
+        parseHTML: (el) => Number(el.getAttribute('data-at')) || null,
+        renderHTML: (a) => (a.at ? { 'data-at': String(a.at) } : {}),
+      },
+      done: {
+        default: false,
+        parseHTML: (el) => el.getAttribute('data-done') === 'true',
+        renderHTML: (a) => (a.done ? { 'data-done': 'true' } : {}),
+      },
+    }
+  },
+  parseHTML() {
+    return [{ tag: 'span[data-reminder]' }]
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['span', mergeAttributes(HTMLAttributes, { 'data-reminder': '' })]
+  },
+  renderText({ node }) {
+    return markdownHooks.reminder(node.attrs.at)
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(ReminderView, { as: 'span' })
+  },
+  renderMarkdown(node) {
+    return markdownHooks.reminder(node.attrs?.at as number)
+  },
+  addProseMirrorPlugins() {
+    // Every reminder has its own id: a copied or pasted one gets a new id (it is a second reminder)
+    return [
+      new Plugin({
+        key: new PluginKey('reminderIds'),
+        appendTransaction: (trs, _old, state) => {
+          // Only when a change brought reminders in (typing elsewhere doesn't walk the document)
+          if (!trs.some((tr) => tr.docChanged && tr.steps.some((s) => bringsReminder((s as unknown as { slice?: Slice }).slice)))) return null
+          const seen = new Set<string>()
+          const fix: number[] = []
+          state.doc.descendants((node, pos) => {
+            if (node.type.name !== 'reminder') return
+            const id = node.attrs.id as string | null
+            if (!id || seen.has(id)) fix.push(pos)
+            else seen.add(id)
+          })
+          if (!fix.length) return null
+          const tr = state.tr
+          fix.forEach((pos) => tr.setNodeAttribute(pos, 'id', uid()))
+          return tr.setMeta('addToHistory', false)
+        },
+      }),
+    ]
+  },
+})
+
+function bringsReminder(slice: Slice | undefined): boolean {
+  if (!slice || !slice.size) return false
+  let found = false
+  slice.content.descendants((n) => {
+    if (found) return false
+    if (n.type.name === 'reminder') found = true
+  })
+  return found
+}
 
 export const DatabaseBlock = Node.create({
   name: 'database',

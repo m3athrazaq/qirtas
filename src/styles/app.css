@@ -2446,3 +2446,266 @@ button.sb-brand:hover {
     padding: 14px 16px 32px;
   }
 }
+
+/* ---------- my tasks ---------- */
+
+.tasks-tabs {
+  margin: 0 20px 6px;
+  align-self: flex-start;
+}
+
+.tasks-tabs > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tasks-tabs .count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--lapis);
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.tasks-body {
+  flex: 1;
+  min-height: 120px;
+  overflow-y: auto;
+  padding: 0 12px 8px;
+}
+
+.tasks-group + .tasks-group {
+  margin-top: 6px;
+}
+
+.tasks-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 10px 0 2px;
+  padding: 4px 8px;
+  background: var(--paper);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.day-due .tasks-head {
+  background: var(--paper-2);
+}
+
+.tasks-group.is-late .tasks-head {
+  color: var(--rubric);
+}
+
+.task-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.task-row:hover {
+  background: var(--hover);
+}
+
+.task-check {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin: 10px 0 0;
+  accent-color: var(--lapis);
+  cursor: pointer;
+}
+
+.task-kind {
+  flex: none;
+  width: 17px;
+  margin-top: 9px;
+  display: inline-grid;
+  place-items: center;
+  color: var(--ink-3);
+}
+
+.task-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1px;
+  padding: 6px 0;
+  text-align: start;
+}
+
+.task-text {
+  font-size: 14.5px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.task-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--tag-orange-fg);
+}
+
+.task-page {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.tasks-hint {
+  margin: 0;
+  padding: 10px 20px 16px;
+  border-top: 1px solid var(--rule);
+  line-height: 1.6;
+}
+
+/* ---------- quick note, shortcuts ---------- */
+
+.capture {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 20px 18px;
+}
+
+.capture-text {
+  width: 100%;
+  min-height: 110px;
+  height: auto;
+  padding: 10px 12px;
+  resize: vertical;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.capture .dialog-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.capture-hint {
+  margin-inline-end: auto;
+}
+
+.shortcuts {
+  overflow-y: auto;
+  padding: 0 20px 18px;
+}
+
+.shortcuts .set-head:first-child {
+  margin-top: 4px;
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
+}
+
+.shortcut-keys {
+  display: inline-flex;
+  gap: 4px;
+  flex: none;
+}
+
+.shortcut-keys kbd,
+.si-keys {
+  display: inline-block;
+  min-width: 22px;
+  padding: 1px 6px;
+  border: 1px solid var(--rule-2);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--paper-2);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.search-item.is-command {
+  align-items: center;
+}
+
+.si-keys {
+  margin-inline-start: auto;
+  flex: none;
+}
+
+/* ---------- settings bits, templates ---------- */
+
+.set-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.set-ok {
+  font-size: 13px;
+  color: var(--tag-green-fg);
+}
+
+.tpl-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.tpl-scroll .tpl-grid {
+  overflow: visible;
+}
+
+.tpl-head {
+  margin: 4px 0 2px;
+  padding: 0 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+@media (max-width: 760px) {
+  .tasks-tabs {
+    margin-inline: 14px;
+  }
+  .tasks-body {
+    padding-inline: 6px;
+  }
+  .task-check {
+    width: 20px;
+    height: 20px;
+    margin-top: 9px;
+  }
+  .task-main {
+    padding: 8px 0;
+  }
+  .si-keys {
+    display: none;
+  }
+}

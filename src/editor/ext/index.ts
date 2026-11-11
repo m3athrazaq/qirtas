@@ -10,7 +10,7 @@ import StarterKit from '@tiptap/starter-kit'
 import type * as Y from 'yjs'
 import { t } from '../../lib/i18n'
 import { AutoDirection } from './bidi'
-import { BlockColor, Callout, DatabaseBlock, DateChip, LocalImage, PageLink, PageMention } from './nodes'
+import { BlockColor, Callout, DatabaseBlock, DateChip, LocalImage, PageLink, PageMention, Reminder } from './nodes'
 import { SlashCommand } from './slash'
 import { PageHistory } from './history'
 import { pageUndoManager } from '../../data/history'
@@ -43,6 +43,7 @@ export function schemaExtensions(): AnyExtension[] {
     PageLink,
     PageMention,
     DateChip,
+    Reminder,
     DatabaseBlock,
     LocalImage,
     BlockColor,

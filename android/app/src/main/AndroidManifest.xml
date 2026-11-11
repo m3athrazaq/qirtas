@@ -69,6 +69,8 @@
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Reminders ring at their minute (granted with the app on Android 13 and later) -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <!-- Daily backup file in Documents/Qirtas. Android 13+ needs no permission for files the app
          creates there; these two only apply to older versions. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />

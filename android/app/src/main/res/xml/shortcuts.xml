@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Long-press the app icon. Launchers show the first four. -->
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="today"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_today"
+        android:shortcutShortLabel="@string/shortcut_today"
+        android:shortcutLongLabel="@string/shortcut_today">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="qirtas://today"
+            android:targetPackage="com.m3athrazaq.qirtas"
+            android:targetClass="com.m3athrazaq.qirtas.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="capture"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_capture"
+        android:shortcutShortLabel="@string/shortcut_capture"
+        android:shortcutLongLabel="@string/shortcut_capture">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="qirtas://capture"
+            android:targetPackage="com.m3athrazaq.qirtas"
+            android:targetClass="com.m3athrazaq.qirtas.MainActivity" />
+    </shortcut>
     <shortcut
         android:shortcutId="new_page"
         android:enabled="true"

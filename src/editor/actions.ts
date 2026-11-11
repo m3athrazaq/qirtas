@@ -142,6 +142,15 @@ export function insertDate(editor: Editor, range?: Range, pick = false) {
   start(editor, range).insertContent([{ type: 'dateChip', attrs: { date: todayIso() } }, { type: 'text', text: ' ' }]).run()
 }
 
+/** A reminder chip, an hour from now, with its time panel open to change it. */
+export function insertReminder(editor: Editor, range?: Range) {
+  const at = new Date(Date.now() + 3600_000)
+  at.setMinutes(Math.ceil(at.getMinutes() / 5) * 5, 0, 0)
+  openDateChipNext()
+  start(editor, range).insertContent([{ type: 'reminder', attrs: { id: uid(), at: at.getTime(), done: false } }, { type: 'text', text: ' ' }]).run()
+  void import('../data/reminders').then((m) => m.askReminderPermission())
+}
+
 export function insertPageMention(editor: Editor, range?: Range) {
   if (range) editor.chain().focus().deleteRange(range).run()
   const pos = editor.state.selection.from

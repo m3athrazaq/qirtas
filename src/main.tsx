@@ -10,6 +10,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import { boot } from './data/boot'
+import './data/install' // listens for the browser's "can be installed" from the very start
 import { useStore } from './data/store'
 import { offerUpdate } from './data/update'
 import { initNative } from './lib/native'

@@ -396,9 +396,10 @@ export class Workspace {
         if (x === id) {
           copy.set('parentId', siblingsParent)
           copy.set('title', (meta.title || '') + titleSuffix)
+          // Right after the original; at the end when it goes under another parent
           const sib = this.childrenOrdered(siblingsParent)
           const idx = sib.findIndex((s) => s.id === id)
-          copy.set('order', orderBetween(sib[idx]?.order ?? sib[sib.length - 1]?.order ?? null, sib[idx + 1]?.order ?? null))
+          copy.set('order', idx < 0 ? orderBetween(sib[sib.length - 1]?.order ?? null, null) : orderBetween(sib[idx].order, sib[idx + 1]?.order ?? null))
         } else {
           copy.set('parentId', idMap.get(m.get('parentId') as string) ?? null)
         }

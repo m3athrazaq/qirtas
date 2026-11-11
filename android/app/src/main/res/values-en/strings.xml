@@ -3,6 +3,8 @@
     <string name="app_name">Qirtas</string>
     <string name="title_activity_main">Qirtas</string>
     <string name="share_label">Save to Qirtas</string>
+    <string name="shortcut_today">Today</string>
+    <string name="shortcut_capture">Quick note</string>
     <string name="shortcut_new">New page</string>
     <string name="shortcut_search">Search</string>
     <string name="shortcut_inbox">Inbox</string>
