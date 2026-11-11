@@ -11,6 +11,8 @@ export default defineConfig({
     'import.meta.env.VITE_PREVIEW': JSON.stringify('1'),
     'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(''),
     'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(''),
+    __APP_VERSION__: JSON.stringify('1.1'),
+    __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)),
   },
   build: {
     outDir: 'dist-preview',

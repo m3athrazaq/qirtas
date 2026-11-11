@@ -116,8 +116,17 @@ export function DateChipView({ node, updateAttributes, selected, editor }: NodeV
   )
 }
 
-export function DatabaseBlockView({ node, selected }: NodeViewProps) {
+export function DatabaseBlockView({ node, selected, editor }: NodeViewProps) {
   const id = node.attrs.databaseId as string
+  const db = usePage(id)
+  // In a version preview the table is not drawn: it would show (and let you edit) today's rows
+  if ((editor.options.editorProps?.attributes as Record<string, string> | undefined)?.['data-preview']) {
+    return (
+      <NodeViewWrapper className="db-block is-static" contentEditable={false}>
+        <span className="db-static">{db?.title || t('bTable')}</span>
+      </NodeViewWrapper>
+    )
+  }
   return (
     <NodeViewWrapper className={'db-block' + (selected ? ' is-selected' : '')} contentEditable={false} data-database-id={id}>
       <Suspense fallback={<div className="db-loading">{t('loading')}</div>}>

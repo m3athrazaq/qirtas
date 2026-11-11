@@ -6,6 +6,7 @@ import {
   Copy,
   FileDown,
   FolderInput,
+  History,
   Link2,
   Minimize2,
   MoreHorizontal,
@@ -244,6 +245,16 @@ function PageActions({ page, anchor, onClose }: { page: PageMeta; anchor: Elemen
             requestPagePicker((target) => ws().movePage(page.id, target === '__root__' ? null : target), { title: t('moveTo'), excludeId: page.id, allowRoot: true })
           }}
         />
+        )}
+        {page.type !== 'database' && (
+          <MenuItem
+            icon={<History size={15} />}
+            label={t('history')}
+            onClick={() => {
+              onClose()
+              st.openHistory(page.id)
+            }}
+          />
         )}
         <MenuSep />
         <MenuItem
