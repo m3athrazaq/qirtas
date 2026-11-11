@@ -272,6 +272,28 @@ export function snapshotsToDrop(list: SnapshotMeta[], now: number): number[] {
   return [...drop]
 }
 
+/** All page versions together stay under this size. */
+export const VERSIONS_MAX_BYTES = 200 * 1024 * 1024
+
+/** Past the size limit, the oldest versions go first; versions saved by hand and each page's
+ *  newest version stay. */
+export function versionsOverCap(all: VersionMeta[], max = VERSIONS_MAX_BYTES): number[] {
+  let total = all.reduce((n, v) => n + v.bytes, 0)
+  if (total <= max) return []
+  const newest = new Map<string, VersionMeta>()
+  for (const v of all) {
+    const cur = newest.get(v.pageId)
+    if (!cur || v.ts > cur.ts) newest.set(v.pageId, v)
+  }
+  const drop: number[] = []
+  for (const v of all.filter((x) => x.reason !== 'manual' && newest.get(x.pageId)?.id !== x.id).sort((a, b) => a.ts - b.ts)) {
+    if (total <= max) break
+    drop.push(v.id)
+    total -= v.bytes
+  }
+  return drop
+}
+
 export function versionsToDrop(list: VersionMeta[], now: number): number[] {
   const manual = list.filter((v) => v.reason === 'manual').sort((a, b) => b.ts - a.ts)
   const keepManual = new Set(manual.slice(0, 20).map((v) => v.id))

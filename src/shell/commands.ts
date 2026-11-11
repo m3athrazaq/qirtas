@@ -30,7 +30,11 @@ export function listCommands(): Command[] {
     cmd('tasks', 'tasks', () => runAction('tasks'), alt('M')),
     canEdit && cmd('templates', 'templates', () => st.openModal('templates')),
     page && page.type !== 'database' && cmd('history', 'history', () => st.openHistory(page.id)),
-    cmd('backup', 'backupExport', () => void downloadBackup().then(() => useStore.getState().toast(t('backupDone')))),
+    cmd('backup', 'backupExport', () =>
+      void downloadBackup()
+        .then((info) => useStore.getState().toast(info.partial ? t('bkPartial') : t('backupDone')))
+        .catch((err) => useStore.getState().toast(t('rsFailed', { msg: String((err as Error).message) }))),
+    ),
     cmd('theme', st.settings.theme === 'dark' ? 'cmdLight' : 'cmdDark', () => st.setSettings({ theme: st.settings.theme === 'dark' ? 'light' : 'dark' })),
     cmd('shortcuts', 'shortcuts', () => st.openModal('shortcuts'), mac() ? '⌘ /' : 'Ctrl /'),
     cmd('share', 'share', () => st.openModal('share')),

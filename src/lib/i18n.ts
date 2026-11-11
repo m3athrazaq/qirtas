@@ -614,6 +614,10 @@ const ar = {
   myTemplates: 'قوالبي',
   myTemplateDesc: 'قالب حفظته',
   readyTemplates: 'قوالب جاهزة',
+  bkPartial: 'حُفظ ما أمكن قراءته فقط: تعذّرت قراءة بيانات هذا الجهاز، فالملف لا يحوي إلا الصفحات المفتوحة الآن.',
+  bkInterrupted: 'لم تكتمل آخر نسخة تلقائية (أُغلق التطبيق أثناءها)، فتوقفت لليوم. اضغط «نسخة الآن».',
+  bkNoImages: 'الصور ليست فيها لكبر حجمها؛ نزّل نسخة يدوية لتشملها',
+  rsNoPoint: 'لم أستطع حفظ نقطة استرجاع قبل الإرجاع (قد تكون مساحة الجهاز ممتلئة)، فلم أُغيّر شيئاً. جرّب «دمج» أو حرّر مساحة ثم أعد المحاولة.',
 }
 
 export type Key = keyof typeof ar
@@ -1213,6 +1217,10 @@ const en: Record<Key, string> = {
   myTemplates: 'My templates',
   myTemplateDesc: 'A template you saved',
   readyTemplates: 'Ready-made templates',
+  bkPartial: 'Only part could be saved: this device\'s data couldn\'t be read, so the file holds just the pages open now.',
+  bkInterrupted: 'The last automatic backup didn\'t finish (the app was closed during it), so it is paused for today. Tap "Back up now".',
+  bkNoImages: 'pictures left out for their size; download a backup by hand to include them',
+  rsNoPoint: 'Couldn\'t save a restore point before rolling back (the device may be full), so nothing was changed. Try "merge", or free some space and try again.',
 }
 
 const dicts: Record<Lang, Record<Key, string>> = { ar, en }

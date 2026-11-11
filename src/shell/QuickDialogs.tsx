@@ -32,6 +32,9 @@ export function CaptureDialog() {
       setText('')
       close()
       toast(t('captureSaved'), { label: t('open'), run: () => navigate(id) })
+    } catch (err) {
+      // The note stays in the box
+      toast(t('errGeneric', { msg: err instanceof Error ? err.message : String(err) }), undefined, 8000)
     } finally {
       setBusy(false)
     }

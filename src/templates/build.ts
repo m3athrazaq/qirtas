@@ -2,6 +2,7 @@
 import { getSchema, type JSONContent } from '@tiptap/core'
 import { prosemirrorJSONToYXmlFragment } from '@tiptap/y-tiptap'
 import { getDoc, pageDocId } from '../data/docs'
+import { ORIGIN_SYSTEM } from '../data/history'
 import { ws } from '../data/store'
 import { schemaExtensions } from '../editor/ext'
 
@@ -71,13 +72,17 @@ function plainText(node: JSONContent): string {
   return inner.join(block ? '' : '\n') + (block ? '\n' : '')
 }
 
-/** Replace a page's content with the given document JSON. */
+/** Replace a page's content with the given document JSON. Written as the difference from what the
+ *  page holds (not "delete all, insert all"): what another device changed meanwhile in the parts
+ *  that stay is kept, nothing is doubled when two devices do this at once, and content this build
+ *  can't read throws before anything is touched. */
 export async function setPageContent(pageId: string, json: JSONContent) {
   const ydoc = await getDoc(pageDocId(pageId))
   const frag = ydoc.getXmlFragment('default')
+  // The app's own write (a template, a quick note, a restore): saved and synced like any change,
+  // but not a version of its own
   ydoc.transact(() => {
-    if (frag.length) frag.delete(0, frag.length)
     prosemirrorJSONToYXmlFragment(getPmSchema(), json, frag)
-  })
+  }, ORIGIN_SYSTEM)
   ws().setText(pageId, plainText(json).replace(/\n{2,}/g, '\n').trim())
 }

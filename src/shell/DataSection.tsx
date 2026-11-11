@@ -119,7 +119,8 @@ export function DataSection() {
       {backup.kind !== 'manual' && backup.enabled && (
         <div className="set-status">
           <span className={backup.lastError ? 'is-bad' : ''}>
-            {backup.lastError ? t('bkFailed') : backup.lastAt ? t('bkLast', { when: when(backup.lastAt) }) : t('bkNone')}
+            {backup.lastError === 'interrupted' ? t('bkInterrupted') : backup.lastError ? t('bkFailed') : backup.lastAt ? t('bkLast', { when: when(backup.lastAt) }) : t('bkNone')}
+            {!backup.lastError && backup.noImages && <span className="muted"> · {t('bkNoImages')}</span>}
           </span>
           {backup.kind === 'folder' && backup.needsPermission ? (
             <button type="button" className="btn btn-small" onClick={() => void grantFolderAccess().then((ok) => ok && toast(t('bkDone', { where: useBackup.getState().folderName })))}>
@@ -143,8 +144,8 @@ export function DataSection() {
           onClick={async () => {
             setBusy(true)
             try {
-              await downloadBackup()
-              toast(t('backupDone'))
+              const info = await downloadBackup()
+              toast(info.partial ? t('bkPartial') : t('backupDone'), undefined, info.partial ? 12000 : undefined)
             } catch (err) {
               toast(t('rsFailed', { msg: String((err as Error).message) }))
             } finally {

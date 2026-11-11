@@ -49,7 +49,7 @@ export class AppBoundary extends Component<{ children: ReactNode }, { failed: bo
 /** The screen for when the app can't be drawn or the data can't be opened: reload, or take the data
  *  out as a backup file first. The backup doesn't depend on anything on screen working. */
 export function Rescue({ message }: { message: string }) {
-  const [state, setState] = useState<'idle' | 'busy' | 'done' | 'failed'>('idle')
+  const [state, setState] = useState<'idle' | 'busy' | 'done' | 'partial' | 'failed'>('idle')
   return (
     <div className="app-crash" role="alert">
       <p>{message}</p>
@@ -64,14 +64,14 @@ export function Rescue({ message }: { message: string }) {
           onClick={async () => {
             setState('busy')
             try {
-              await (await import('../data/autobackup')).downloadBackup()
-              setState('done')
+              const info = await (await import('../data/autobackup')).downloadBackup()
+              setState(info.partial ? 'partial' : 'done')
             } catch {
               setState('failed')
             }
           }}
         >
-          {state === 'done' ? t('backupDone') : state === 'failed' ? t('bkFailed') : t('backupExport')}
+          {state === 'done' ? t('backupDone') : state === 'partial' ? t('bkPartial') : state === 'failed' ? t('bkFailed') : t('backupExport')}
         </button>
       </div>
     </div>

@@ -1,5 +1,5 @@
 // "What is due": open tasks, reminders and database rows gathered from every page and sorted by day.
-import { dateToIso } from '../lib/hijri'
+import { localIso } from '../lib/hijri'
 import { t } from '../lib/i18n'
 import { isReachable } from '../shell/pageOps'
 import { inTemplates } from './today'
@@ -22,7 +22,7 @@ export interface Agenda {
   count: number
 }
 
-const dayOf = (ms: number) => dateToIso(new Date(ms))
+const dayOf = (ms: number) => localIso(ms)
 
 export function buildAgenda(entries: Record<string, PageIndexEntry>, pages: Record<string, PageMeta>, today: string): Agenda {
   const dated: AgendaItem[] = []

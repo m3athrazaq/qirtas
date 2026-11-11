@@ -16,6 +16,7 @@ import { BackupFormatError, describeWorkspace, type BackupData } from './backup'
 import { applyOutside, flushWrites, getDoc, pageDocId } from './docs'
 import { ORIGIN_SYSTEM } from './history'
 import { takeSnapshot } from './snapshots'
+import { t } from '../lib/i18n'
 import { useStore } from './store'
 import type { PropValue } from './types'
 import { fingerprint, listVersions, saveVersion } from './vault'
@@ -159,7 +160,10 @@ export async function restoreData(b: BackupData, mode: RestoreMode, onProgress?:
   const wasPristine = w.isPristine()
   const had = new Set(w.pages.keys())
 
-  await takeSnapshot('before-restore')
+  // The way back. A rollback replaces content, so it doesn't go ahead without one (a brand-new
+  // workspace has nothing to lose)
+  const point = await takeSnapshot('before-restore')
+  if (!point && mode === 'rollback' && !wasPristine) throw new Error(t('rsNoPoint'))
 
   // 1. Merge: brings in whatever this device doesn't have (everything, on a new device)
   applyOutside(`ws:${w.id}`, w.doc, b.docs.get(wsDocId)!, ORIGIN_SYSTEM)

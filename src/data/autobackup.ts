@@ -2,7 +2,7 @@
 // or in Documents/Qirtas (Android). The files survive clearing the browser or removing the app, and a
 // folder inside OneDrive or Google Drive puts them in the cloud as well.
 import { create } from 'zustand'
-import { backupFileName, buildBackupBlob, buildBackupParts, collectDocs } from './backup'
+import { backupFileName, buildBackupBlob, buildBackupParts, collectDocs, IncompleteBackupError, type BackupInfo } from './backup'
 import { useStore } from './store'
 import { fingerprint, vaultGet, vaultSet } from './vault'
 import { isNative, saveFile } from '../lib/platform'
@@ -14,6 +14,10 @@ const HOUR = 3600_000
 const DAY = 24 * HOUR
 const KEEP = 7
 const ANDROID_DIR = 'Qirtas'
+/** Pictures larger than this in total stay out of the automatic file (a download by hand has them). */
+const AUTO_ASSET_MAX = 60 * 1024 * 1024
+/** Set while an automatic backup runs: still there at the next start means it never finished. */
+const RUNNING_KEY = 'qirtas.autobackup.running'
 
 /** folder: a chosen folder on the computer; device: Documents/Qirtas on the phone; manual: neither is possible here. */
 export type BackupKind = 'folder' | 'device' | 'manual'
@@ -29,6 +33,8 @@ interface Saved {
   lastNagAt: number
   /** When this device first ran a version with backups: the reminder waits a few days from then. */
   since: number
+  /** The last automatic file left the pictures out (too large). */
+  noImages: boolean
 }
 
 export interface BackupState extends Saved {
@@ -40,7 +46,7 @@ export interface BackupState extends Saved {
 }
 
 function load(): Saved {
-  const base: Saved = { enabled: false, lastAt: 0, lastHash: '', lastName: '', lastError: '', lastAnyAt: 0, lastNagAt: 0, since: 0 }
+  const base: Saved = { enabled: false, lastAt: 0, lastHash: '', lastName: '', lastError: '', lastAnyAt: 0, lastNagAt: 0, since: 0, noImages: false }
   try {
     return { ...base, ...(JSON.parse(localStorage.getItem(KEY) || '{}') as Partial<Saved>) }
   } catch {
@@ -59,6 +65,7 @@ function save(patch: Partial<Saved>) {
     lastAnyAt: cur.lastAnyAt,
     lastNagAt: cur.lastNagAt,
     since: cur.since,
+    noImages: cur.noImages,
     ...patch,
   }
   try {
@@ -105,8 +112,23 @@ function deviceTag(): string {
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
-export function autoBackupName(date = new Date()): string {
-  return `qirtas-backup-${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}-${deviceTag()}.json`
+/** `keep`: a file the rotation never removes (the copy made before signing out). */
+export function autoBackupName(date = new Date(), keep = false): string {
+  return `qirtas-backup-${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}-${deviceTag()}${keep ? '-keep' : ''}.json`
+}
+
+/** After signing out or clearing the device: the next files get a new device tag, so the rotation
+ *  never removes the files written before (another account's, the copy made before signing out),
+ *  and a folder whose access was cleared is no longer counted as backing up. */
+export function forgetBackupDevice() {
+  try {
+    localStorage.removeItem(DEVICE_KEY)
+    localStorage.removeItem(RUNNING_KEY)
+  } catch {
+    /* ignore */
+  }
+  const kind = backupKind()
+  save({ lastHash: '', lastName: '', lastError: '', lastAt: 0, ...(kind === 'folder' ? { enabled: false } : {}) })
 }
 
 /** This installation's backup files that are older than the newest `keep`. */
@@ -283,7 +305,11 @@ async function doBackup(opts: { force?: boolean }): Promise<BackupOutcome> {
   let handle: DirHandle | null = null
   if (kind === 'folder') {
     handle = await folderHandle()
-    if (!handle) return 'off'
+    if (!handle) {
+      // The folder's access was cleared (signing out, clearing the device): say so instead of going quiet
+      save({ enabled: false })
+      return 'off'
+    }
     let state: PermissionState = 'prompt'
     try {
       state = await handle.queryPermission({ mode: 'readwrite' })
@@ -295,6 +321,23 @@ async function doBackup(opts: { force?: boolean }): Promise<BackupOutcome> {
       return 'permission'
     }
   }
+  // The last automatic backup never finished (the app was closed, or ran out of memory): not again
+  // automatically today, and the settings say so. "Back up now" still tries.
+  let startedAt = 0
+  try {
+    startedAt = Number(localStorage.getItem(RUNNING_KEY)) || 0
+  } catch {
+    /* ignore */
+  }
+  if (!opts.force && startedAt && Date.now() - startedAt < DAY) {
+    save({ lastError: 'interrupted' })
+    return 'failed'
+  }
+  try {
+    localStorage.setItem(RUNNING_KEY, String(Date.now()))
+  } catch {
+    /* ignore */
+  }
   useBackup.setState({ busy: true, needsPermission: false })
   try {
     const docs = await collectDocs()
@@ -304,36 +347,48 @@ async function doBackup(opts: { force?: boolean }): Promise<BackupOutcome> {
       save({ lastAt: Date.now(), lastAnyAt: Date.now(), lastError: '' })
       return 'unchanged'
     }
-    const { parts, info } = await buildBackupParts({ docs })
+    const { parts, info } = await buildBackupParts({ docs, maxAssetBytes: AUTO_ASSET_MAX })
     const name = autoBackupName()
     if (kind === 'folder') await writeToFolder(handle!, name, parts, info.bytes)
     else await writeToDevice(name, parts, info.bytes)
-    save({ lastAt: Date.now(), lastAnyAt: Date.now(), lastHash: hash, lastName: name, lastError: '' })
+    save({ lastAt: Date.now(), lastAnyAt: Date.now(), lastHash: hash, lastName: name, lastError: '', noImages: info.assetsSkipped })
     return 'done'
   } catch (err) {
     console.warn('[qirtas] automatic backup failed', err)
     save({ lastError: String((err as Error)?.message ?? err).slice(0, 200) })
     return 'failed'
+  } finally {
+    try {
+      localStorage.removeItem(RUNNING_KEY)
+    } catch {
+      /* ignore */
+    }
   }
 }
 
-/** Download a full backup file (the settings, the crash screen and signing out use it). */
-export async function downloadBackup(): Promise<void> {
-  const { blob } = await buildBackupBlob()
+/** Download a full backup file (the settings, the crash screen and signing out use it). When the
+ *  device store can't be read, what is open in memory is still saved, and info.partial says so.
+ *  Throws when there is nothing at all to save. */
+export async function downloadBackup(): Promise<BackupInfo> {
+  const { blob, info } = await buildBackupBlob()
+  if (!info.docs) throw new IncompleteBackupError('nothing could be read')
   await saveFile(backupFileName(), blob, 'application/json')
-  // A file saved by hand counts for the reminder
-  save({ lastAnyAt: Date.now() })
+  // A file saved by hand counts for the reminder (a partial one doesn't)
+  if (!info.partial) save({ lastAnyAt: Date.now() })
+  return info
 }
 
 /** A full backup right now, somewhere that outlives signing out: Documents/Qirtas on the phone (the
  *  place is returned), a downloaded file elsewhere (returns ''). Throws when it could not be written. */
 export async function emergencyBackup(): Promise<string> {
   if (backupKind() !== 'device') {
-    await downloadBackup()
+    // Signing out goes ahead only with a complete copy
+    if ((await downloadBackup()).partial) throw new IncompleteBackupError('partial')
     return ''
   }
   const { parts, info } = await buildBackupParts()
-  const name = autoBackupName()
+  if (info.partial || !info.docs) throw new IncompleteBackupError('partial')
+  const name = autoBackupName(new Date(), true)
   await writeToDevice(name, parts, info.bytes)
   save({ lastAt: Date.now(), lastAnyAt: Date.now(), lastName: name, lastError: '' })
   return `Documents/${ANDROID_DIR}/${name}`

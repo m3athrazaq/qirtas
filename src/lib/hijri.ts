@@ -33,6 +33,12 @@ export function dateToIso(d: Date): string {
 }
 
 /** Today's local calendar date as ISO. */
+/** The local calendar day of a moment (a reminder's time). dateToIso is for the noon-UTC dates of isoToDate. */
+export function localIso(ms: number): string {
+  const d = new Date(ms)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 export function todayIso(): string {
   const now = new Date()
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`

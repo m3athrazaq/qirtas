@@ -180,12 +180,15 @@ export class SyncEngine {
     }
     this.flushing = true
     let again = false
+    // Taken out of the set before their state is read: a change that fails to queue while they are
+    // being sent puts its document back in, for the next round
+    const whole = [...this.resync]
+    whole.forEach((d) => this.resync.delete(d))
     try {
       await this.pending
       // Only this workspace's changes: ones queued in another workspace (offline, then switched)
       // wait until that workspace is open again, instead of landing here
       const items = (await outboxAll()).filter(this.mine)
-      const whole = [...this.resync]
       if (!items.length && !whole.length) {
         useStore.setState({ pendingSync: 0 })
         return
@@ -208,7 +211,7 @@ export class SyncEngine {
         if (error) throw error
       }
       await outboxDelete(items.map((i) => i.id!).filter((x) => x !== undefined))
-      whole.forEach((d) => this.resync.delete(d))
+      whole.length = 0
       this.status('synced')
       this.synced()
       again = (await outboxAll()).some(this.mine) || this.resync.size > 0
@@ -216,6 +219,8 @@ export class SyncEngine {
       this.status('offline')
       if (!this.stopped) this.flushTimer = setTimeout(() => void this.flush(), 6000)
     } finally {
+      // Not sent: they go back in the set
+      whole.forEach((d) => this.resync.add(d))
       this.flushing = false
       void this.countPending()
       if (again) void this.flush()
@@ -393,6 +398,34 @@ export class SyncEngine {
   setPage(pageId: string | null) {
     this.me = { ...this.me, pageId }
     if (this.channel) void this.channel.track(this.me)
+  }
+
+  /** Every row of one document, whatever the bookmark says: for a page deleted for good on this
+   *  device that is in use again (see data/purged.ts). Applying rows twice changes nothing. */
+  async refetchDoc(docId: string) {
+    const doc = await getDoc(docId)
+    let after = 0
+    for (;;) {
+      const { data, error } = await this.sb
+        .from('doc_updates')
+        .select('id, doc_id, data, client_id')
+        .eq('workspace_id', this.wsId)
+        .eq('doc_id', docId)
+        .gt('id', after)
+        .order('id', { ascending: true })
+        .limit(200)
+      if (error) throw error
+      const rows = (data ?? []) as Row[]
+      for (const r of rows) {
+        try {
+          applyOutside(docId, doc, fromB64(r.data), ORIGIN_REMOTE)
+        } catch {
+          /* malformed update: skip */
+        }
+        after = r.id
+      }
+      if (rows.length < 200) break
+    }
   }
 
   /** Make sure a page that only exists remotely is available locally. */
