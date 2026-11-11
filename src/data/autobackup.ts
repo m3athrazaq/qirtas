@@ -14,10 +14,36 @@ const HOUR = 3600_000
 const DAY = 24 * HOUR
 const KEEP = 7
 const ANDROID_DIR = 'Qirtas'
-/** Pictures larger than this in total stay out of the automatic file (a download by hand has them). */
-const AUTO_ASSET_MAX = 60 * 1024 * 1024
-/** Set while an automatic backup runs: still there at the next start means it never finished. */
+/** Pictures larger than this in total stay out of the automatic file (a download by hand has them):
+ *  the file is put together in memory, and a phone has less of it. */
+const AUTO_ASSET_MAX = { folder: 400 * 1024 * 1024, device: 60 * 1024 * 1024 }
+/** Set while a backup runs, refreshed every few seconds: a fresh one means another window is writing
+ *  now; an old one means a backup never finished (the app was closed or ran out of memory). */
 const RUNNING_KEY = 'qirtas.autobackup.running'
+const BEAT = 5000
+const OWNER = Math.random().toString(36).slice(2)
+interface RunMark {
+  owner: string
+  beat: number
+  /** Backups in a row that never finished. */
+  fails: number
+}
+function readMark(): RunMark | null {
+  try {
+    const m = JSON.parse(localStorage.getItem(RUNNING_KEY) || 'null') as RunMark | null
+    return m && typeof m.beat === 'number' ? m : null
+  } catch {
+    return null
+  }
+}
+function writeMark(m: RunMark | null) {
+  try {
+    if (m) localStorage.setItem(RUNNING_KEY, JSON.stringify(m))
+    else localStorage.removeItem(RUNNING_KEY)
+  } catch {
+    /* ignore */
+  }
+}
 
 /** folder: a chosen folder on the computer; device: Documents/Qirtas on the phone; manual: neither is possible here. */
 export type BackupKind = 'folder' | 'device' | 'manual'
@@ -55,25 +81,14 @@ function load(): Saved {
 }
 
 function save(patch: Partial<Saved>) {
-  const cur = useBackup.getState()
-  const next: Saved = {
-    enabled: cur.enabled,
-    lastAt: cur.lastAt,
-    lastHash: cur.lastHash,
-    lastName: cur.lastName,
-    lastError: cur.lastError,
-    lastAnyAt: cur.lastAnyAt,
-    lastNagAt: cur.lastNagAt,
-    since: cur.since,
-    noImages: cur.noImages,
-    ...patch,
-  }
+  // On top of what is stored, not of this window's copy: another window may have written since
+  const next: Saved = { ...load(), ...patch }
   try {
     localStorage.setItem(KEY, JSON.stringify(next))
   } catch {
     /* ignore */
   }
-  useBackup.setState(patch)
+  useBackup.setState(next)
 }
 
 type PermissionMode = { mode: 'readwrite' }
@@ -321,23 +336,18 @@ async function doBackup(opts: { force?: boolean }): Promise<BackupOutcome> {
       return 'permission'
     }
   }
-  // The last automatic backup never finished (the app was closed, or ran out of memory): not again
-  // automatically today, and the settings say so. "Back up now" still tries.
-  let startedAt = 0
-  try {
-    startedAt = Number(localStorage.getItem(RUNNING_KEY)) || 0
-  } catch {
-    /* ignore */
-  }
-  if (!opts.force && startedAt && Date.now() - startedAt < DAY) {
+  const mark = readMark()
+  const live = !!mark && Date.now() - mark.beat < 6 * BEAT
+  if (live && mark.owner !== OWNER) return 'busy' // another window is writing it right now
+  // Backups that never finished, twice in a row (the app closed during them, or ran out of memory):
+  // not again automatically today, and the settings say so. "Back up now" still tries.
+  const fails = mark && !live ? mark.fails + 1 : 0
+  if (!opts.force && fails >= 2 && Date.now() - mark!.beat < DAY) {
     save({ lastError: 'interrupted' })
     return 'failed'
   }
-  try {
-    localStorage.setItem(RUNNING_KEY, String(Date.now()))
-  } catch {
-    /* ignore */
-  }
+  writeMark({ owner: OWNER, beat: Date.now(), fails })
+  const beat = setInterval(() => writeMark({ owner: OWNER, beat: Date.now(), fails }), BEAT)
   useBackup.setState({ busy: true, needsPermission: false })
   try {
     const docs = await collectDocs()
@@ -347,7 +357,7 @@ async function doBackup(opts: { force?: boolean }): Promise<BackupOutcome> {
       save({ lastAt: Date.now(), lastAnyAt: Date.now(), lastError: '' })
       return 'unchanged'
     }
-    const { parts, info } = await buildBackupParts({ docs, maxAssetBytes: AUTO_ASSET_MAX })
+    const { parts, info } = await buildBackupParts({ docs, maxAssetBytes: AUTO_ASSET_MAX[kind] })
     const name = autoBackupName()
     if (kind === 'folder') await writeToFolder(handle!, name, parts, info.bytes)
     else await writeToDevice(name, parts, info.bytes)
@@ -358,11 +368,8 @@ async function doBackup(opts: { force?: boolean }): Promise<BackupOutcome> {
     save({ lastError: String((err as Error)?.message ?? err).slice(0, 200) })
     return 'failed'
   } finally {
-    try {
-      localStorage.removeItem(RUNNING_KEY)
-    } catch {
-      /* ignore */
-    }
+    clearInterval(beat)
+    writeMark(null)
   }
 }
 

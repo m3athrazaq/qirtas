@@ -8,6 +8,7 @@ import { flushWrites, getDoc, hasUnsaved, resetDocs } from '../data/docs'
 import { anyRevived, forgetPurged, purgedDocs } from '../data/purged'
 import { takeSnapshot } from '../data/snapshots'
 import { forgetBackupDevice } from '../data/autobackup'
+import { cancelReminders } from '../data/reminders'
 import { wipeVault } from '../data/vault'
 import { useStore } from '../data/store'
 import { getActor, setActor } from '../data/workspace'
@@ -313,6 +314,9 @@ async function refreshMembership(user: User) {
     return
   }
   useSession.setState({ workspaces: list })
+  // Reminders of a workspace this account is no longer in stop ringing (this one's own are kept
+  // while it is open; local workspaces aren't in the list)
+  void cancelReminders([...list.map((x) => x.id), w.id])
   const role = list.find((x) => x.id === w.id)?.role ?? null
   if (role === useSession.getState().role) return
   if (!role) {
@@ -452,6 +456,7 @@ export async function signOut() {
   await wipeAll()
   await wipeVault().catch(() => {})
   forgetBackupDevice() // the files written so far stay out of the next account's rotation
+  await cancelReminders() // the account's reminders must not ring on this device any more
   localStorage.removeItem('qirtas.recent')
   location.hash = '#/'
   location.reload()

@@ -231,6 +231,7 @@ export function DataSection() {
             resetDocs()
             await wipeAll()
             await wipeVault().catch(() => {})
+            await (await import('../data/reminders')).cancelReminders()
             localStorage.clear()
             location.hash = ''
             location.reload()

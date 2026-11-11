@@ -50,18 +50,22 @@ async function ensureFixedPage(id: string, init: { title: string; icon: string; 
   return true
 }
 
-/** In a workspace that syncs, wait (a few seconds at most) for the first sync of this session. */
+/** In a workspace that syncs, wait (a few seconds at most, once per session) for its first sync. */
+let settled = false
 async function settleSync() {
   const st = useStore.getState()
-  if (!st.ws || st.syncStatus === 'synced' || st.syncStatus === 'offline') return
+  if (settled || !st.ws || st.syncStatus === 'synced' || st.syncStatus === 'offline') return
   if (!(await kvGet(`sync:linked:${st.ws.id}`).catch(() => null))) return
+  settled = true
+  // Not started yet (it may never start, e.g. signed out meanwhile): a shorter wait
+  const ms = st.syncStatus === 'syncing' ? 5000 : 2000
   await new Promise<void>((resolve) => {
     const done = () => {
       clearTimeout(timer)
       stop()
       resolve()
     }
-    const timer = setTimeout(done, 5000)
+    const timer = setTimeout(done, ms)
     const stop = useStore.subscribe((s) => (s.syncStatus === 'synced' || s.syncStatus === 'offline') && done())
   })
 }

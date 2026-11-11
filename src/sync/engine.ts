@@ -190,7 +190,9 @@ export class SyncEngine {
       // wait until that workspace is open again, instead of landing here
       const items = (await outboxAll()).filter(this.mine)
       if (!items.length && !whole.length) {
-        useStore.setState({ pendingSync: 0 })
+        // A document may have come back into the set while the queue was settling
+        again = this.resync.size > 0
+        if (!again) useStore.setState({ pendingSync: 0 })
         return
       }
       const byDoc = new Map<string, Uint8Array[]>()
