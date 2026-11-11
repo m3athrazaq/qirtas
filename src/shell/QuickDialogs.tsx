@@ -43,7 +43,8 @@ export function CaptureDialog() {
         <textarea
           ref={ref}
           className="input capture-text"
-          dir="auto"
+          // Empty: the caret starts on the side of the app's language; then the text decides
+          dir={text.trim() ? 'auto' : document.documentElement.dir || 'auto'}
           rows={4}
           value={text}
           placeholder={t('capturePlaceholder')}
