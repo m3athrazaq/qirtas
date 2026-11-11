@@ -29,7 +29,9 @@ jobs:
       - name: Install a test browser
         run: |
           npm i --no-save playwright@1.63.0
-          npx playwright install --with-deps chromium
+          # System packages come from Ubuntu's mirrors; when those can't be reached, the runner's own
+          # libraries are enough for Chromium
+          npx playwright install --with-deps chromium || npx playwright install chromium
 
       - name: Run the test
         env:
