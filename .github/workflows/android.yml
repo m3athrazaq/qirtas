@@ -57,13 +57,13 @@ jobs:
           fi
           ./gradlew assembleRelease --no-daemon --stacktrace
           mkdir -p ../out
-          cp app/build/outputs/apk/release/*.apk "../out/qirtas-1.0.${GITHUB_RUN_NUMBER}.apk"
+          cp app/build/outputs/apk/release/*.apk "../out/qirtas-1.1.${GITHUB_RUN_NUMBER}.apk"
 
       - name: Publish release
         if: env.SIGNED == '1'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: قِرطاس 1.0.${{ github.run_number }}
+          tag_name: v1.1.${{ github.run_number }}
+          name: قِرطاس 1.1.${{ github.run_number }}
           files: out/*.apk
           make_latest: true

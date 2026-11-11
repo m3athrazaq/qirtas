@@ -16,6 +16,7 @@ export function formatWhen(ts: number, s: Pick<Settings, 'lang' | 'numerals'>, n
   const days = Math.round((startOfDay(now) - startOfDay(ts)) / DAY)
   if (days === 0) return `${t('today')} ${time}`
   if (days === 1) return `${t('yesterday')} ${time}`
+  if (days === -1) return `${t('tomorrow')} ${time}`
   const sameYear = d.getFullYear() === new Date(now).getFullYear()
   const date = d.toLocaleDateString(loc, sameYear ? { day: 'numeric', month: 'short' } : { day: 'numeric', month: 'short', year: 'numeric' })
   return `${date}${s.lang === 'ar' ? '،' : ','} ${time}`

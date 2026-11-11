@@ -1135,3 +1135,171 @@
 .kb-btn.is-accent {
   color: var(--lapis);
 }
+
+/* ---------- reminders ---------- */
+
+.reminder-chip > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--tag-orange-bg);
+  color: var(--tag-orange-fg);
+  cursor: pointer;
+  font-size: 0.92em;
+  line-height: 1.7;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+.reminder-chip > span svg {
+  flex: none;
+}
+
+.reminder-chip > span:hover,
+.reminder-chip.is-selected > span {
+  filter: brightness(0.96);
+  box-shadow: 0 0 0 1px currentColor inset;
+}
+
+.reminder-chip.is-due > span {
+  background: var(--tag-red-bg);
+  color: var(--tag-red-fg);
+  font-weight: 500;
+}
+
+.reminder-chip.is-done > span {
+  background: var(--paper-3);
+  color: var(--ink-3);
+  text-decoration: line-through;
+}
+
+.reminder-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  min-width: 280px;
+}
+
+.reminder-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reminder-time {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 4px 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.reminder-time .input {
+  width: auto;
+  min-width: 120px;
+  height: 32px;
+}
+
+.reminder-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.reminder-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- journal day, links to this page ---------- */
+
+.day-panel {
+  margin: 4px 0 14px;
+}
+
+.day-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.day-nav .count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--lapis);
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.day-due {
+  margin-top: 12px;
+  padding: 4px 6px 6px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+}
+
+.day-due .tasks-head {
+  margin-top: 6px;
+}
+
+.backlinks {
+  margin: 40px 0 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.backlinks-head {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.backlinks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.backlink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 32px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-align: start;
+  color: var(--ink-2);
+}
+
+.backlink:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.backlink .tree-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media print {
+  .day-panel,
+  .backlinks {
+    display: none;
+  }
+}

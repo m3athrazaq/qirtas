@@ -1,11 +1,12 @@
 // Android integration: system bars, the hardware back button, shortcuts and "share to Qirtas".
 import { navigate } from '../data/nav'
-import { useStore, ws } from '../data/store'
+import { runAction } from '../data/actions'
+import { useStore } from '../data/store'
+import { inboxPageId } from '../data/today'
 import { closeAi, useAi } from '../ai/aiBus'
 import { closePagePicker, usePicker } from '../ui/pickerBus'
 import { minimizePage, minimizeTarget } from '../shell/pageOps'
 import { isNative, QirtasNative } from './platform'
-import { t } from './i18n'
 
 export async function initNative() {
   if (!isNative()) return
@@ -51,20 +52,11 @@ export async function initNative() {
 }
 
 function handleUrl(url: string) {
-  // qirtas://new, qirtas://search, qirtas://page/<id>
-  const u = url.replace(/^qirtas:\/\//, '')
-  if (u.startsWith('new')) navigate(ws().createPage({ parentId: null }))
-  else if (u.startsWith('search')) useStore.getState().openModal('search')
-  else if (u.startsWith('task')) navigate(inboxPage())
+  // qirtas://new, qirtas://search, qirtas://today, qirtas://capture, qirtas://tasks, qirtas://task (the inbox), qirtas://page/<id>
+  const u = url.replace(/^qirtas:\/\//, '').replace(/\/$/, '')
+  if (u === 'new' || u === 'search' || u === 'today' || u === 'capture' || u === 'tasks') runAction(u)
+  else if (u.startsWith('task')) navigate(inboxPageId())
   else if (u.startsWith('page/')) navigate(u.slice(5))
-}
-
-/** A page named "Inbox" that collects things shared from other apps. */
-function inboxPage(): string {
-  const st = useStore.getState()
-  const title = t('inbox')
-  const existing = Object.values(st.pages).find((p) => !p.deletedAt && !p.parentId && p.icon === '📥')
-  return existing?.id ?? ws().createPage({ title, icon: '📥', parentId: null })
 }
 
 async function checkShared() {
@@ -72,7 +64,7 @@ async function checkShared() {
     const shared = await QirtasNative.getSharedContent()
     if (!shared || (!shared.text && !shared.image)) return
     const { addToInbox } = await import('./inbox')
-    const id = await addToInbox(inboxPage(), shared)
+    const id = await addToInbox(inboxPageId(), shared)
     navigate(id)
   } catch {
     /* plugin not present */

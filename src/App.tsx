@@ -13,6 +13,8 @@ import { TemplatesDialog } from './shell/TemplatesDialog'
 import { Toasts } from './shell/Toasts'
 import { JoinDialog } from './shell/JoinDialog'
 import { HistoryDialog } from './shell/HistoryDialog'
+import { CaptureDialog, ShortcutsDialog } from './shell/QuickDialogs'
+import { TasksDialog } from './shell/TasksDialog'
 import { DialogHost } from './ui/dialogs'
 import { TopBar } from './shell/TopBar'
 import { TrashDialog } from './shell/TrashDialog'
@@ -72,6 +74,9 @@ export default function App() {
       <SettingsDialog />
       <TrashDialog />
       <HistoryDialog />
+      <TasksDialog />
+      <CaptureDialog />
+      <ShortcutsDialog />
       <ShareDialog />
       <PagePicker />
       <RowPeek />

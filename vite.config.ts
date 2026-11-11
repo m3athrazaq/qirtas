@@ -6,6 +6,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 // 1.1 for the web app (which is always the latest), each with the day it was built.
 const run = process.env.GITHUB_RUN_NUMBER
 const version = run ? `1.1.${run}` : '1.1'
+// Changes with every build (the web app's version stays "1.1"): a restore point is taken before
+// the first start of a new build.
+const buildId = (process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA || '').slice(0, 8) || String(Date.now())
 
 // Relative base so the same build runs on any web host and inside the Android app.
 export default defineConfig({
@@ -13,6 +16,7 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(version),
     __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)),
+    __BUILD_ID__: JSON.stringify(buildId),
   },
   plugins: [
     react(),
@@ -38,9 +42,13 @@ export default defineConfig({
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
           { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
+        // Right-click the app in the taskbar / long-press its icon
         shortcuts: [
+          { name: 'اليوم', url: './#/today' },
+          { name: 'ملاحظة سريعة', url: './#/capture' },
           { name: 'صفحة جديدة', url: './#/new' },
           { name: 'بحث', url: './#/search' },
+          { name: 'مهامي', url: './#/tasks' },
         ],
       },
       workbox: {

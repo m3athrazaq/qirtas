@@ -1,5 +1,6 @@
-import { ChevronsLeft, ChevronsRight, Cloud, CloudOff, Database, FileText, LayoutTemplate, Plus, Search, Settings, Trash2 } from 'lucide-react'
+import { CalendarCheck2, ChevronsLeft, ChevronsRight, Cloud, CloudOff, Database, FileText, LayoutTemplate, ListChecks, Plus, Search, Settings, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { runAction } from '../data/actions'
 import { getRecent, navigate } from '../data/nav'
 import { useCanEdit, useStore, ws } from '../data/store'
 import { t } from '../lib/i18n'
@@ -7,6 +8,7 @@ import { num } from '../lib/hijri'
 import { syncAvailable } from '../sync/config'
 import { useSession } from '../sync/session'
 import { PageTree } from './PageTree'
+import { useAgenda } from './TasksDialog'
 import { isReachable } from './pageOps'
 import { openSettingsAt } from './SettingsDialog'
 import { WorkspaceMenu } from './WorkspaceMenu'
@@ -39,6 +41,7 @@ export function Sidebar({ variant = 'side' }: { variant?: 'side' | 'home' }) {
         : [],
     [variant, pages],
   )
+  const due = useAgenda().count
   const trashCount = useMemo(() => Object.values(pages).filter((p) => p.deletedAt && !(p.parentId && pages[p.parentId]?.deletedAt)).length, [pages])
 
   const newPage = () => navigate(ws().createPage({ parentId: null }))
@@ -68,6 +71,15 @@ export function Sidebar({ variant = 'side' }: { variant?: 'side' | 'home' }) {
           <Search size={17} strokeWidth={1.7} />
           <span>{t('search')}</span>
           {variant === 'side' && <kbd>{isMac() ? '⌘K' : 'Ctrl K'}</kbd>}
+        </button>
+        <button type="button" className="sb-item" onClick={() => runAction('today')}>
+          <CalendarCheck2 size={17} strokeWidth={1.7} />
+          <span>{t('todayPage')}</span>
+        </button>
+        <button type="button" className="sb-item" onClick={() => openModal('tasks')}>
+          <ListChecks size={17} strokeWidth={1.7} />
+          <span>{t('tasks')}</span>
+          {due > 0 && <span className="count">{num(due, numerals)}</span>}
         </button>
         <button type="button" className="sb-item" onClick={() => openModal('templates')}>
           <LayoutTemplate size={17} strokeWidth={1.7} />

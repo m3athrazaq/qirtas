@@ -46,7 +46,7 @@ function loadSettings(): Settings {
   return { ...defaultSettings, numerals: defaultSettings.lang === 'en' ? 'latn' : 'arab' }
 }
 
-export type Modal = null | 'search' | 'templates' | 'settings' | 'trash' | 'share' | 'history'
+export type Modal = null | 'search' | 'templates' | 'settings' | 'trash' | 'share' | 'history' | 'tasks' | 'shortcuts' | 'capture'
 
 export interface Toast {
   id: number

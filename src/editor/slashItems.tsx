@@ -1,5 +1,6 @@
 import type { Editor, Range } from '@tiptap/core'
 import {
+  BellRing,
   CalendarCheck2,
   CalendarDays,
   Code2,
@@ -34,6 +35,7 @@ import {
   insertDivider,
   insertImage,
   insertPageMention,
+  insertReminder,
   insertSimpleTable,
   insertSubPage,
   turnInto,
@@ -74,6 +76,7 @@ export const SLASH_ITEMS: SlashItem[] = [
   { id: 'simpletable', title: 'bSimpleTable', desc: 'bSimpleTableDesc', icon: Grid3x3, group: 'blocksData', keywords: ['grid', 'simple table', 'جدول بسيط', 'شبكة'], run: (e, r) => insertSimpleTable(e, r) },
   { id: 'today', title: 'bToday', desc: 'bTodayDesc', icon: CalendarCheck2, group: 'blocksInsert', keywords: ['today', 'date', 'now', 'اليوم', 'تاريخ', 'هجري'], run: (e, r) => insertDate(e, r) },
   { id: 'date', title: 'bDate', desc: 'bDateDesc', icon: CalendarSearch, group: 'blocksInsert', keywords: ['date', 'pick', 'تاريخ', 'موعد'], run: (e, r) => insertDate(e, r, true) },
+  { id: 'reminder', title: 'bReminder', desc: 'bReminderDesc', icon: BellRing, group: 'blocksInsert', keywords: ['reminder', 'remind', 'alarm', 'notify', 'تذكير', 'ذكرني', 'منبه', 'تنبيه', 'موعد'], run: (e, r) => insertReminder(e, r) },
   { id: 'ai', title: 'bAi', desc: 'bAiDesc', icon: Sparkles, group: 'blocksAi', keywords: ['ai', 'assistant', 'claude', 'ذكاء', 'مساعد', 'اكتب'], run: (e, r) => openAi(e, { range: r }) },
   { id: 'voice', title: 'bVoice', desc: 'bVoiceDesc', icon: Mic, group: 'blocksAi', keywords: ['voice', 'speech', 'dictate', 'صوت', 'تسجيل', 'إملاء'], run: (e, r) => openVoice(e, r) },
 ]

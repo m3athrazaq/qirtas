@@ -4,6 +4,8 @@ import { t } from '../lib/i18n'
 import { Modal } from '../ui/Modal'
 import { AccountSection } from '../sync/AccountSection'
 import { DataSection } from './DataSection'
+import { promptInstall, useInstall } from '../data/install'
+import { notificationState, requestNotifications, testNotification, type NotifyState } from '../data/reminders'
 
 export type SettingsTab = 'general' | 'account' | 'ai' | 'data'
 type Tab = SettingsTab
@@ -34,6 +36,7 @@ export function SettingsDialog() {
   const settings = useStore((s) => s.settings)
   const setSettings = useStore((s) => s.setSettings)
   const wsName = useStore((s) => s.wsName)
+  const installable = useInstall((s) => s.available)
   const [tab, setTab] = useState<Tab>('general')
   const set = (patch: Partial<Settings>) => setSettings(patch)
   useEffect(() => {
@@ -121,6 +124,14 @@ export function SettingsDialog() {
               <Row label={t('spellcheck')} desc={t('spellcheckDesc')}>
                 <input type="checkbox" className="switch" checked={settings.spellcheck} onChange={(e) => set({ spellcheck: e.target.checked })} />
               </Row>
+              <NotificationsRow />
+              {installable && (
+                <Row label={t('installApp')} desc={t('installAppDesc')}>
+                  <button type="button" className="btn btn-small" onClick={() => void promptInstall()}>
+                    {t('install')}
+                  </button>
+                </Row>
+              )}
               <Row label={t('yourName')}>
                 <input className="input" dir="auto" value={settings.userName} onChange={(e) => set({ userName: e.target.value })} />
               </Row>
@@ -160,6 +171,34 @@ export function SettingsDialog() {
         </div>
       </div>
     </Modal>
+  )
+}
+
+function NotificationsRow() {
+  const [state, setState] = useState<NotifyState | null>(null)
+  useEffect(() => {
+    let live = true
+    void notificationState().then((s) => live && setState(s))
+    return () => {
+      live = false
+    }
+  }, [])
+  if (!state || state === 'none') return null
+  return (
+    <Row label={t('notifications')} desc={state === 'denied' ? t('notificationsBlocked') : t('notificationsDesc')}>
+      {state === 'granted' ? (
+        <span className="set-inline">
+          <span className="set-ok">{t('notificationsOn')}</span>
+          <button type="button" className="btn btn-small" onClick={() => void testNotification()}>
+            {t('notificationsTest')}
+          </button>
+        </span>
+      ) : state === 'ask' ? (
+        <button type="button" className="btn btn-small" onClick={() => void requestNotifications().then(setState)}>
+          {t('notificationsAllow')}
+        </button>
+      ) : null}
+    </Row>
   )
 }
 

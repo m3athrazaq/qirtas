@@ -14,6 +14,10 @@ const config: CapacitorConfig = {
       insetsHandling: 'css',
       initialViewportFitValueHint: 'cover',
     },
+    LocalNotifications: {
+      smallIcon: 'ic_stat_qirtas',
+      iconColor: '#2a47a8',
+    },
   },
 }
 

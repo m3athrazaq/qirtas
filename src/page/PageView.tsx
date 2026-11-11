@@ -8,6 +8,7 @@ import type { PropDef, ViewType } from '../data/types'
 import { getActiveEditor, PageEditor } from '../editor/PageEditor'
 import { t } from '../lib/i18n'
 import { uid } from '../lib/ids'
+import { Backlinks, DayPanel } from './DayPanel'
 import { PageCover, PageTitleBlock } from './PageHeader'
 import { RowProps } from './RowProps'
 
@@ -114,7 +115,9 @@ export function PageView({ pageId, inPeek = false }: { pageId: string; inPeek?: 
                 </button>
               </div>
             )}
+            {!inPeek && <DayPanel pageId={page.id} />}
             <PageEditor pageId={page.id} editable={editable} onReady={setEditor} />
+            {!inPeek && <Backlinks pageId={page.id} />}
           </>
         )}
       </div>

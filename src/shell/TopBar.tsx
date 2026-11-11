@@ -7,6 +7,7 @@ import {
   FileDown,
   FolderInput,
   History,
+  LayoutTemplate,
   Link2,
   Minimize2,
   MoreHorizontal,
@@ -26,6 +27,7 @@ import type { PageFont, PageMeta } from '../data/types'
 import { getActor } from '../data/workspace'
 import { exportMarkdown, exportPdf } from '../lib/exporter'
 import { num } from '../lib/hijri'
+import { saveAsTemplate } from '../data/today'
 import { t } from '../lib/i18n'
 import { copyText } from '../lib/platform'
 import { requestPagePicker } from '../ui/pickerBus'
@@ -245,6 +247,16 @@ function PageActions({ page, anchor, onClose }: { page: PageMeta; anchor: Elemen
             requestPagePicker((target) => ws().movePage(page.id, target === '__root__' ? null : target), { title: t('moveTo'), excludeId: page.id, allowRoot: true })
           }}
         />
+        )}
+        {canEdit && page.type !== 'row' && (
+          <MenuItem
+            icon={<LayoutTemplate size={15} />}
+            label={t('saveAsTemplate')}
+            onClick={async () => {
+              onClose()
+              if (await saveAsTemplate(page.id)) st.toast(t('templateSaved'), { label: t('show'), run: () => useStore.getState().openModal('templates') })
+            }}
+          />
         )}
         {page.type !== 'database' && (
           <MenuItem

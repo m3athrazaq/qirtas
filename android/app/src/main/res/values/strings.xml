@@ -5,6 +5,8 @@
     <string name="package_name">com.m3athrazaq.qirtas</string>
     <string name="custom_url_scheme">com.m3athrazaq.qirtas</string>
     <string name="share_label">حفظ في قِرطاس</string>
+    <string name="shortcut_today">اليوم</string>
+    <string name="shortcut_capture">ملاحظة سريعة</string>
     <string name="shortcut_new">صفحة جديدة</string>
     <string name="shortcut_search">بحث</string>
     <string name="shortcut_inbox">صندوق الوارد</string>
