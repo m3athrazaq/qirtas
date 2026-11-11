@@ -165,6 +165,23 @@ async function evaluate(c, expression, timeout) {
     await evaluate(c, `document.documentElement.setAttribute('data-theme', 'dark')`, 5000)
     await sleep(800)
     shot('09-dark')
+    // Automatic backup: on from the start here (Android 13+ asks nothing for Documents); "back up now" must write a file
+    await evaluate(c, `window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'data' }))`, 5000)
+    await sleep(2000)
+    console.log('data settings:', JSON.stringify(await evaluate(c, `document.querySelector('.settings-body')?.innerText.slice(0, 260)`, 5000)))
+    console.log('backup now:', await evaluate(c, `(() => { const b = [...document.querySelectorAll('.settings-body button')].find((x) => x.textContent.includes('نسخة الآن')); if (!b) return 'no button'; b.click(); return 'ok' })()`, 5000))
+    await sleep(5000)
+    console.log('backup status:', JSON.stringify(await evaluate(c, `document.querySelector('.set-status')?.innerText`, 5000)))
+    shot('10-backup')
+    for (const cmd of ['ls -l /sdcard/Documents/Qirtas/', 'sh -c "head -c 220 /sdcard/Documents/Qirtas/*.json"', 'sh -c "tail -c 40 /sdcard/Documents/Qirtas/*.json"']) {
+      try {
+        console.log(`backup ${cmd.split(' ')[0] === 'sh' ? cmd.split(' ')[2].replace('"', '') : 'files'}:`, adb(cmd).trim())
+      } catch (e) {
+        console.log('backup check failed:', cmd, e.message.slice(0, 200))
+      }
+    }
+    adb('input keyevent 4') // closes the settings
+    await sleep(1200)
     adb('input keyevent 4') // back on the home screen leaves the app
     await sleep(1500)
     console.log('after back on home:', focusApp().trim())
