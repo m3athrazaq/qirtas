@@ -200,6 +200,31 @@ async function initNative() {
 
 // ---------------------------------------------------------------- permission
 
+/** Cancel scheduled reminders on Android: all of them (signing out, clearing the device), or those of
+ *  workspaces not in `keepWs` (one the user left or was removed from). Never throws. */
+export async function cancelReminders(keepWs?: string[]) {
+  if (!isNative()) return
+  try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications')
+    const pending = (await LocalNotifications.getPending()).notifications.filter((p) => {
+      const x = p.extra as { pageId?: string; wsId?: string } | undefined
+      if (!x?.pageId) return false
+      return !keepWs || (!!x.wsId && !keepWs.includes(x.wsId))
+    })
+    if (pending.length) await LocalNotifications.cancel({ notifications: pending.map((p) => ({ id: p.id })) })
+  } catch {
+    /* nothing scheduled, or no permission */
+  }
+  if (!keepWs) {
+    try {
+      localStorage.removeItem(NATIVE_KEY)
+      localStorage.removeItem(FIRED_KEY)
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 export type NotifyState = 'granted' | 'denied' | 'ask' | 'none'
 
 /** May the app show notifications here? */
