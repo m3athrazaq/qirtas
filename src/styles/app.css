@@ -2709,3 +2709,81 @@ button.sb-brand:hover {
     display: none;
   }
 }
+
+/* ---------- reminders: what keeps them from arriving with the app closed (Android) ---------- */
+
+.rem-health {
+  margin: 6px 0 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+}
+
+.rem-health-title {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.rem-health ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rem-health li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  font-size: 13.5px;
+}
+
+.rem-health li > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.rem-health li svg {
+  flex: none;
+}
+
+.rem-health li.is-ok svg {
+  color: var(--tag-green-fg);
+}
+
+.rem-health li.is-bad svg {
+  color: var(--tc-orange);
+}
+
+.rem-health-note {
+  margin: 10px 0 0;
+  line-height: 1.7;
+}
+
+.rem-health-note button {
+  padding: 0;
+  font-size: inherit;
+  color: var(--lapis);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rem-health-test {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.rem-health-test .set-desc {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.6;
+}

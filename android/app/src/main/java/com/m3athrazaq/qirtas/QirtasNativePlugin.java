@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
@@ -24,13 +26,17 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 
+import org.json.JSONArray;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Native helpers for Qirtas: printing / PDF, "share to Qirtas", speech recognition
- * and data for the home-screen widget.
+ * Native helpers for Qirtas: printing / PDF, "share to Qirtas", speech recognition,
+ * data for the home-screen widget, and reminders (see Reminders).
  */
 @CapacitorPlugin(
     name = "QirtasNative",
@@ -113,6 +119,105 @@ public class QirtasNativePlugin extends Plugin {
         SharedPreferences prefs = getContext().getSharedPreferences("qirtas_widget", Context.MODE_PRIVATE);
         prefs.edit().putString("data", json).apply();
         call.resolve();
+    }
+
+    // ---------------------------------------------------------------- reminders
+
+    /** The reminders of a workspace (they replace its earlier ones); every alarm is set again. */
+    @PluginMethod
+    public void setReminders(PluginCall call) {
+        try {
+            JSONArray items = call.getArray("items", new com.getcapacitor.JSArray());
+            int waiting = Reminders.set(getContext(), call.getString("ws", ""), items);
+            JSObject r = new JSObject();
+            r.put("waiting", waiting);
+            r.put("exact", Reminders.canExact(getContext()));
+            call.resolve(r);
+        } catch (Exception e) {
+            call.reject(e.getMessage());
+        }
+    }
+
+    /** Forget the reminders: all of them, or those of workspaces not in `keep`. */
+    @PluginMethod
+    public void clearReminders(PluginCall call) {
+        Set<String> keep = null;
+        try {
+            JSONArray list = call.getArray("keep", null);
+            if (list != null) {
+                keep = new HashSet<>();
+                for (int i = 0; i < list.length(); i++) keep.add(list.getString(i));
+            }
+        } catch (Exception ignored) {
+        }
+        Reminders.clear(getContext(), keep);
+        call.resolve();
+    }
+
+    /** A notification after a few seconds, the way reminders arrive. */
+    @PluginMethod
+    public void testReminder(PluginCall call) {
+        try {
+            Reminders.test(getContext(), call.getInt("seconds", 2), call.getString("title", "Qirtas"), call.getString("body", ""));
+            call.resolve();
+        } catch (Exception e) {
+            call.reject(e.getMessage());
+        }
+    }
+
+    /** Which reminders were shown, and when. */
+    @PluginMethod
+    public void reminderLog(PluginCall call) {
+        JSObject r = new JSObject();
+        r.put("shown", Reminders.shown(getContext()));
+        call.resolve(r);
+    }
+
+    /** Whether reminders can arrive on time with the app closed. */
+    @PluginMethod
+    public void reminderHealth(PluginCall call) {
+        call.resolve(Reminders.health(getContext()));
+    }
+
+    /** Ask Android to let the app work in the background (no battery restrictions for its alarms). */
+    @PluginMethod
+    public void allowBackground(PluginCall call) {
+        String pkg = getContext().getPackageName();
+        if (!open(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + pkg))) {
+            if (!open(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))) open(appDetails());
+        }
+        call.resolve();
+    }
+
+    /** Ask Android to allow alarms at the exact minute. */
+    @PluginMethod
+    public void allowExactAlarms(PluginCall call) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+            || !open(new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:" + getContext().getPackageName())))) {
+            open(appDetails());
+        }
+        call.resolve();
+    }
+
+    /** The app's page in the system settings (battery use, auto-launch, notifications). */
+    @PluginMethod
+    public void openAppSettings(PluginCall call) {
+        open(appDetails());
+        call.resolve();
+    }
+
+    private Intent appDetails() {
+        return new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getContext().getPackageName()));
+    }
+
+    private boolean open(Intent intent) {
+        try {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(intent);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // ---------------------------------------------------------------- speech

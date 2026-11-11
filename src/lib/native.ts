@@ -56,7 +56,11 @@ function handleUrl(url: string) {
   const u = url.replace(/^qirtas:\/\//, '').replace(/\/$/, '')
   if (u === 'new' || u === 'search' || u === 'today' || u === 'capture' || u === 'tasks') runAction(u)
   else if (u.startsWith('task')) navigate(inboxPageId())
-  else if (u.startsWith('page/')) navigate(u.slice(5))
+  else if (u.startsWith('page/')) {
+    // (a reminder's notification opens its page this way)
+    const id = decodeURIComponent(u.slice(5).split('?')[0])
+    if (id) navigate(id)
+  }
 }
 
 async function checkShared() {

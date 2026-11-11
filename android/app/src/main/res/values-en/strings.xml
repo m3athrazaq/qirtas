@@ -12,4 +12,5 @@
     <string name="widget_description">A quick note, today\'s page, a new page and search, one tap each</string>
     <string name="widget_capture">Note</string>
     <string name="widget_new">New</string>
+    <string name="channel_reminders">Reminders</string>
 </resources>

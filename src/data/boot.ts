@@ -181,7 +181,14 @@ export async function boot() {
   startSafetyNet()
   // Tasks, dates, reminders and links of every page, for "Today", "My tasks" and the notifications
   void startPageIndex()
-  startReminders(() => useStore.getState().openModal('tasks'))
+  startReminders(
+    () => useStore.getState().openModal('tasks'),
+    // "Fix": the settings, at what keeps reminders from arriving
+    () => {
+      window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'general' }))
+      setTimeout(() => document.querySelector('.rem-health')?.scrollIntoView({ block: 'center' }), 350)
+    },
+  )
 
   window.addEventListener('keydown', (e) => {
     const mod = e.metaKey || e.ctrlKey

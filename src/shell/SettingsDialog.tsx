@@ -5,7 +5,18 @@ import { Modal } from '../ui/Modal'
 import { AccountSection } from '../sync/AccountSection'
 import { DataSection } from './DataSection'
 import { promptInstall, useInstall } from '../data/install'
-import { notificationState, requestNotifications, testNotification, type NotifyState } from '../data/reminders'
+import { AlertTriangle, CheckCircle2 } from 'lucide-react'
+import {
+  allowBackground,
+  allowExactAlarms,
+  notificationState,
+  openAppSettings,
+  reminderHealth,
+  requestNotifications,
+  testNotification,
+  type NotifyState,
+} from '../data/reminders'
+import type { ReminderHealth } from '../lib/platform'
 
 export type SettingsTab = 'general' | 'account' | 'ai' | 'data'
 type Tab = SettingsTab
@@ -174,31 +185,86 @@ export function SettingsDialog() {
   )
 }
 
+/** Calls `fn` now and every time the app comes back (e.g. from the system settings). */
+function useOnReturn(fn: () => void) {
+  useEffect(() => {
+    fn()
+    const on = () => document.visibilityState === 'visible' && fn()
+    document.addEventListener('visibilitychange', on)
+    return () => document.removeEventListener('visibilitychange', on)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+}
+
 function NotificationsRow() {
   const [state, setState] = useState<NotifyState | null>(null)
-  useEffect(() => {
-    let live = true
-    void notificationState().then((s) => live && setState(s))
-    return () => {
-      live = false
-    }
-  }, [])
+  useOnReturn(() => void notificationState().then(setState))
   if (!state || state === 'none') return null
   return (
-    <Row label={t('notifications')} desc={state === 'denied' ? t('notificationsBlocked') : t('notificationsDesc')}>
-      {state === 'granted' ? (
-        <span className="set-inline">
-          <span className="set-ok">{t('notificationsOn')}</span>
-          <button type="button" className="btn btn-small" onClick={() => void testNotification()}>
-            {t('notificationsTest')}
+    <>
+      <Row label={t('notifications')} desc={state === 'denied' ? t('notificationsBlocked') : t('notificationsDesc')}>
+        {state === 'granted' ? (
+          <span className="set-inline">
+            <span className="set-ok">{t('notificationsOn')}</span>
+            <button type="button" className="btn btn-small" onClick={() => void testNotification()}>
+              {t('notificationsTest')}
+            </button>
+          </span>
+        ) : state === 'ask' ? (
+          <button type="button" className="btn btn-small" onClick={() => void requestNotifications().then(setState)}>
+            {t('notificationsAllow')}
           </button>
-        </span>
-      ) : state === 'ask' ? (
-        <button type="button" className="btn btn-small" onClick={() => void requestNotifications().then(setState)}>
-          {t('notificationsAllow')}
+        ) : null}
+      </Row>
+      <ReminderHealthView />
+    </>
+  )
+}
+
+/** Phones that stop closed apps to save battery unless told otherwise. */
+const STRICT_MAKERS = /oneplus|oppo|realme|xiaomi|redmi|poco|vivo|iqoo|huawei|honor|samsung|meizu|asus|nothing|tecno|infinix/i
+
+/** Android: what keeps reminders from arriving on time with the app closed, each with its fix. */
+function ReminderHealthView() {
+  const [h, setH] = useState<ReminderHealth | null>(null)
+  useOnReturn(() => void reminderHealth().then(setH))
+  if (!h) return null
+  const checks = [
+    { ok: h.notifications, label: t('rhNotifications'), fix: () => void openAppSettings() },
+    { ok: h.exact, label: t('rhExact'), fix: () => void allowExactAlarms() },
+    { ok: h.battery && !h.restricted, label: t('rhBattery'), fix: () => void (h.restricted ? openAppSettings() : allowBackground()) },
+  ]
+  return (
+    <div className="rem-health">
+      <div className="rem-health-title">{t('rhTitle')}</div>
+      <ul>
+        {checks.map((c) => (
+          <li key={c.label} className={c.ok ? 'is-ok' : 'is-bad'}>
+            {c.ok ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
+            <span>{c.label}</span>
+            {!c.ok && (
+              <button type="button" className="btn btn-small" onClick={c.fix}>
+                {t('rhFix')}
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+      {STRICT_MAKERS.test(h.maker) && (
+        <p className="set-desc rem-health-note">
+          {t('rhMaker', { maker: h.maker.charAt(0).toUpperCase() + h.maker.slice(1) })}{' '}
+          <button type="button" className="link-btn" onClick={() => void openAppSettings()}>
+            {t('rhAppInfo')}
+          </button>
+        </p>
+      )}
+      <div className="rem-health-test">
+        <span className="set-desc">{t('rhTestHint')}</span>
+        <button type="button" className="btn btn-small" onClick={() => void testNotification(60)}>
+          {t('rhTestLater')}
         </button>
-      ) : null}
-    </Row>
+      </div>
+    </div>
   )
 }
 

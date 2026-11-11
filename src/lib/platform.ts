@@ -3,10 +3,45 @@ import { Capacitor, registerPlugin } from '@capacitor/core'
 export const isNative = () => Capacitor.isNativePlatform()
 export const isAndroid = () => Capacitor.getPlatform() === 'android'
 
+/** Can reminders arrive on time with the app closed (Android)? */
+export interface ReminderHealth {
+  /** Notifications allowed (the app's permission and its reminders channel). */
+  notifications: boolean
+  /** Alarms at the exact minute allowed. */
+  exact: boolean
+  /** Spared from battery optimisation. */
+  battery: boolean
+  /** Background work restricted by the user ("Restricted" battery use). */
+  restricted: boolean
+  maker: string
+  sdk: number
+  /** Reminders waiting for their time. */
+  waiting: number
+}
+
+export interface NativeReminder {
+  id: number
+  at: number
+  title: string
+  body: string
+  page: string
+}
+
+/** When a reminder was shown ("id@at"), and why late: "boot"/"update", or "off" (notifications off). */
+export type ReminderLog = Record<string, { t: number; r?: string }>
+
 interface QirtasNativePlugin {
   print(options: { name: string }): Promise<void>
   getSharedContent(): Promise<{ text?: string; subject?: string; image?: string } | null>
   setWidgetData(options: { json: string }): Promise<void>
+  setReminders(options: { ws: string; items: NativeReminder[] }): Promise<{ waiting: number; exact: boolean }>
+  clearReminders(options: { keep: string[] | null }): Promise<void>
+  testReminder(options: { seconds: number; title: string; body: string }): Promise<void>
+  reminderLog(): Promise<{ shown: ReminderLog }>
+  reminderHealth(): Promise<ReminderHealth>
+  allowBackground(): Promise<void>
+  allowExactAlarms(): Promise<void>
+  openAppSettings(): Promise<void>
 }
 
 export const QirtasNative = registerPlugin<QirtasNativePlugin>('QirtasNative')
