@@ -1,0 +1,31 @@
+name: Keep the sync server awake
+
+# Supabase pauses a free project after a week without requests, and sign-in and sync stop until it
+# is restored by hand. One small request a day keeps it available while the app isn't being used.
+# (Delete this file if the project moves to a paid plan: it is not needed there.)
+on:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .env.production
+          sparse-checkout-cone-mode: false
+      - name: Ask the server a small question
+        run: |
+          set -a; . ./.env.production; set +a
+          code=$(curl -sS -m 30 -o /dev/null -w "%{http_code}" -X POST "$VITE_SUPABASE_URL/rest/v1/rpc/invite_info" \
+            -H "apikey: $VITE_SUPABASE_ANON_KEY" -H "content-type: application/json" -d '{"invite_token":"keepalive"}' || true)
+          echo "status: ${code:-none}"
+          if [ "$code" != "200" ]; then
+            echo "::warning title=The sync server did not answer::Status ${code:-none}. If the Supabase project is paused, open its dashboard and choose Restore project."
+          fi

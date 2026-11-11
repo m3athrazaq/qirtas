@@ -325,6 +325,20 @@ export async function downloadBackup(): Promise<void> {
   save({ lastAnyAt: Date.now() })
 }
 
+/** A full backup right now, somewhere that outlives signing out: Documents/Qirtas on the phone (the
+ *  place is returned), a downloaded file elsewhere (returns ''). Throws when it could not be written. */
+export async function emergencyBackup(): Promise<string> {
+  if (backupKind() !== 'device') {
+    await downloadBackup()
+    return ''
+  }
+  const { parts, info } = await buildBackupParts()
+  const name = autoBackupName()
+  await writeToDevice(name, parts, info.bytes)
+  save({ lastAt: Date.now(), lastAnyAt: Date.now(), lastName: name, lastError: '' })
+  return `Documents/${ANDROID_DIR}/${name}`
+}
+
 export type BackupNudge = null | 'permission' | 'stale' | 'failed'
 
 /** What, if anything, the user should be told about backups right now. */

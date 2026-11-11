@@ -18,7 +18,8 @@ export default defineConfig({
     react(),
     VitePWA({
       injectRegister: null,
-      registerType: 'autoUpdate',
+      // 'prompt': the new version takes over when the app says so (see data/update.ts), not mid-typing
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         id: './',

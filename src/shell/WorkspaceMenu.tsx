@@ -3,6 +3,7 @@ import { navigate } from '../data/nav'
 import { useStore } from '../data/store'
 import { t } from '../lib/i18n'
 import { syncAvailable } from '../sync/config'
+import { friendlyError } from '../sync/errors'
 import { createWorkspace, switchWorkspace, useSession } from '../sync/session'
 import { MenuItem, MenuLabel, MenuSep, Popover } from '../ui/Popover'
 import { askText } from '../ui/dialogs'
@@ -46,7 +47,7 @@ export function WorkspaceMenu({ anchor, onClose }: { anchor: Element; onClose: (
                 try {
                   await createWorkspace(name)
                 } catch (err) {
-                  toast((err as Error).message)
+                  toast(friendlyError(err))
                 }
               }}
             />

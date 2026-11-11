@@ -13,7 +13,7 @@ import { yXmlFragmentToProsemirrorJSON } from '@tiptap/y-tiptap'
 import * as Y from 'yjs'
 import { restoreAsset } from './assets'
 import { BackupFormatError, describeWorkspace, type BackupData } from './backup'
-import { flushWrites, getDoc, pageDocId } from './docs'
+import { applyOutside, flushWrites, getDoc, pageDocId } from './docs'
 import { ORIGIN_SYSTEM } from './history'
 import { takeSnapshot } from './snapshots'
 import { useStore } from './store'
@@ -162,14 +162,14 @@ export async function restoreData(b: BackupData, mode: RestoreMode, onProgress?:
   await takeSnapshot('before-restore')
 
   // 1. Merge: brings in whatever this device doesn't have (everything, on a new device)
-  Y.applyUpdate(w.doc, b.docs.get(wsDocId)!, ORIGIN_SYSTEM)
+  applyOutside(`ws:${w.id}`, w.doc, b.docs.get(wsDocId)!, ORIGIN_SYSTEM)
   const total = bPages.size
   let step = 0
   for (const id of bPages.keys()) {
     const u = b.docs.get(pageDocId(id))
     if (u) {
       try {
-        Y.applyUpdate(await getDoc(pageDocId(id)), u, ORIGIN_SYSTEM)
+        applyOutside(pageDocId(id), await getDoc(pageDocId(id)), u, ORIGIN_SYSTEM)
       } catch {
         result.failed++
       }

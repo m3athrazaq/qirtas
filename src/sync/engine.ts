@@ -3,7 +3,7 @@
 // remote changes arrive through realtime inserts and are merged by Yjs.
 import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import * as Y from 'yjs'
-import { getDoc, ORIGIN_REMOTE, pageDocId, setSyncHook } from '../data/docs'
+import { applyOutside, getDoc, ORIGIN_REMOTE, pageDocId, setSyncHook } from '../data/docs'
 import { allDocIds, kvGet, kvSet, outboxAdd, outboxAll, outboxDelete } from '../data/idb'
 import { useStore } from '../data/store'
 import type { Workspace } from '../data/workspace'
@@ -18,6 +18,12 @@ interface Row {
   data: string
   client_id: string | null
 }
+
+/** How far behind the bookmark a pull looks for rows it has not seen (see recheck). */
+const RECHECK_WINDOW = 300
+const RECHECK_EVERY = 2 * 60_000
+/** A document's history is squashed only when no row for it arrived for this long. */
+const COMPACT_QUIET = 60_000
 
 export interface PresenceUser {
   userId: string
@@ -43,7 +49,12 @@ export class SyncEngine {
   private saveTimer: ReturnType<typeof setTimeout> | null = null
   private pending: Promise<unknown> = Promise.resolve()
   private stopped = false
-  private perDocCount = new Map<string, { n: number; maxId: number }>()
+  private perDocCount = new Map<string, { n: number; maxId: number; at: number }>()
+  /** Ids of recent rows this device has taken in (applied, or its own): what recheck compares against. */
+  private recent = new Set<number>()
+  private lastRecheck = 0
+  /** Documents whose change could not be queued: their whole state is sent on the next flush. */
+  private resync = new Set<string>()
   private live = false
   private pollTimer: ReturnType<typeof setInterval> | null = null
   private catchUpTimer: ReturnType<typeof setTimeout> | null = null
@@ -73,6 +84,9 @@ export class SyncEngine {
 
   async start(opts: { upload?: boolean } = {}) {
     this.lastId = (await kvGet<number>(`sync:last:${this.wsId}`)) ?? 0
+    ;((await kvGet<number[]>(`sync:recent:${this.wsId}`)) ?? []).forEach((id) => this.recent.add(id))
+    useStore.setState({ lastSyncedAt: (await kvGet<number>(`sync:ok:${this.wsId}`)) ?? null })
+    void this.countPending()
     if (this.role !== 'viewer') setSyncHook((docId, update) => this.enqueue(docId, update))
     window.addEventListener('online', this.onOnline)
     window.addEventListener('offline', this.onOffline)
@@ -130,28 +144,59 @@ export class SyncEngine {
   // ---------------- outgoing
 
   private enqueue(docId: string, update: Uint8Array) {
-    this.pending = this.pending.then(() => outboxAdd(docId, update, this.wsId)).catch(() => {})
+    // A change that can't be queued (storage full) must not be skipped: later changes build on it,
+    // and other devices could not apply them. The whole document is sent instead.
+    this.pending = this.pending.then(() => outboxAdd(docId, update, this.wsId)).catch(() => void this.resync.add(docId))
+    if (!useStore.getState().pendingSync) useStore.setState({ pendingSync: 1 })
     if (this.flushTimer) clearTimeout(this.flushTimer)
     this.flushTimer = setTimeout(() => void this.flush(), 350)
   }
 
+  private mine = (i: { wsId?: string }) => !i.wsId || i.wsId === this.wsId
+
+  /** How many documents have changes that the server doesn't have yet (shown in the settings). */
+  private async countPending() {
+    try {
+      const docs = new Set((await outboxAll()).filter(this.mine).map((i) => i.docId))
+      this.resync.forEach((d) => docs.add(d))
+      if (!this.stopped) useStore.setState({ pendingSync: docs.size })
+    } catch {
+      /* leave the last count */
+    }
+  }
+
+  private synced() {
+    if (this.stopped) return
+    const now = Date.now()
+    useStore.setState({ lastSyncedAt: now })
+    void kvSet(`sync:ok:${this.wsId}`, now).catch(() => {})
+  }
+
   async flush(): Promise<void> {
     if (this.flushing || this.stopped) return
-    if (!navigator.onLine) return this.status('offline')
+    if (!navigator.onLine) {
+      void this.countPending()
+      return this.status('offline')
+    }
     this.flushing = true
     let again = false
     try {
       await this.pending
       // Only this workspace's changes: ones queued in another workspace (offline, then switched)
       // wait until that workspace is open again, instead of landing here
-      const items = (await outboxAll()).filter((i) => !i.wsId || i.wsId === this.wsId)
-      if (!items.length) return
+      const items = (await outboxAll()).filter(this.mine)
+      const whole = [...this.resync]
+      if (!items.length && !whole.length) {
+        useStore.setState({ pendingSync: 0 })
+        return
+      }
       const byDoc = new Map<string, Uint8Array[]>()
       items.forEach((i) => {
         const l = byDoc.get(i.docId) ?? []
         l.push(i.update)
         byDoc.set(i.docId, l)
       })
+      for (const docId of whole) byDoc.set(docId, [Y.encodeStateAsUpdate(await getDoc(docId))])
       const rows = [...byDoc].map(([docId, list]) => ({
         workspace_id: this.wsId,
         doc_id: docId,
@@ -163,13 +208,16 @@ export class SyncEngine {
         if (error) throw error
       }
       await outboxDelete(items.map((i) => i.id!).filter((x) => x !== undefined))
+      whole.forEach((d) => this.resync.delete(d))
       this.status('synced')
-      again = (await outboxAll()).some((i) => !i.wsId || i.wsId === this.wsId)
+      this.synced()
+      again = (await outboxAll()).some(this.mine) || this.resync.size > 0
     } catch {
       this.status('offline')
       if (!this.stopped) this.flushTimer = setTimeout(() => void this.flush(), 6000)
     } finally {
       this.flushing = false
+      void this.countPending()
       if (again) void this.flush()
     }
   }
@@ -210,9 +258,34 @@ export class SyncEngine {
       if (rows.length < 500) break
     }
     for (const id of this.seen) if (id <= this.lastId) this.seen.delete(id)
+    await this.recheck()
     this.saveLast()
     this.status('synced')
-    void this.compact()
+    this.synced()
+    void this.compact().catch(() => {})
+  }
+
+  /** Rows get their number when they are written but become visible when their write completes, so
+   *  a row can show up *behind* the bookmark (two devices writing in the same instant). A pull that
+   *  only asks for "newer than the bookmark" would never fetch it. Every so often, compare the ids
+   *  just behind the bookmark with the ones this device has taken in, and fetch any it lacks. */
+  private async recheck() {
+    if (this.lastId <= 0) return
+    const now = Date.now()
+    if (now - this.lastRecheck < RECHECK_EVERY) return
+    const floor = this.lastId - RECHECK_WINDOW
+    const { data, error } = await this.sb.from('doc_updates').select('id').eq('workspace_id', this.wsId).gt('id', floor).lte('id', this.lastId).limit(RECHECK_WINDOW)
+    if (error) throw error
+    this.lastRecheck = now
+    const missing = ((data ?? []) as { id: number }[]).map((r) => r.id).filter((id) => !this.recent.has(id))
+    for (let i = 0; i < missing.length; i += 50) {
+      const { data: rows, error: e2 } = await this.sb.from('doc_updates').select('id, doc_id, data, client_id').eq('workspace_id', this.wsId).in('id', missing.slice(i, i + 50))
+      if (e2) throw e2
+      for (const r of (rows ?? []) as Row[]) await this.apply(r, true)
+    }
+    for (const id of this.recent) if (id <= floor - RECHECK_WINDOW) this.recent.delete(id)
+    // Remembered at once, so the same rows are not fetched again after a restart
+    if (missing.length) await this.writeBookmark().catch(() => {})
   }
 
   /** Pull a little later (after live changes settle) so the bookmark moves forward. */
@@ -230,18 +303,21 @@ export class SyncEngine {
     if (!live && r.id > this.lastId) this.lastId = r.id
     if (this.seen.has(r.id)) return
     if (live) this.seen.add(r.id)
-    const c = this.perDocCount.get(r.doc_id) ?? { n: 0, maxId: 0 }
+    const c = this.perDocCount.get(r.doc_id) ?? { n: 0, maxId: 0, at: 0 }
     c.n++
     c.maxId = Math.max(c.maxId, r.id)
+    c.at = Date.now()
     this.perDocCount.set(r.doc_id, c)
-    if (r.client_id === this.clientId) return
-    const docId = r.doc_id.startsWith('ws:') ? `ws:${this.wsId}` : r.doc_id
-    const doc = await getDoc(docId)
-    try {
-      Y.applyUpdate(doc, fromB64(r.data), ORIGIN_REMOTE)
-    } catch {
-      /* malformed update: skip */
+    if (r.client_id !== this.clientId) {
+      const docId = r.doc_id.startsWith('ws:') ? `ws:${this.wsId}` : r.doc_id
+      const doc = await getDoc(docId)
+      try {
+        applyOutside(docId, doc, fromB64(r.data), ORIGIN_REMOTE)
+      } catch {
+        /* malformed update: skip */
+      }
     }
+    this.recent.add(r.id)
     if (!live) this.saveLast()
   }
 
@@ -249,18 +325,33 @@ export class SyncEngine {
     if (this.saveTimer) return
     this.saveTimer = setTimeout(() => {
       this.saveTimer = null
-      void kvSet(`sync:last:${this.wsId}`, this.lastId)
+      void this.writeBookmark().catch(() => {})
     }, 800)
   }
 
-  /** Squash long histories into one update so new devices download less. */
+  private async writeBookmark() {
+    await kvSet(`sync:last:${this.wsId}`, this.lastId)
+    await kvSet(`sync:recent:${this.wsId}`, [...this.recent].filter((id) => id > this.lastId - 2 * RECHECK_WINDOW))
+  }
+
+  /** Squash long histories into one update so new devices download less. Only for a document that
+   *  has been quiet for a while: the squash deletes every row up to the newest one seen, and a row
+   *  that another device is writing at that very moment must not be among them. */
   private async compact() {
     if (this.role === 'viewer') return
+    let checked = false
     for (const [docId, c] of this.perDocCount) {
-      if (c.n < 150) continue
+      if (c.n < 150 || Date.now() - c.at < COMPACT_QUIET) continue
+      if (!checked) {
+        // Look behind the bookmark once more right now; a row found there resets the quiet time
+        checked = true
+        this.lastRecheck = 0
+        await this.recheck()
+        if (Date.now() - c.at < COMPACT_QUIET) continue
+      }
       const doc = await getDoc(docId.startsWith('ws:') ? `ws:${this.wsId}` : docId)
-      await this.sb.rpc('compact_doc', { ws: this.wsId, doc: docId, upto: c.maxId, merged: toB64(Y.encodeStateAsUpdate(doc)) })
-      this.perDocCount.delete(docId)
+      const { error } = await this.sb.rpc('compact_doc', { ws: this.wsId, doc: docId, upto: c.maxId, merged: toB64(Y.encodeStateAsUpdate(doc)) })
+      if (!error) this.perDocCount.delete(docId)
     }
   }
 
