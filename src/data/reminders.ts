@@ -158,7 +158,8 @@ async function syncNative() {
     .filter((r) => !r.done && r.at > now + 3000)
     .slice(0, 60)
   const want = new Map(wanted.map((r) => [nid(r), r]))
-  const pending = (await LocalNotifications.getPending()).notifications
+  // Only the reminders' own notifications (the settings' test one is left alone)
+  const pending = (await LocalNotifications.getPending()).notifications.filter((p) => !!(p.extra as { pageId?: string } | undefined)?.pageId)
   const stale = pending.filter((p) => {
     const w = want.get(p.id)
     return !w || (p.extra as { at?: number } | undefined)?.at !== w.at || p.title !== label(w)
