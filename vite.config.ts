@@ -2,9 +2,18 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// The version shown in the settings: 1.1.<build number> for the Android app (built by GitHub),
+// 1.1 for the web app (which is always the latest), each with the day it was built.
+const run = process.env.GITHUB_RUN_NUMBER
+const version = run ? `1.1.${run}` : '1.1'
+
 // Relative base so the same build runs on any web host and inside the Android app.
 export default defineConfig({
   base: './',
+  define: {
+    __APP_VERSION__: JSON.stringify(version),
+    __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)),
+  },
   plugins: [
     react(),
     VitePWA({

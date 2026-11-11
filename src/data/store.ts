@@ -46,7 +46,7 @@ function loadSettings(): Settings {
   return { ...defaultSettings, numerals: defaultSettings.lang === 'en' ? 'latn' : 'arab' }
 }
 
-export type Modal = null | 'search' | 'templates' | 'settings' | 'trash' | 'share'
+export type Modal = null | 'search' | 'templates' | 'settings' | 'trash' | 'share' | 'history'
 
 export interface Toast {
   id: number
@@ -76,6 +76,16 @@ interface State {
   canRedo: boolean
   /** Position in the browser history since the app opened (0 = nothing to go back to). */
   navIndex: number
+  /** The page whose version history is open. */
+  historyPage: string | null
+  /** Writing to the device is failing (storage full or blocked): the latest changes live in memory only. */
+  saveFailing: boolean
+  /** The data on this device could not be opened at start. */
+  bootError: string | null
+  /** Changes waiting to be sent to the server, and when the last exchange with it succeeded. */
+  pendingSync: number
+  lastSyncedAt: number | null
+  openHistory: (pageId: string) => void
   setSettings: (patch: Partial<Settings>) => void
   openModal: (m: Modal) => void
   closeModal: () => void
@@ -103,6 +113,12 @@ export const useStore = create<State>((set, get) => ({
   canUndo: false,
   canRedo: false,
   navIndex: 0,
+  historyPage: null,
+  saveFailing: false,
+  bootError: null,
+  pendingSync: 0,
+  lastSyncedAt: null,
+  openHistory: (pageId) => set({ modal: 'history', historyPage: pageId }),
   setSettings: (patch) => {
     const settings = { ...get().settings, ...patch }
     try {

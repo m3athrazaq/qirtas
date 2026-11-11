@@ -1,15 +1,9 @@
-import { Download, Upload } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { buildBackup, restoreBackup } from '../data/backup'
-import { resetDocs } from '../data/docs'
-import { wipeAll } from '../data/idb'
 import { useStore, ws, type Settings } from '../data/store'
-import { pickFile } from '../data/assets'
 import { t } from '../lib/i18n'
-import { saveFile } from '../lib/platform'
 import { Modal } from '../ui/Modal'
-import { askConfirm, askText } from '../ui/dialogs'
 import { AccountSection } from '../sync/AccountSection'
+import { DataSection } from './DataSection'
 
 export type SettingsTab = 'general' | 'account' | 'ai' | 'data'
 type Tab = SettingsTab
@@ -21,8 +15,6 @@ export function openSettingsAt(tab: Tab) {
   useStore.getState().openModal('settings')
 }
 window.addEventListener('qirtas:settings', (e) => openSettingsAt(((e as CustomEvent).detail as Tab) ?? 'general'))
-
-export const APP_VERSION = '1.0.0'
 
 function Seg<T extends string | number | boolean>({ value, options, onChange }: { value: T; options: { v: T; label: string }[]; onChange: (v: T) => void }) {
   return (
@@ -42,7 +34,6 @@ export function SettingsDialog() {
   const settings = useStore((s) => s.settings)
   const setSettings = useStore((s) => s.setSettings)
   const wsName = useStore((s) => s.wsName)
-  const toast = useStore((s) => s.toast)
   const [tab, setTab] = useState<Tab>('general')
   const set = (patch: Partial<Settings>) => setSettings(patch)
   useEffect(() => {
@@ -165,60 +156,7 @@ export function SettingsDialog() {
               </Row>
             </>
           )}
-          {tab === 'data' && (
-            <>
-              <div className="settings-actions">
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={async () => {
-                    const json = await buildBackup()
-                    const d = new Date().toISOString().slice(0, 10)
-                    await saveFile(`qirtas-backup-${d}.json`, json, 'application/json')
-                    toast(t('backupDone'))
-                  }}
-                >
-                  <Download size={15} /> {t('backupExport')}
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={async () => {
-                    const f = await pickFile('application/json,.json')
-                    if (!f || !(await askConfirm(t('restoreConfirm')))) return
-                    try {
-                      await restoreBackup(await f.text())
-                      toast(t('restoreDone'))
-                    } catch (err) {
-                      toast(String(err))
-                    }
-                  }}
-                >
-                  <Upload size={15} /> {t('backupImport')}
-                </button>
-              </div>
-              <div className="danger-zone">
-                <button
-                  type="button"
-                  className="btn is-danger"
-                  onClick={async () => {
-                    const word = await askText(t('wipeConfirm'), { requireText: t('wipeWord'), danger: true, confirmLabel: t('delete') })
-                    if (word?.trim() !== t('wipeWord')) return
-                    resetDocs()
-                    await wipeAll()
-                    localStorage.clear()
-                    location.hash = ''
-                    location.reload()
-                  }}
-                >
-                  {t('wipe')}
-                </button>
-              </div>
-              <p className="muted small">
-                {t('version')} {APP_VERSION}
-              </p>
-            </>
-          )}
+          {tab === 'data' && <DataSection />}
         </div>
       </div>
     </Modal>

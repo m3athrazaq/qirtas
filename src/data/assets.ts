@@ -24,6 +24,14 @@ export async function importImage(file: Blob, maxSide = 1800): Promise<string> {
   return `asset:${id}`
 }
 
+/** A picture brought back from a backup: stored as it is and, when syncing, sent to the server again. */
+export async function restoreAsset(id: string, type: string, blob: Blob): Promise<boolean> {
+  if (await getAsset(id)) return false
+  await putAsset({ id, blob, type: type || blob.type, createdAt: Date.now() })
+  uploadHook?.(id, blob)
+  return true
+}
+
 async function downscale(file: Blob, maxSide: number): Promise<Blob> {
   if (!file.type.startsWith('image/') || file.type === 'image/gif' || file.type === 'image/svg+xml') return file
   try {
