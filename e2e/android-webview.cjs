@@ -235,6 +235,24 @@ async function evaluate(c, expression, timeout) {
     }
     adb('input keyevent 4') // closes the settings
     await sleep(1200)
+    // The address the widget and the launcher shortcut use for a quick note
+    try {
+      adb('am start -a android.intent.action.VIEW -d qirtas://capture -n com.m3athrazaq.qirtas/.MainActivity')
+      await sleep(2500)
+      console.log('qirtas://capture opens the quick note:', await evaluate(c, `!!document.querySelector('.capture-text')`, 5000))
+      shot('15-capture')
+      adb('input keyevent 4') // closes the keyboard
+      await sleep(600)
+      await evaluate(c, `document.querySelector('.modal-backdrop .icon-btn')?.click()`, 5000)
+      await sleep(800)
+    } catch (e) {
+      console.log('capture link failed:', e.message.slice(0, 200))
+    }
+    try {
+      console.log('widget provider:', adb('dumpsys appwidget').split('\n').filter((l) => l.includes('QuickWidget')).slice(0, 2).map((l) => l.trim()).join(' | ') || 'not listed')
+    } catch (e) {
+      console.log('widget check failed:', e.message.slice(0, 200))
+    }
     adb('input keyevent 4') // back to the home screen
     await sleep(1200)
     adb('input keyevent 4') // back on the home screen leaves the app

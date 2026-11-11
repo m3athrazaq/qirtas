@@ -8,4 +8,8 @@
     <string name="shortcut_new">New page</string>
     <string name="shortcut_search">Search</string>
     <string name="shortcut_inbox">Inbox</string>
+    <string name="widget_label">Qirtas quick</string>
+    <string name="widget_description">A quick note, today\'s page, a new page and search, one tap each</string>
+    <string name="widget_capture">Note</string>
+    <string name="widget_new">New</string>
 </resources>

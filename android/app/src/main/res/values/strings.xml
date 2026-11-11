@@ -10,4 +10,8 @@
     <string name="shortcut_new">صفحة جديدة</string>
     <string name="shortcut_search">بحث</string>
     <string name="shortcut_inbox">صندوق الوارد</string>
+    <string name="widget_label">قِرطاس السريع</string>
+    <string name="widget_description">ملاحظة سريعة، وصفحة اليوم، وصفحة جديدة، والبحث بضغطة</string>
+    <string name="widget_capture">ملاحظة</string>
+    <string name="widget_new">جديدة</string>
 </resources>

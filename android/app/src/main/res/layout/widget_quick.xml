@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The home-screen widget: four buttons in a row -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="4dp">
+
+    <LinearLayout
+        android:id="@+id/widget_capture"
+        style="@style/QirtasWidgetButton">
+        <ImageView style="@style/QirtasWidgetIcon" android:src="@drawable/ic_w_capture" android:contentDescription="@string/shortcut_capture" />
+        <TextView style="@style/QirtasWidgetLabel" android:text="@string/widget_capture" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_today"
+        style="@style/QirtasWidgetButton">
+        <ImageView style="@style/QirtasWidgetIcon" android:src="@drawable/ic_w_today" android:contentDescription="@string/shortcut_today" />
+        <TextView style="@style/QirtasWidgetLabel" android:text="@string/shortcut_today" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_new"
+        style="@style/QirtasWidgetButton">
+        <ImageView style="@style/QirtasWidgetIcon" android:src="@drawable/ic_w_new" android:contentDescription="@string/shortcut_new" />
+        <TextView style="@style/QirtasWidgetLabel" android:text="@string/widget_new" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_search"
+        style="@style/QirtasWidgetButton">
+        <ImageView style="@style/QirtasWidgetIcon" android:src="@drawable/ic_w_search" android:contentDescription="@string/shortcut_search" />
+        <TextView style="@style/QirtasWidgetLabel" android:text="@string/shortcut_search" />
+    </LinearLayout>
+</LinearLayout>
