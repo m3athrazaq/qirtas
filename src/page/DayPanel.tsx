@@ -6,7 +6,7 @@ import { navigate } from '../data/nav'
 import { backlinksOf, usePageIndex } from '../data/pageIndex'
 import { useStore } from '../data/store'
 import { dayOfPage, ensureDayPage } from '../data/today'
-import { addDays, num } from '../lib/hijri'
+import { addDays, formatGregorian, formatHijri, num } from '../lib/hijri'
 import { t } from '../lib/i18n'
 import { Group, useAgenda, useToday } from '../shell/TasksDialog'
 
@@ -15,6 +15,7 @@ export function DayPanel({ pageId }: { pageId: string }) {
   const today = useToday()
   const lang = useStore((s) => s.settings.lang)
   const numerals = useStore((s) => s.settings.numerals)
+  const calendar = useStore((s) => s.settings.calendar)
   const agenda = useAgenda()
   if (!day) return null
   const rtl = lang === 'ar'
@@ -25,8 +26,11 @@ export function DayPanel({ pageId }: { pageId: string }) {
   const elsewhere = (items: typeof agenda.today) => items.filter((i) => i.pageId !== pageId)
   const overdue = day === today ? elsewhere(agenda.overdue) : []
   const due = day === today ? elsewhere(agenda.today) : []
+  // The title carries the date in the chosen calendar; the other one is shown here
+  const alt = calendar === 'hijri' ? formatGregorian(day, { lang, numerals }) : formatHijri(day, { lang, numerals })
   return (
     <div className="day-panel" contentEditable={false}>
+      <div className="day-alt">{alt}</div>
       <div className="day-nav">
         <button type="button" className="chip-btn" onClick={() => go(addDays(day, -1))}>
           <Prev size={14} /> {t('dayPrev')}

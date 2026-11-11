@@ -1303,3 +1303,9 @@
     display: none;
   }
 }
+
+.day-alt {
+  margin: -6px 0 10px;
+  font-size: 14px;
+  color: var(--ink-3);
+}
