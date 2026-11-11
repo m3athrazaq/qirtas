@@ -1,0 +1,321 @@
+--------- beginning of main
+W/chromium( 2157): [WARNING:dns_config_service_android.cc(115)] Failed to read DnsConfig.
+D/Capacitor( 2157): Starting BridgeActivity
+D/Capacitor( 2157): Registering plugin instance: CapacitorCookies
+D/Capacitor( 2157): Registering plugin instance: WebView
+D/Capacitor( 2157): Registering plugin instance: CapacitorHttp
+D/Capacitor( 2157): Registering plugin instance: SystemBars
+D/Capacitor( 2157): Registering plugin instance: QirtasNative
+D/Capacitor( 2157): Registering plugin instance: App
+D/Capacitor( 2157): Registering plugin instance: Filesystem
+D/Capacitor( 2157): Registering plugin instance: Keyboard
+D/Capacitor( 2157): Registering plugin instance: LocalNotifications
+D/Capacitor( 2157): Registering plugin instance: Share
+W/Capacitor( 2157): Unable to read file at path public/plugins
+D/Capacitor( 2157): Loading app at https://localhost
+D/Capacitor( 2157): App started
+D/Capacitor( 2157): App resumed
+D/Capacitor( 2157): Handling local request: https://localhost/
+D/Capacitor( 2157): Handling local request: https://localhost/assets/index-hZhnQqzp.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/store-P4HTi9vd.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/ids-CbOebr4s.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/pageOps-uy9aAtfR.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/Popover-DzWJmpVp.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/docs-BJyzDeO-.js
+W/chromium( 2157): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+D/Capacitor( 2157): Handling local request: https://localhost/assets/history-B5P_zkD_.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/preload-helper-CRzLMJPS.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/assets-CRuWYob_.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/ext-o6g_-w-4.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/dist-BPcjKUdj.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/index-XDzjhXK1.css
+D/Capacitor( 2157): Handling local request: https://localhost/splash-mark.svg
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2157): Handling local request: https://localhost/assets/esm-Bwg7FvOh.js
+D/Capacitor( 2157): Handling local request: https://localhost/assets/esm-Dt1JbdLX.js
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2157): Handling local request: https://localhost/assets/markazi-text-arabic-wght-normal-zEmVoUHK.woff2
+D/Capacitor( 2157): Handling local request: https://localhost/assets/readex-pro-arabic-wght-normal-DiwT_uOQ.woff2
+D/Capacitor( 2157): Handling local request: https://localhost/assets/readex-pro-latin-wght-normal--ekFhJJC.woff2
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172318, pluginId: LocalNotifications, methodName: createChannel, methodData: {"id":"reminders","name":"التذكيرات","importance":4,"visibility":1}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172319, pluginId: SystemBars, methodName: setStyle, methodData: {"style":"LIGHT"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172320, pluginId: App, methodName: addListener, methodData: {"eventName":"backButton"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172321, pluginId: App, methodName: addListener, methodData: {"eventName":"appUrlOpen"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172322, pluginId: App, methodName: getLaunchUrl, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172323, pluginId: LocalNotifications, methodName: addListener, methodData: {"eventName":"localNotificationActionPerformed"}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172324, pluginId: App, methodName: addListener, methodData: {"eventName":"resume"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172325, pluginId: QirtasNative, methodName: getSharedContent, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172326, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172327, pluginId: LocalNotifications, methodName: getPending, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"notifications":[]}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172328, pluginId: QirtasNative, methodName: setReminders, methodData: {"ws":"8002e765-2579-4297-8540-e2ee97c99726","items":[]}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"waiting":0,"exact":true}
+D/Capacitor( 2157): Handling local request: https://localhost/assets/esm-C6lx-KCP.js
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172329, pluginId: Filesystem, methodName: checkPermissions, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"publicStorage":"granted"}
+D/Capacitor( 2157): Handling local request: https://localhost/assets/markazi-text-latin-wght-normal-XVaf1yc4.woff2
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172330, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172331, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+D/Capacitor( 2157): Handling local request: https://localhost/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172332, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172333, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172334, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"canGoBack":true}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2157): Handling local request: https://localhost/assets/DatabaseView-CNx79mjR.js
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+W/Capacitor/Console( 2157): File: https://localhost/assets/history-B5P_zkD_.js - Line 5 - Msg: TextSelection endpoint not pointing into a node with inline content (callout)
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172335, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"canGoBack":true}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172336, pluginId: LocalNotifications, methodName: checkPermissions, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"display":"granted"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172337, pluginId: Filesystem, methodName: checkPermissions, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"publicStorage":"granted"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172338, pluginId: Filesystem, methodName: mkdir, methodData: {"path":"Qirtas","directory":"DOCUMENTS","recursive":true}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172339, pluginId: Filesystem, methodName: deleteFile, methodData: {"path":"Qirtas\/qirtas-backup-2026-11-11-tbl3.json.part","directory":"DOCUMENTS"}
+D/Capacitor( 2157): Sending plugin error: {"save":false,"callbackId":"2172339","pluginId":"Filesystem","methodName":"deleteFile","success":false,"error":{"message":"'deleteFile' failed because file at '\/storage\/emulated\/0\/Documents\/Qirtas\/qirtas-backup-2026-11-11-tbl3.json.part' does not exist.","code":"OS-PLUG-FILE-0008"}}
+E/Capacitor/Console( 2157): File:  - Line 330 - Msg: [object Object]
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172340, pluginId: Filesystem, methodName: writeFile, methodData: {"path":"Qirtas\/qirtas-backup-2026-11-11-tbl3.json.part","directory":"DOCUMENTS","data":"","encoding":"utf8"}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"uri":"file:///storage/emulated/0/Documents/Qirtas/qirtas-backup-2026-11-11-tbl3.json.part"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172341, pluginId: Filesystem, methodName: appendFile, methodData: {"path":"Qirtas\/qirtas-backup-2026-11-11-tbl3.json.part","directory":"DOCUMENTS","data":"{\"app\":\"qirtas\",\"version\":2,\"exportedAt\":\"2026-11-11T19:01:03.655Z\",\"appVersion\":\"1.1.18\",\"workspaceId\":\"8002e765-2579-4297-8540-e2ee97c99726\",\"workspaceName\":\"\",\"pages\":34,\"docs\":{\"ws:8002e765-2579-4297-8540-e2ee97c99726\":\"AZsFk\/qc\/Q0AJwEFcGFnZXMMTEtZN1p3b1ZJZ2hZASgAk\/qc\/Q0ABHR5cGUBdwRwYWdlKACT+pz9DQAFdGl0bGUBdyHYo9mH2YTYp9mLINio2YMg2YHZiiDZgtmQ2LHYt9in2LMoAJP6nP0NAARpY29uAXcG4pyN77iPKACT+pz9DQAFY292ZXIBdgIEa2luZHcHcGF0dGVybgV2YWx1ZXcFcnVsZWQoAJP6nP0NAAZjb3ZlclkBfTIoAJP6nP0NAAhwYXJlbnRJZAF+KACT+pz9DQAFb3JkZXIBdwJhMCgAk\/qc\/Q0ACWNyZWF0ZWRBdAF7Qnocv7d4YAAoAJP6nP0NAAl1cGRhdGVkQXQBe0J6HL+3eGAAKACT+pz9DQAJY3JlYXRlZEJ5AXcFbG9jYWwoAJP6nP0NAAl1cGRhdGVkQnkBdwVsb2NhbCgAk\/qc\/Q0ACWRlbGV0ZWRBdAF+KACT+pz9DQAJZnVsbFdpZHRoAXkoAJP6nP0NAARmb250AXcEc2FucygAk\/qc\/Q0ACXNtYWxsVGV4dAF5KACT+pz9DQAGaW5saW5lAXknAQVwYWdlcww3VG0xVTFtYTFiRjkBKACT+pz9DREEdHlwZQF3BHBhZ2UoAJP6nP0NEQV0aXRsZQF3Fdi12YHYrdipINiv2KfYrtmE2YrYqSgAk\/qc\/Q0RBGljb24BdwTwn5OEKACT+pz9DREFY292ZXIBfigAk\/qc\/Q0RBmNvdmVyWQF9MigAk\/qc\/Q0RCHBhcmVudElkAXcMTEtZN1p3b1ZJZ2hZKACT+pz9DREFb3JkZXIBdwJhMCgAk\/qc\/Q0RCWNyZWF0ZWRBdAF7Qnocv7d44AAoAJP6nP0NEQl1cGRhdGVkQXQBe0J6HL+3eOAAKACT+pz9DREJY3JlYXRlZEJ5AXcFbG9jYWwoAJP6nP0NEQl1cGRhdGVkQnkBdwVsb2NhbCgAk\/qc\/Q0RCWRlbGV0ZWRBdAF+KACT+pz9DREJZnVsbFdpZHRoAXkoAJP6nP0NEQRmb250AXcEc2FucygAk\/qc\/Q0RCXNtYWxsVGV4dAF5KACT+pz9DREGaW5saW5lAXkoAJP6nP0NEQR0ZXh0AXefAdin2YTYtdmB2K3Yp9iqINiq2KrYr9in2K7ZhCDYqNmE2Kcg2K3Yr9mI2K8uINij2LbZgSDYtdmB2K3YqSDYr9in2K7ZhCDYo9mKINi12YHYrdipINmF2YYg2LLYsSArINmB2Yog2KfZhNi02LHZiti3INin2YTYrNin2YbYqNmK2Iwg2KPZiCDYqNmD2KrYp9io2KkgL9i12YHYrdipLoiT+pz9DRoBe0J6HL+3elAAiJP6nP0NHAF3BWxvY2FsKACT+pz9DQAEdGV4dAF3\/gfZgtmQ2LHYt9in2LMg2YXYs9in2K3YqtmDINmE2YTZhdmE2KfYrdi42KfYqiDZiNin2YTZhdmH2KfZhSDZiNin2YTZhdi02KfYsdmK2LnYjCDYqNin2YTYudix2KjZitipINij2YjZhNin2YsuINmD2YQg2YXYpyDYqtmD2KrYqNmHINmF2K3ZgdmI2Lgg2LnZhNmJINis2YfYp9iy2YMg2YjZiti52YXZhCDYr9mI2YYg2KfYqti12KfZhC4K2KfYqNiv2KMg2YXZhiDZh9mG2KcK2KfZg9iq2KggLyDZgdmKINiz2LfYsSDYrNiv2YrYryDZhNiq2LHZiSDZg9mEINij2YbZiNin2Lkg2KfZhNmD2KrZhArYp9mD2KrYqCAjINir2YUg2YXYs9in2YHYqSDZhNi52YbZiNin2YbYjCDZiC0g2YTZgtin2KbZhdip2Iwg2YhbXSDZhNmF2YfZhdipCtit2K\/ZkdivINij2Yog2YbYtSDZhNiq2YbYs9mK2YLZhyDYo9mIINiq2YTZiNmK2YbZhyDYo9mIINmE2LfZhNioINin2YTZhdiz2KfYudivCtin2LPYrdioINin2YTZhdmC2KjYtiDYqNis2KfZhtioINij2Yog2LPYt9ixINmE2KrYutmK2YrYsSDYqtix2KrZitio2YcK2KzYsdmR2Kgg2KfZhNio2K3Yqzog2KfZg9iq2KggwqvYp9mE2YLYsdin2YbCuyDZiNiz2YrYrNivIMKr2KfZhNmC2LHYotmGwrsK2KfZhNiq2KfYsdmK2K4g2KfZhNmH2KzYsdmKCtin2YTZitmI2YU6IArYo9iv2LHYrCDYp9mE2KrYp9ix2YrYriDZgdmKINij2Yog2LXZgdit2Kkg2KjZg9iq2KfYqNipIC\/Yqtin2LHZitiu2Iwg2YjYp9i52LHYtiDZgtmI2KfYudivINin2YTYqNmK2KfZhtin2Kog2YHZiiDYqtmC2YjZitmFINmH2KzYsdmKINij2Ygg2YXZitmE2KfYr9mKLgrYp9mE2LnYsdio2YrYqSDZiNin2YTYpdmG2KzZhNmK2LLZitipINmF2LnYp9mLCtmD2YQg2LPYt9ixINmK2KPYrtiwINin2KrYrNin2YfZhyDZhdmGINij2YjZhCDYrdix2YEg2YHZitmHOgpNZWV0aW5nIHdpdGggdGhlIGRlc2lnbiB0ZWFtIGF0IDEwYW0K2KfYrNiq2YXYp9i5INmF2Lkg2YHYsdmK2YIg2KfZhNiq2LXZhdmK2YUg2KfZhNiz2KfYudipINin2YTYudin2LTYsdipCti12YHYrdin2Kog2K\/Yp9iu2YQg2LXZgdit2KfYqoiT+pz9DQkBe0J6HL+3evAAiJP6nP0NCwF3BWxvY2FsKACT+pz9DQAEc2VlZAF4KACT+pz9DREEc2VlZAF4JwEFcGFnZXMMUVBDWHIwdm1neU15ASgAk\/qc\/Q0qBHR5cGUBdwRwYWdlKACT+pz9DSoFdGl0bGUBdwAoAJP6nP0NKgRpY29uAXcAKACT+pz9DSoFY292ZXIBfigAk\/qc\/Q0qBmNvdmVyWQF9MigAk\/qc\/Q0qCHBhcmVudElkAX4oAJP6nP0NKgVvcmRlcgF3AmExKACT+pz9DSoJY3JlYXRlZEF0AXtCehy\/vX1AACgAk\/qc\/Q0qCXVwZGF0ZWRBdAF7Qnocv719QAAoAJP6nP0NKgljcmVhdGVkQnkBdwVsb2NhbCgAk\/qc\/Q0qCXVwZGF0ZWRCeQF3BWxvY2FsKACT+pz9DSoJZGVsZXRlZEF0AX4oAJP6nP0NKglmdWxsV2lkdGgBeSgAk\/qc\/Q0qBGZvbnQBdwRzYW5zKACT+pz9DSoJc21hbGxUZXh0AXkoAJP6nP0NKgZpbmxpbmUBeYiT+pz9DSwBdx7Yqtis2LHYqNipINi52YTZiSDYp9mE2KzZiNin2YSIk\/qc\/Q0zAXtCehy\/vdywAIiT+pz9DTUBdwVsb2NhbCgAk\/qc\/Q0qBHRleHQBdyHYs9i32LEg2LnYsdio2Yog2KvZhSBFbmdsaXNoIGxpbmWIk\/qc\/Q08AXtCehy\/vjxAAIiT+pz9DT0BdwVsb2NhbIiT+pz9DT4BdyPYs9i32LEg2LnYsdio2Yog2KvZhSBFbmdsaXNoIGxpbmUKL4iT+pz9DT8Be0J6HL++o
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172342, pluginId: Filesystem, methodName: stat, methodData: {"path":"Qirtas\/qirtas-backup-2026-11-11-tbl3.json.part","directory":"DOCUMENTS"}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"name":"qirtas-backup-2026-11-11-tbl3.json.part","type":"file","size":32223,"mtime":1794423663786,"ctime":1794423663000,"uri":"file:///storage/emulated/0/Documents/Qirtas/qirtas-backup-2026-11-11-tbl3.json.part"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172343, pluginId: Filesystem, methodName: deleteFile, methodData: {"path":"Qirtas\/qirtas-backup-2026-11-11-tbl3.json","directory":"DOCUMENTS"}
+D/Capacitor( 2157): Sending plugin error: {"save":false,"callbackId":"2172343","pluginId":"Filesystem","methodName":"deleteFile","success":false,"error":{"message":"'deleteFile' failed because file at '\/storage\/emulated\/0\/Documents\/Qirtas\/qirtas-backup-2026-11-11-tbl3.json' does not exist.","code":"OS-PLUG-FILE-0008"}}
+E/Capacitor/Console( 2157): File:  - Line 330 - Msg: [object Object]
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172344, pluginId: Filesystem, methodName: rename, methodData: {"from":"Qirtas\/qirtas-backup-2026-11-11-tbl3.json.part","to":"Qirtas\/qirtas-backup-2026-11-11-tbl3.json","directory":"DOCUMENTS","toDirectory":"DOCUMENTS"}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172345, pluginId: Filesystem, methodName: readdir, methodData: {"path":"Qirtas","directory":"DOCUMENTS"}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"files":[{"name":"qirtas-backup-2026-11-11-tbl3.json","type":"file","size":32223,"mtime":1794423663786,"ctime":1794423663000,"uri":"file:///storage/emulated/0/Documents/Qirtas/qirtas-backup-2026-11-11-tbl3.json"}]}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"canGoBack":true}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172346, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172347, pluginId: LocalNotifications, methodName: checkPermissions, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"display":"granted"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172348, pluginId: QirtasNative, methodName: reminderHealth, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172349, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":0}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172350, pluginId: QirtasNative, methodName: setReminders, methodData: {"ws":"8002e765-2579-4297-8540-e2ee97c99726","items":[{"id":848010748,"at":1794427500000,"title":"موعد المراجعة","body":"الأربعاء، ١ جمادى الآخرة ١٤٤٨ هـ","page":"day-8002e7652579-2026-11-11"}]}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"waiting":1,"exact":true}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172351, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172352, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{}}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172353, pluginId: LocalNotifications, methodName: checkPermissions, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"display":"granted"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172354, pluginId: QirtasNative, methodName: reminderHealth, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172355, pluginId: LocalNotifications, methodName: checkPermissions, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"display":"granted"}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172356, pluginId: QirtasNative, methodName: reminderHealth, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172357, pluginId: QirtasNative, methodName: testReminder, methodData: {"seconds":2,"title":"قِرطاس","body":"هكذا يظهر التذكير"}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"canGoBack":true}
+D/Capacitor( 2157): App paused
+D/Capacitor( 2157): App resumed
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"url":"qirtas://capture"}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172358, pluginId: QirtasNative, methodName: getSharedContent, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"canGoBack":true}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172359, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{"42@1794423687396":{"t":1794423690408}}}
+D/Capacitor( 2157): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2157): App paused
+D/Capacitor( 2157): App resumed
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172360, pluginId: QirtasNative, methodName: getSharedContent, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172361, pluginId: QirtasNative, methodName: reminderHealth, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172362, pluginId: QirtasNative, methodName: setReminders, methodData: {"ws":"smoke","items":[{"id":7001,"at":1794423761969,"title":"تذكير والتطبيق في الخلفية","body":"smoke 1","page":""}]}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"waiting":2,"exact":true}
+D/Capacitor( 2157): App paused
+D/Capacitor( 2157): App stopped
+D/Capacitor( 2157): Saving instance state!
+D/Capacitor( 2157): App restarted
+D/Capacitor( 2157): App started
+D/Capacitor( 2157): App resumed
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172363, pluginId: QirtasNative, methodName: getSharedContent, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {}
+W/chromium( 2157): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172364, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"shown":{"42@1794423687396":{"t":1794423690408},"7001@1794423761969":{"t":1794423761974}}}
+I/Capacitor/Console( 2157): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2157): callback: 2172365, pluginId: QirtasNative, methodName: setReminders, methodData: {"ws":"smoke","items":[{"id":7002,"at":1794423881070,"title":"تذكير بعد إيقاف التطبيق","body":"smoke 2","page":""}]}
+I/Capacitor/Console( 2157): File:  - Line 333 - Msg: {"waiting":2,"exact":true}
+W/chromium( 2808): [WARNING:dns_config_service_android.cc(115)] Failed to read DnsConfig.
+D/Capacitor( 2808): Starting BridgeActivity
+D/Capacitor( 2808): Registering plugin instance: CapacitorCookies
+D/Capacitor( 2808): Registering plugin instance: WebView
+D/Capacitor( 2808): Registering plugin instance: CapacitorHttp
+D/Capacitor( 2808): Registering plugin instance: SystemBars
+D/Capacitor( 2808): Registering plugin instance: QirtasNative
+D/Capacitor( 2808): Registering plugin instance: App
+D/Capacitor( 2808): Registering plugin instance: Filesystem
+D/Capacitor( 2808): Registering plugin instance: Keyboard
+D/Capacitor( 2808): Registering plugin instance: LocalNotifications
+D/Capacitor( 2808): Registering plugin instance: Share
+W/Capacitor( 2808): Unable to read file at path public/plugins
+D/Capacitor( 2808): Loading app at https://localhost
+D/Capacitor( 2808): App started
+D/Capacitor( 2808): App resumed
+D/Capacitor( 2808): Handling local request: https://localhost/
+W/chromium( 2808): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+D/Capacitor( 2808): Handling local request: https://localhost/assets/index-hZhnQqzp.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/store-P4HTi9vd.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/ids-CbOebr4s.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/pageOps-uy9aAtfR.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/Popover-DzWJmpVp.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/docs-BJyzDeO-.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/history-B5P_zkD_.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/preload-helper-CRzLMJPS.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/assets-CRuWYob_.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/dist-BPcjKUdj.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/index-XDzjhXK1.css
+D/Capacitor( 2808): Handling local request: https://localhost/assets/ext-o6g_-w-4.js
+D/Capacitor( 2808): Handling local request: https://localhost/splash-mark.svg
+D/Capacitor( 2808): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2808): Handling local request: https://localhost/assets/esm-Bwg7FvOh.js
+D/Capacitor( 2808): Handling local request: https://localhost/assets/esm-Dt1JbdLX.js
+D/Capacitor( 2808): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2808): Handling local request: https://localhost/assets/markazi-text-arabic-wght-normal-zEmVoUHK.woff2
+D/Capacitor( 2808): Handling local request: https://localhost/assets/readex-pro-arabic-wght-normal-DiwT_uOQ.woff2
+D/Capacitor( 2808): Handling local request: https://localhost/assets/readex-pro-latin-wght-normal--ekFhJJC.woff2
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292405, pluginId: LocalNotifications, methodName: createChannel, methodData: {"id":"reminders","name":"التذكيرات","importance":4,"visibility":1}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292406, pluginId: SystemBars, methodName: setStyle, methodData: {"style":"LIGHT"}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292407, pluginId: App, methodName: addListener, methodData: {"eventName":"backButton"}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292408, pluginId: App, methodName: addListener, methodData: {"eventName":"appUrlOpen"}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292409, pluginId: App, methodName: getLaunchUrl, methodData: {}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292410, pluginId: LocalNotifications, methodName: addListener, methodData: {"eventName":"localNotificationActionPerformed"}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292411, pluginId: App, methodName: addListener, methodData: {"eventName":"resume"}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292412, pluginId: QirtasNative, methodName: getSharedContent, methodData: {}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292413, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {"shown":{"42@1794423687396":{"t":1794423690408},"7001@1794423761969":{"t":1794423761974}}}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292414, pluginId: QirtasNative, methodName: setReminders, methodData: {"ws":"8002e765-2579-4297-8540-e2ee97c99726","items":[{"id":848010748,"at":1794427500000,"title":"موعد المراجعة","body":"الأربعاء، ١ جمادى الآخرة ١٤٤٨ هـ","page":"day-8002e7652579-2026-11-11"}]}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {"waiting":2,"exact":true}
+D/Capacitor( 2808): Handling local request: https://localhost/favicon.svg
+D/Capacitor( 2808): App paused
+D/Capacitor( 2808): App stopped
+D/Capacitor( 2808): Saving instance state!
+D/Capacitor( 2808): App restarted
+D/Capacitor( 2808): App started
+D/Capacitor( 2808): App resumed
+W/chromium( 2808): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: undefined
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292415, pluginId: QirtasNative, methodName: getSharedContent, methodData: {}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292416, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {"shown":{"42@1794423687396":{"t":1794423690408},"7001@1794423761969":{"t":1794423761974},"7002@1794423881070":{"t":1794423881081}}}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292417, pluginId: QirtasNative, methodName: reminderLog, methodData: {}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {"shown":{"42@1794423687396":{"t":1794423690408},"7001@1794423761969":{"t":1794423761974},"7002@1794423881070":{"t":1794423881081}}}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292418, pluginId: QirtasNative, methodName: reminderHealth, methodData: {}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292419, pluginId: LocalNotifications, methodName: checkPermissions, methodData: {}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {"display":"granted"}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292420, pluginId: QirtasNative, methodName: reminderHealth, methodData: {}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292421, pluginId: QirtasNative, methodName: setReminders, methodData: {"ws":"8002e765-2579-4297-8540-e2ee97c99726","items":[{"id":848010748,"at":1794427500000,"title":"موعد المراجعة","body":"الأربعاء، ١ جمادى الآخرة ١٤٤٨ هـ","page":"day-8002e7652579-2026-11-11"}]}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: {"waiting":1,"exact":true}
+I/Capacitor/Console( 2808): File:  - Line 349 - Msg: [object Object]
+V/Capacitor( 2808): callback: 52292422, pluginId: QirtasNative, methodName: testReminder, methodData: {"seconds":60,"title":"قِرطاس","body":"وصل هذا الإشعار والتطبيق مغلق: التذكيرات تعمل."}
+I/Capacitor/Console( 2808): File:  - Line 333 - Msg: undefined
+D/Capacitor( 2808): App paused
+D/Capacitor( 2808): App stopped
+D/Capacitor( 2808): Saving instance state!

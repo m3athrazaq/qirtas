@@ -1,0 +1,19 @@
+Warning: Activity not started, intent has been delivered to currently running top-most instance.
+health: {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+set 1: {"waiting":2,"exact":true}
+alarms waiting: 2
+1. shown with the app in the background: YES NotificationRecord(0x09360c55: pkg=com.m3athrazaq.qirtas user=UserHandle{0} id=7001 tag=null importance=4 key=0|com.m3athrazaq.qirtas|7001|n
+Warning: Activity not started, its current task has been brought to the front
+set 2: {"waiting":2,"exact":true}
+alarms before the stop: 2
+alarms after the stop (dropped): 0
+alarms after opening again: 2
+2. shown after the stop and reopening: YES NotificationRecord(0x0dc20e0f: pkg=com.m3athrazaq.qirtas user=UserHandle{0} id=7002 tag=null importance=4 key=0|com.m3athrazaq.qirtas|7002|n
+Warning: Activity not started, its current task has been brought to the front
+3. noted as shown: [["7001","0s late",""],["7002","0s late",""]]
+health after: {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+4. checks in the settings: ["is-ok: الإشعارات مسموح بها","is-ok: التنبيه في الدقيقة المحددة","is-bad: العمل في الخلفية دون قيود البطاريةالسماح"]
+test in a minute: ok
+5. "test in a minute" with the app closed: YES
+done
+exit=0

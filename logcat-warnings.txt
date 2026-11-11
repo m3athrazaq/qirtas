@@ -1,0 +1,924 @@
+--------- beginning of main
+E/ystem:dynsystem( 2086): Not starting debugger since process cannot load the jdwp agent.
+--------- beginning of system
+E/AppOps  (  507): attributionTag VCN not declared in manifest of android
+W/FeatureConnection(  998): getRegistrationTech: ImsRegistration is null
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/.intentresolver( 2135): Unexpected CPU variant for x86: x86_64.
+W/.intentresolver( 2135): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+E/.intentresolver( 2135): Not starting debugger since process cannot load the jdwp agent.
+W/ActivityTaskManager(  507): callingPackage for (uid=2000, pid=2136) has no WPC
+W/FirebaseApp( 2079): Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.
+W/ActivityManager(  507): Slow operation: 71ms so far, now at startProcess: returned from zygote!
+W/ActivityManager(  507): Slow operation: 71ms so far, now at startProcess: done updating battery stats
+W/ActivityManager(  507): Slow operation: 71ms so far, now at startProcess: building log message
+W/ActivityManager(  507): Slow operation: 71ms so far, now at startProcess: starting to update pids map
+W/ActivityManager(  507): Slow operation: 71ms so far, now at startProcess: done updating pids map
+W/ActivityManager(  507): Slow operation: 66ms so far, now at startProcess: asking zygote to start proc
+W/ActivityManager(  507): Slow operation: 85ms so far, now at startProcess: returned from zygote!
+W/ActivityManager(  507): Slow operation: 85ms so far, now at startProcess: done updating battery stats
+W/ActivityManager(  507): Slow operation: 85ms so far, now at startProcess: building log message
+W/ActivityManager(  507): Slow operation: 86ms so far, now at startProcess: starting to update pids map
+W/ActivityManager(  507): Slow operation: 86ms so far, now at startProcess: done updating pids map
+W/droid.messaging( 2155): Unexpected CPU variant for x86: x86_64.
+W/droid.messaging( 2155): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+--------- beginning of kernel
+E/apexd   (    0): Didn't generate uevent for [com.android.apex.cts.shim] removal
+W/apexd   (    0): Failed to delete dm-device com.android.apex.cts.shim
+W/ActivityThread(  998): getPackageInfo() called with an older ApplicationInfo than the cached version for package com.android.phone
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+E/apexd   (    0): Didn't generate uevent for [com.android.btservices] removal
+W/apexd   (    0): Failed to delete dm-device com.android.btservices
+E/apexd   (    0): Didn't generate uevent for [com.android.devicelock] removal
+E/KeyguardClockSwitch(  795): No clock being shown
+W/apexd   (    0): Failed to delete dm-device com.android.devicelock
+E/apexd   (    0): Didn't generate uevent for [com.android.healthfitness] removal
+W/JavaBinder(  507): BinderProxy is being destroyed but the application did not call unlinkToDeath to unlink all of its death recipients beforehand.  Releasing leaked death recipient: com.android.server.am.ActivityManagerService$14
+W/JavaBinder(  507): BinderProxy is being destroyed but the application did not call unlinkToDeath to unlink all of its death recipients beforehand.  Releasing leaked death recipient: com.android.server.am.ActivityManagerService$14
+W/system_server(  507): Long monitor contention with owner PackageManager (560) at int com.android.server.am.ActivityManagerService$LocalService.broadcastIntent(android.content.Intent, android.content.IIntentReceiver, java.lang.String[], boolean, int, int[], java.util.function.BiFunction, android.os.Bundle)(ActivityManagerService.java:18097) waiters=0 in void com.android.server.am.ActivityManagerService.finishReceiver(android.os.IBinder, int, java.lang.String, android.os.Bundle, boolean, int) for 106ms
+W/apexd   (    0): Failed to delete dm-device com.android.healthfitness
+E/droid.messaging( 2155): Not starting debugger since process cannot load the jdwp agent.
+W/ActivityManager(  507): finishReceiver: no app for android.os.BinderProxy@cd9142e
+E/apexd   (    0): Didn't generate uevent for [com.android.i18n] removal
+W/apexd   (    0): Failed to delete dm-device com.android.i18n
+E/apexd   (    0): Didn't generate uevent for [com.android.os.statsd] removal
+W/apexd   (    0): Failed to delete dm-device com.android.os.statsd
+W/athrazaq.qirtas( 2157): Unexpected CPU variant for x86: x86_64.
+W/athrazaq.qirtas( 2157): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+E/apexd   (    0): Didn't generate uevent for [com.android.rkpd] removal
+W/apexd   (    0): Failed to delete dm-device com.android.rkpd
+E/apexd   (    0): Didn't generate uevent for [com.android.runtime] removal
+W/apexd   (    0): Failed to delete dm-device com.android.runtime
+E/KeyguardClockSwitch(  795): No clock being shown
+E/apexd   (    0): Didn't generate uevent for [com.android.sdkext] removal
+W/apexd   (    0): Failed to delete dm-device com.android.sdkext
+E/apexd   (    0): Didn't generate uevent for [com.android.tzdata] removal
+W/apexd   (    0): Failed to delete dm-device com.android.tzdata
+E/apexd   (    0): Didn't generate uevent for [com.android.virt] removal
+W/apexd   (    0): Failed to delete dm-device com.android.virt
+E/apexd   (    0): Didn't generate uevent for [com.android.vndk.v34] removal
+W/apexd   (    0): Failed to delete dm-device com.android.vndk.v34
+W/com.android.nfc( 2189): Unexpected CPU variant for x86: x86_64.
+W/com.android.nfc( 2189): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+E/com.android.nfc( 2189): Not starting debugger since process cannot load the jdwp agent.
+W/ziparchive( 2157): Unable to open '/data/app/~~dCjhiefZ0piW2awDRaHvxA==/com.m3athrazaq.qirtas-wsKcUppwmKr-7w0SU7tGig==/base.dm': No such file or directory
+W/ziparchive( 2157): Unable to open '/data/app/~~dCjhiefZ0piW2awDRaHvxA==/com.m3athrazaq.qirtas-wsKcUppwmKr-7w0SU7tGig==/base.dm': No such file or directory
+W/WindowMagnificationMgr(  507): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070064.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002e.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002e.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070060.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002a.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002a.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070062.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002c.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002c.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070063.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002d.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002d.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070061.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002b.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002b.
+W/PackageManager(  507): Failed registering loading progress callback. Package is fully loaded.
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/ActivityThread(  998): getPackageInfo() called with an older ApplicationInfo than the cached version for package com.android.stk
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+E/AppOps  (  507): attributionTag VCN not declared in manifest of android
+E/AppOps  (  507): attributionTag VCN not declared in manifest of android
+E/AppOps  (  507): attributionTag VCN not declared in manifest of android
+E/AppOps  (  507): attributionTag VCN not declared in manifest of android
+W/ActivityManager(  507): Slow operation: 72ms so far, now at startProcess: returned from zygote!
+W/ActivityManager(  507): Slow operation: 73ms so far, now at startProcess: done updating battery stats
+W/ActivityManager(  507): Slow operation: 73ms so far, now at startProcess: building log message
+W/ActivityManager(  507): Slow operation: 73ms so far, now at startProcess: starting to update pids map
+W/ActivityManager(  507): Slow operation: 73ms so far, now at startProcess: done updating pids map
+W/SubscriptionInfo(  795): MCC string is not a number
+W/SubscriptionInfo(  795): MNC string is not a number
+E/SystemServiceRegistry(  947): No service published for: ethernet
+E/SystemServiceRegistry(  947): android.os.ServiceManager$ServiceNotFoundException: No service published for: ethernet
+E/SystemServiceRegistry(  947): 	at android.os.ServiceManager.getServiceOrThrow(ServiceManager.java:166)
+E/SystemServiceRegistry(  947): 	at android.app.SystemServiceRegistry$139.createService(SystemServiceRegistry.java:1872)
+E/SystemServiceRegistry(  947): 	at android.app.SystemServiceRegistry$CachedServiceFetcher.getService(SystemServiceRegistry.java:1971)
+E/SystemServiceRegistry(  947): 	at android.app.SystemServiceRegistry.getSystemService(SystemServiceRegistry.java:1645)
+E/SystemServiceRegistry(  947): 	at android.app.ContextImpl.getSystemService(ContextImpl.java:2212)
+E/SystemServiceRegistry(  947): 	at android.content.ContextWrapper.getSystemService(ContextWrapper.java:934)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.isEthernetSupported(Tethering.java:1582)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.makeSupportedDownstreams(Tethering.java:2550)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.updateSupportedDownstreams(Tethering.java:2524)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.updateConfiguration(Tethering.java:546)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.lambda$new$3(Tethering.java:345)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.$r8$lambda$bts3FsOwVdwDhrwMjvAr9kV3Jgs(Tethering.java:0)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering$$ExternalSyntheticLambda7.accept(R8$$SyntheticClass:0)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.util.VersionedBroadcastListener$Receiver.onReceive(VersionedBroadcastListener.java:103)
+E/SystemServiceRegistry(  947): 	at android.app.LoadedApk$ReceiverDispatcher$Args.lambda$getRunnable$0(LoadedApk.java:1802)
+E/SystemServiceRegistry(  947): 	at android.app.LoadedApk$ReceiverDispatcher$Args.$r8$lambda$gDuJqgxY6Zb-ifyeubKeivTLAwk(Unknown Source:0)
+E/SystemServiceRegistry(  947): 	at android.app.LoadedApk$ReceiverDispatcher$Args$$ExternalSyntheticLambda0.run(Unknown Source:2)
+E/SystemServiceRegistry(  947): 	at android.os.Handler.handleCallback(Handler.java:958)
+E/SystemServiceRegistry(  947): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+E/SystemServiceRegistry(  947): 	at android.os.Looper.loopOnce(Looper.java:205)
+E/SystemServiceRegistry(  947): 	at android.os.Looper.loop(Looper.java:294)
+E/SystemServiceRegistry(  947): 	at android.os.HandlerThread.run(HandlerThread.java:67)
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/Telephony(  998): registerImsRegistrationCallback: registration failed, no ImsService available. Exception: code: 1
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/android.rkpdapp( 2205): Unexpected CPU variant for x86: x86_64.
+W/android.rkpdapp( 2205): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+E/android.rkpdapp( 2205): Not starting debugger since process cannot load the jdwp agent.
+W/WindowMagnificationMgr(  507): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+W/m.android.shell( 2231): Unexpected CPU variant for x86: x86_64.
+W/m.android.shell( 2231): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+E/m.android.shell( 2231): Not starting debugger since process cannot load the jdwp agent.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070064.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002e.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002e.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070060.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002a.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002a.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070062.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002c.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002c.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070063.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002d.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002d.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f070061.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002b.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f0d002b.
+W/MessagingApp( 2155): canonicalizeMccMnc: invalid mccmnc:null ,null
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/MessagingApp( 2155): Rebuilt databases: reseting related state
+W/MessagingApp( 2155): canonicalizeMccMnc: invalid mccmnc:null ,null
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/Telephony(  998): registerImsRegistrationCallback: registration failed, no ImsService available. Exception: code: 1
+W/ActivityManager(  507): Slow operation: 74ms so far, now at startProcess: returned from zygote!
+W/ActivityManager(  507): Slow operation: 75ms so far, now at startProcess: done updating battery stats
+W/ActivityManager(  507): Slow operation: 75ms so far, now at startProcess: building log message
+W/ActivityManager(  507): Slow operation: 75ms so far, now at startProcess: starting to update pids map
+W/ActivityManager(  507): Slow operation: 75ms so far, now at startProcess: done updating pids map
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/tatementservice( 2257): Unexpected CPU variant for x86: x86_64.
+W/tatementservice( 2257): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+E/tatementservice( 2257): Not starting debugger since process cannot load the jdwp agent.
+W/ndroid.systemui(  795): Cleared Reference was only reachable from finalizer (only reported once)
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/Telephony(  998): registerImsRegistrationCallback: registration failed, no ImsService available. Exception: code: 1
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+E/DrmHalHidl( 2205): Failed to find passthrough drm factories
+W/ackageinstaller( 2286): Unexpected CPU variant for x86: x86_64.
+W/ackageinstaller( 2286): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+W/ActivityManager(  507): Slow operation: 79ms so far, now at startProcess: returned from zygote!
+W/ActivityManager(  507): Slow operation: 79ms so far, now at startProcess: done updating battery stats
+W/ActivityManager(  507): Slow operation: 79ms so far, now at startProcess: building log message
+W/ActivityManager(  507): Slow operation: 80ms so far, now at startProcess: starting to update pids map
+W/ActivityManager(  507): Slow operation: 80ms so far, now at startProcess: done updating pids map
+E/ackageinstaller( 2286): Not starting debugger since process cannot load the jdwp agent.
+E/clearkey-DrmFactory( 2291): Clearkey Drm HAL: failed to create drm plugin, invalid crypto scheme
+E/DrmHalAidl( 2205): uuid=[edef8ba979d64ace a3c827dcd51d21ed] Failed to make drm plugin: 6
+E/DrmHalHidl( 2205): uuid=[edef8ba979d64ace a3c827dcd51d21ed] No supported hal instance found
+W/JobScheduler(  507): Job didn't exist in JobStore: 9cc4e0a #u0a135/1 com.android.rkpdapp/androidx.work.impl.background.systemjob.SystemJobService
+W/athrazaq.qirtas( 2157): Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (unsupported, reflection, allowed)
+W/WindowMagnificationMgr(  507): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+E/SystemServiceRegistry(  947): No service published for: ethernet
+E/SystemServiceRegistry(  947): android.os.ServiceManager$ServiceNotFoundException: No service published for: ethernet
+E/SystemServiceRegistry(  947): 	at android.os.ServiceManager.getServiceOrThrow(ServiceManager.java:166)
+E/SystemServiceRegistry(  947): 	at android.app.SystemServiceRegistry$139.createService(SystemServiceRegistry.java:1872)
+E/SystemServiceRegistry(  947): 	at android.app.SystemServiceRegistry$CachedServiceFetcher.getService(SystemServiceRegistry.java:1971)
+E/SystemServiceRegistry(  947): 	at android.app.SystemServiceRegistry.getSystemService(SystemServiceRegistry.java:1645)
+E/SystemServiceRegistry(  947): 	at android.app.ContextImpl.getSystemService(ContextImpl.java:2212)
+E/SystemServiceRegistry(  947): 	at android.content.ContextWrapper.getSystemService(ContextWrapper.java:934)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.isEthernetSupported(Tethering.java:1582)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.makeSupportedDownstreams(Tethering.java:2550)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.updateSupportedDownstreams(Tethering.java:2524)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.updateConfiguration(Tethering.java:546)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.lambda$new$3(Tethering.java:345)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.$r8$lambda$bts3FsOwVdwDhrwMjvAr9kV3Jgs(Tethering.java:0)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering$$ExternalSyntheticLambda7.accept(R8$$SyntheticClass:0)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.util.VersionedBroadcastListener$Receiver.onReceive(VersionedBroadcastListener.java:103)
+E/SystemServiceRegistry(  947): 	at android.app.LoadedApk$ReceiverDispatcher$Args.lambda$getRunnable$0(LoadedApk.java:1802)
+E/SystemServiceRegistry(  947): 	at android.app.LoadedApk$ReceiverDispatcher$Args.$r8$lambda$gDuJqgxY6Zb-ifyeubKeivTLAwk(Unknown Source:0)
+E/SystemServiceRegistry(  947): 	at android.app.LoadedApk$ReceiverDispatcher$Args$$ExternalSyntheticLambda0.run(Unknown Source:2)
+E/SystemServiceRegistry(  947): 	at android.os.Handler.handleCallback(Handler.java:958)
+E/SystemServiceRegistry(  947): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+E/SystemServiceRegistry(  947): 	at android.os.Looper.loopOnce(Looper.java:205)
+E/SystemServiceRegistry(  947): 	at android.os.Looper.loop(Looper.java:294)
+E/SystemServiceRegistry(  947): 	at android.os.HandlerThread.run(HandlerThread.java:67)
+E/CellBroadcastConfigService( 1234): fails to setCellBroadcastRanges, result = 2
+W/athrazaq.qirtas( 2157): Accessing hidden method Landroid/os/Trace;->isTagEnabled(J)Z (unsupported, reflection, allowed)
+W/athrazaq.qirtas( 2157): Accessing hidden method Landroid/os/Trace;->traceBegin(JLjava/lang/String;)V (unsupported, reflection, allowed)
+W/athrazaq.qirtas( 2157): Accessing hidden method Landroid/os/Trace;->traceEnd(J)V (unsupported, reflection, allowed)
+W/athrazaq.qirtas( 2157): Accessing hidden method Landroid/os/Trace;->asyncTraceBegin(JLjava/lang/String;I)V (unsupported, reflection, allowed)
+W/athrazaq.qirtas( 2157): Accessing hidden method Landroid/os/Trace;->asyncTraceEnd(JLjava/lang/String;I)V (unsupported, reflection, allowed)
+W/ContextImpl(  507): Calling a method in the system process without a qualified user: android.app.ContextImpl.sendBroadcastMultiplePermissions:1303 android.content.Context.sendBroadcastMultiplePermissions:2422 android.content.Context.sendBroadcastMultiplePermissions:2410 com.android.server.TelephonyRegistry.broadcastDataConnectionStateChanged:3767 com.android.server.TelephonyRegistry.notifyDataConnectionForSubscriber:2159 
+E/WifiDataStall(  507): onDataConnectionStateChanged unexpected State: 1
+E/MboOceController(  507): onDataConnectionStateChanged unexpected State: 1
+E/AppOps  (  507): attributionTag VCN not declared in manifest of android
+W/MessagingApp( 2155): canonicalizeMccMnc: invalid mccmnc:null ,null
+E/AppOps  (  507): attributionTag VCN not declared in manifest of android
+W/ActivityThread( 2286): getPackageInfo() called with an older ApplicationInfo than the cached version for package com.android.packageinstaller
+W/MessagingApp( 2155): canonicalizeMccMnc: invalid mccmnc:null ,null
+W/JobScheduler(  507): Job didn't exist in JobStore: d81824e #u0a59/2 com.android.statementservice/androidx.work.impl.background.systemjob.SystemJobService
+W/ActivityManager(  507): Slow operation: 72ms so far, now at startProcess: returned from zygote!
+W/chromium( 2157): [WARNING:dns_config_service_android.cc(115)] Failed to read DnsConfig.
+W/ActivityManager(  507): Slow operation: 101ms so far, now at startProcess: done updating battery stats
+W/ActivityManager(  507): Slow operation: 102ms so far, now at startProcess: building log message
+W/ActivityManager(  507): Slow operation: 103ms so far, now at startProcess: starting to update pids map
+W/ActivityManager(  507): Slow operation: 103ms so far, now at startProcess: done updating pids map
+W/ActivityManager(  507): Slow operation: 101ms so far, now at startProcess: asking zygote to start proc
+W/ocessService0:0( 2339): Unexpected CPU variant for x86: x86_64.
+W/ocessService0:0( 2339): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+W/FeatureConnection(  998): getRegistrationTech: ImsRegistration is null
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/ActivityManager(  507): Slow operation: 125ms so far, now at startProcess: returned from zygote!
+W/ActivityManager(  507): Slow operation: 129ms so far, now at startProcess: done updating battery stats
+E/ocessService0:0( 2339): Not starting debugger since process cannot load the jdwp agent.
+W/ActivityManager(  507): Slow operation: 130ms so far, now at startProcess: building log message
+W/ActivityManager(  507): Slow operation: 131ms so far, now at startProcess: starting to update pids map
+W/ActivityManager(  507): Slow operation: 131ms so far, now at startProcess: done updating pids map
+W/idmap2d (  433): failed to parse idmap header of '/data/resource-cache/vendor@overlay@SystemUI__auto_generated_rro_vendor.apk@idmap'
+W/idmap2d (  433): failed to find resource 'bool/config_show4GForLTE'
+E/idmap2d (  433): no resources were overlaid
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/webview_service( 2347): Unexpected CPU variant for x86: x86_64.
+W/webview_service( 2347): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+E/webview_service( 2347): Not starting debugger since process cannot load the jdwp agent.
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+E/system_server(  507): No package ID 7f found for resource ID 0x7f08025b.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f1315be.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f08025a.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f13067c.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f080259.
+E/system_server(  507): No package ID 7f found for resource ID 0x7f130e50.
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/SystemServiceRegistry( 2339): No service published for: virtualdevice
+E/SELinux (    0): avc:  denied  { find } for pid=2339 uid=99000 name=content_capture scontext=u:r:isolated_app:s0:c512,c768 tcontext=u:object_r:content_capture_service:s0 tclass=service_manager permissive=0
+W/FeatureConnection(  998): getRegistrationTech: ImsRegistration is null
+W/FeatureConnection(  998): getRegistrationTech: ImsRegistration is null
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/Capacitor( 2157): Unable to read file at path public/plugins
+W/iew:webview_apk( 2387): Unexpected CPU variant for x86: x86_64.
+W/iew:webview_apk( 2387): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+W/cr_media( 2157): BLUETOOTH_CONNECT permission is missing.
+W/cr_media( 2157): registerBluetoothIntentsIfNeeded: Requires BLUETOOTH permission
+E/iew:webview_apk( 2387): Not starting debugger since process cannot load the jdwp agent.
+W/RkpdSystemInterface( 2205): HAL returned a batch size that's too small (20), defaulting to 20
+W/WindowOnBackDispatcher( 2157): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 2157): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/OpenGLRenderer( 2157): Unknown dataspace 0
+E/RkpdServerInterface( 2205): Server connection failed for url: https://remoteprovisioning.googleapis.com/v1:signCertificates?challenge=AAABocv7c1oBILStY5xmDEMGJwli3a8yAuD9cJ4=&request_id=cd5e6c9e-7264-4d50-9f6c-8adc09ee812a, response code: 400
+E/RkpdServerInterface( 2205): Repeated failure count: 1
+E/RkpdServerInterface( 2205): {
+E/RkpdServerInterface( 2205):   "error": {
+E/RkpdServerInterface( 2205):     "code": 400,
+E/RkpdServerInterface( 2205):     "message": "Invalid request payload: vendor_patch_level`0` should be in the format YYYYMMDD or YYYYMM if present.\nRequestId: cd5e6c9e-7264-4d50-9f6c-8adc09ee812a",
+E/RkpdServerInterface( 2205):     "status": "INVALID_ARGUMENT"
+E/RkpdServerInterface( 2205):   }
+E/RkpdServerInterface( 2205): }
+E/RkpdPeriodicProvisioner( 2205): Error provisioning keys for com.android.rkpdapp.interfaces.SystemInterface{android.hardware.security.keymint.IRemotelyProvisionedComponent/default}
+E/RkpdPeriodicProvisioner( 2205): com.android.rkpdapp.RkpdException: HTTP error status encountered: 400
+E/RkpdPeriodicProvisioner( 2205): 	at com.android.rkpdapp.interfaces.ServerInterface.requestData(ServerInterface.java:341)
+E/RkpdPeriodicProvisioner( 2205): 	at com.android.rkpdapp.interfaces.ServerInterface.connectAndGetData(ServerInterface.java:287)
+E/RkpdPeriodicProvisioner( 2205): 	at com.android.rkpdapp.interfaces.ServerInterface.requestSignedCertificates(ServerInterface.java:121)
+E/RkpdPeriodicProvisioner( 2205): 	at com.android.rkpdapp.provisioner.Provisioner.batchProvision(Provisioner.java:157)
+E/RkpdPeriodicProvisioner( 2205): 	at com.android.rkpdapp.provisioner.Provisioner.fetchCertificates(Provisioner.java:136)
+E/RkpdPeriodicProvisioner( 2205): 	at com.android.rkpdapp.provisioner.Provisioner.provisionKeys(Provisioner.java:89)
+E/RkpdPeriodicProvisioner( 2205): 	at com.android.rkpdapp.provisioner.PeriodicProvisioner.doWork(PeriodicProvisioner.java:110)
+E/RkpdPeriodicProvisioner( 2205): 	at androidx.work.Worker$1.run(Worker.java:82)
+E/RkpdPeriodicProvisioner( 2205): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+E/RkpdPeriodicProvisioner( 2205): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+E/RkpdPeriodicProvisioner( 2205): 	at java.lang.Thread.run(Thread.java:1012)
+W/SystemServiceRegistry( 2339): No service published for: uimode
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.ROTATE_SURFACE_FLINGER from uid=10141 pid=0
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.INTERNAL_SYSTEM_WINDOW from uid=10141 pid=0
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.INTERNAL_SYSTEM_WINDOW from uid=10141 pid=2157
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10141 pid=0
+W/JobScheduler(  507): Job didn't exist in JobStore: 9aad17c #u0a135/0 com.android.rkpdapp/androidx.work.impl.background.systemjob.SystemJobService
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10141 pid=2157
+W/OpenGLRenderer( 2157): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/Telephony(  998): registerImsRegistrationCallback: registration failed, no ImsService available. Exception: code: 1
+W/ContextImpl(  507): Calling a method in the system process without a qualified user: android.app.ContextImpl.sendBroadcastMultiplePermissions:1303 android.content.Context.sendBroadcastMultiplePermissions:2422 android.content.Context.sendBroadcastMultiplePermissions:2410 com.android.server.TelephonyRegistry.broadcastDataConnectionStateChanged:3767 com.android.server.TelephonyRegistry.notifyDataConnectionForSubscriber:2159 
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/Telephony(  998): registerImsRegistrationCallback: registration failed, no ImsService available. Exception: code: 1
+E/Netd    (  325): no such netId 101
+W/ConnectivityService(  507): Exception adding interface: android.os.ServiceSpecificException: Machine is not on the network (code 64)
+E/Netd    (  325): no such netId 101
+E/ConnectivityService(  507): Exception in networkAddRouteParcel for non-gateway: android.os.ServiceSpecificException: Machine is not on the network (code 64)
+E/Netd    (  325): no such netId 101
+E/ConnectivityService(  507): Exception in networkAddRouteParcel for gateway: android.os.ServiceSpecificException: Machine is not on the network (code 64)
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/chromium( 2157): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+W/DnsManager(  507): updatePrivateDns(101, PrivateDnsConfig{true:/[]})
+W/resolv  (  325): Validating DnsTlsServer 10.0.2.3 with mark 0xf0065
+W/resolv  (  325): SSL_connect ssl error =5, mark 0xf0065: Connection refused
+W/resolv  (  325): TLS Handshake failed
+W/resolv  (  325): query failed
+W/resolv  (  325): validateDnsTlsServer returned 0 for 10.0.2.3
+W/resolv  (  325): Validation failed
+W/ServiceManagerCppClient(  507): Permission failure: android.permission.ROTATE_SURFACE_FLINGER from uid=10141 pid=0
+W/ServiceManagerCppClient(  507): Permission failure: android.permission.INTERNAL_SYSTEM_WINDOW from uid=10141 pid=0
+W/ServiceManagerCppClient(  507): Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10141 pid=0
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/WindowOnBackDispatcher(  795): sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@d57b32e
+W/InputManager-JNI(  507): Input channel object '4f0d100 Splash Screen com.m3athrazaq.qirtas (client)' was disposed without first being removed with the input manager!
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/ziparchive(  507): Unable to open '/data/app/~~dCjhiefZ0piW2awDRaHvxA==/com.m3athrazaq.qirtas-wsKcUppwmKr-7w0SU7tGig==/base.dm': No such file or directory
+W/resolv  (  325): Validating DnsTlsServer 10.0.2.3 with mark 0xf0065
+W/resolv  (  325): SSL_connect ssl error =5, mark 0xf0065: Connection refused
+W/resolv  (  325): TLS Handshake failed
+W/resolv  (  325): query failed
+W/resolv  (  325): validateDnsTlsServer returned 0 for 10.0.2.3
+W/resolv  (  325): Validation failed
+W/athrazaq.qirtas( 2157): Long monitor contention with owner ThreadPoolForeg (2326) at java.lang.Object libcore.content.type.MimeMap$MemoizingSupplier.get()(MimeMap.java:475) waiters=2 in java.lang.Object libcore.content.type.MimeMap$MemoizingSupplier.get() for 277ms
+W/athrazaq.qirtas( 2157): Long monitor contention with owner ThreadPoolForeg (2326) at java.lang.Object libcore.content.type.MimeMap$MemoizingSupplier.get()(MimeMap.java:475) waiters=4 in java.lang.Object libcore.content.type.MimeMap$MemoizingSupplier.get() for 224ms
+W/droid.launcher3( 1032): Cleared Reference was only reachable from finalizer (only reported once)
+W/FeatureConnection(  998): getRegistrationTech: ImsRegistration is null
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/FeatureConnection(  998): getRegistrationTech: ImsRegistration is null
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+E/AppOps  (  507): attributionTag VCN not declared in manifest of android
+E/AppOps  (  507): attributionTag VCN not declared in manifest of android
+W/MessagingApp( 2155): canonicalizeMccMnc: invalid mccmnc:null ,null
+E/SystemServiceRegistry(  947): No service published for: ethernet
+E/SystemServiceRegistry(  947): android.os.ServiceManager$ServiceNotFoundException: No service published for: ethernet
+E/SystemServiceRegistry(  947): 	at android.os.ServiceManager.getServiceOrThrow(ServiceManager.java:166)
+E/SystemServiceRegistry(  947): 	at android.app.SystemServiceRegistry$139.createService(SystemServiceRegistry.java:1872)
+E/SystemServiceRegistry(  947): 	at android.app.SystemServiceRegistry$CachedServiceFetcher.getService(SystemServiceRegistry.java:1971)
+E/SystemServiceRegistry(  947): 	at android.app.SystemServiceRegistry.getSystemService(SystemServiceRegistry.java:1645)
+E/SystemServiceRegistry(  947): 	at android.app.ContextImpl.getSystemService(ContextImpl.java:2212)
+E/SystemServiceRegistry(  947): 	at android.content.ContextWrapper.getSystemService(ContextWrapper.java:934)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.isEthernetSupported(Tethering.java:1582)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.makeSupportedDownstreams(Tethering.java:2550)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.updateSupportedDownstreams(Tethering.java:2524)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.updateConfiguration(Tethering.java:546)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.lambda$new$3(Tethering.java:345)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering.$r8$lambda$bts3FsOwVdwDhrwMjvAr9kV3Jgs(Tethering.java:0)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.Tethering$$ExternalSyntheticLambda7.accept(R8$$SyntheticClass:0)
+E/SystemServiceRegistry(  947): 	at com.android.networkstack.tethering.util.VersionedBroadcastListener$Receiver.onReceive(VersionedBroadcastListener.java:103)
+E/SystemServiceRegistry(  947): 	at android.app.LoadedApk$ReceiverDispatcher$Args.lambda$getRunnable$0(LoadedApk.java:1802)
+E/SystemServiceRegistry(  947): 	at android.app.LoadedApk$ReceiverDispatcher$Args.$r8$lambda$gDuJqgxY6Zb-ifyeubKeivTLAwk(Unknown Source:0)
+E/SystemServiceRegistry(  947): 	at android.app.LoadedApk$ReceiverDispatcher$Args$$ExternalSyntheticLambda0.run(Unknown Source:2)
+E/SystemServiceRegistry(  947): 	at android.os.Handler.handleCallback(Handler.java:958)
+E/SystemServiceRegistry(  947): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+E/SystemServiceRegistry(  947): 	at android.os.Looper.loopOnce(Looper.java:205)
+E/SystemServiceRegistry(  947): 	at android.os.Looper.loop(Looper.java:294)
+E/SystemServiceRegistry(  947): 	at android.os.HandlerThread.run(HandlerThread.java:67)
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+E/CellBroadcastConfigService( 1234): fails to setCellBroadcastRanges, result = 2
+W/MessagingApp( 2155): canonicalizeMccMnc: invalid mccmnc:null ,null
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/Telephony(  998): registerImsRegistrationCallback: registration failed, no ImsService available. Exception: code: 1
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/FeatureConnection(  998): getRegistrationTech: ImsRegistration is null
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/Telephony(  998): registerMmTelCapabilityCallback: registration failed, no ImsService available. Exception: code: 1
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/libgoldfish-rild(  455): Multi-element reporting criteria are not supported with HIDL HAL
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/System  (  998): A resource failed to call AbstractCursor.close. 
+W/HeadsetPhoneState(  974): startListenForPhoneState, no event to listen
+W/BroadcastLoopers(  507): Found previously unknown looper Thread[appscheduling.default,5,main]
+E/TaskPersister(  507): File error accessing recents directory (directory doesn't exist?).
+W/ModernMediaScanner( 1463): Failed to apply ContentProviderOperation(type=insert uri=content://media/internal/file values={instance_id=null, compilation=null, disc_number=0, duration=10214, is_ringtone=1, album_artist=null, resolution=null, orientation=null, artist=pdx, author=null, height=null, is_drm=0, is_audiobook=0, date_modified=1702767290, writer=null, composer=null, _modifier=3, is_recording=0, datetaken=null, mime_type=audio/ogg, is_notification=0, bitrate=96000, cd_track_number=0, xmp=[], year=null, _data=/product/media/audio/ringtones/PERSEUS.ogg, _size=112981, album=Unknown, genre=Unknown, is_alarm=0, title=Perseus, track=0, width=null, is_music=0, document_id=null, is_podcast=0, capture_framerate=null, num_tracks=1, original_document_id=null, media_type=2} exceptionAllowed)
+W/ModernMediaScanner( 1463): android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteConnection.nativeExecuteForLastInsertedRowId(Native Method)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteConnection.executeForLastInsertedRowId(SQLiteConnection.java:961)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteSession.executeForLastInsertedRowId(SQLiteSession.java:790)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteStatement.executeInsert(SQLiteStatement.java:89)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.DatabaseUtils.executeInsert(DatabaseUtils.java:488)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.insert(SQLiteQueryBuilder.java:611)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.lambda$insert$1(SQLiteQueryBuilder.java:575)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.$r8$lambda$z6PmNgi8nEawad46M5nyYc14aRM(SQLiteQueryBuilder.java:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder$$ExternalSyntheticLambda4.apply(R8$$SyntheticClass:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.DatabaseHelper.runWithTransaction(DatabaseHelper.java:850)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.insert(SQLiteQueryBuilder.java:574)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.lambda$insertAllowingUpsert$20(MediaProvider.java:4846)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.$r8$lambda$A8_bSAcDGkyGiCcvRo57xoMQkf8(MediaProvider.java:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider$$ExternalSyntheticLambda39.apply(R8$$SyntheticClass:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.DatabaseHelper.runWithTransaction(DatabaseHelper.java:850)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insertAllowingUpsert(MediaProvider.java:4836)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insertFile(MediaProvider.java:4818)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insertInternal(MediaProvider.java:5287)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insert(MediaProvider.java:4980)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProviderOperation.applyInternal(ContentProviderOperation.java:375)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProviderOperation.apply(ContentProviderOperation.java:347)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProvider.applyBatch(ContentProvider.java:2653)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.applyBatch(MediaProvider.java:5339)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProvider.applyBatch(ContentProvider.java:2644)
+W/ModernMediaScanner( 1463): 	at android.content.ContentResolver.applyBatch(ContentResolver.java:2246)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.applyPending(ModernMediaScanner.java:957)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.maybeApplyPending(ModernMediaScanner.java:947)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.visitFile(ModernMediaScanner.java:853)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.visitFile(ModernMediaScanner.java:338)
+W/ModernMediaScanner( 1463): 	at java.nio.file.Files.walkFileTree(Files.java:2670)
+W/ModernMediaScanner( 1463): 	at java.nio.file.Files.walkFileTree(Files.java:2742)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.walkFileTree(ModernMediaScanner.java:454)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.runInternal(ModernMediaScanner.java:417)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.run(ModernMediaScanner.java:406)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner.scanDirectory(ModernMediaScanner.java:252)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.scanDirectory(MediaProvider.java:1939)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaService.onScanVolume(MediaService.java:204)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaService.onScanVolume(MediaService.java:172)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaService.onHandleWork(MediaService.java:95)
+W/ModernMediaScanner( 1463): 	at androidx.core.app.JobIntentService$CommandProcessor.doInBackground(JobIntentService.java:396)
+W/ModernMediaScanner( 1463): 	at androidx.core.app.JobIntentService$CommandProcessor.doInBackground(JobIntentService.java:387)
+W/ModernMediaScanner( 1463): 	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+W/ModernMediaScanner( 1463): 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+W/ModernMediaScanner( 1463): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+W/ModernMediaScanner( 1463): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+W/ModernMediaScanner( 1463): 	at java.lang.Thread.run(Thread.java:1012)
+W/ModernMediaScanner( 1463): Failed to apply ContentProviderOperation(type=insert uri=content://media/internal/file values={instance_id=null, compilation=null, disc_number=0, duration=4383, is_ringtone=0, album_artist=null, resolution=null, orientation=null, artist=Unknown, author=null, height=null, is_drm=0, is_audiobook=0, date_modified=1702767290, writer=null, composer=null, _modifier=3, is_recording=0, datetaken=null, mime_type=audio/ogg, is_notification=1, bitrate=96000, cd_track_number=null, xmp=[], year=null, _data=/product/media/audio/notifications/Vega.ogg, _size=29310, album=notifications, genre=null, is_alarm=0, title=Vega, track=null, width=null, is_music=0, document_id=null, is_podcast=0, capture_framerate=null, num_tracks=1, original_document_id=null, media_type=2} exceptionAllowed)
+W/ModernMediaScanner( 1463): android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteConnection.nativeExecuteForLastInsertedRowId(Native Method)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteConnection.executeForLastInsertedRowId(SQLiteConnection.java:961)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteSession.executeForLastInsertedRowId(SQLiteSession.java:790)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteStatement.executeInsert(SQLiteStatement.java:89)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.DatabaseUtils.executeInsert(DatabaseUtils.java:488)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.insert(SQLiteQueryBuilder.java:611)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.lambda$insert$1(SQLiteQueryBuilder.java:575)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.$r8$lambda$z6PmNgi8nEawad46M5nyYc14aRM(SQLiteQueryBuilder.java:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder$$ExternalSyntheticLambda4.apply(R8$$SyntheticClass:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.DatabaseHelper.runWithTransaction(DatabaseHelper.java:850)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.insert(SQLiteQueryBuilder.java:574)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.lambda$insertAllowingUpsert$20(MediaProvider.java:4846)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.$r8$lambda$A8_bSAcDGkyGiCcvRo57xoMQkf8(MediaProvider.java:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider$$ExternalSyntheticLambda39.apply(R8$$SyntheticClass:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.DatabaseHelper.runWithTransaction(DatabaseHelper.java:850)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insertAllowingUpsert(MediaProvider.java:4836)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insertFile(MediaProvider.java:4818)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insertInternal(MediaProvider.java:5287)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insert(MediaProvider.java:4980)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProviderOperation.applyInternal(ContentProviderOperation.java:375)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProviderOperation.apply(ContentProviderOperation.java:347)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProvider.applyBatch(ContentProvider.java:2653)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.applyBatch(MediaProvider.java:5339)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProvider.applyBatch(ContentProvider.java:2644)
+W/ModernMediaScanner( 1463): 	at android.content.ContentResolver.applyBatch(ContentResolver.java:2246)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.applyPending(ModernMediaScanner.java:957)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.maybeApplyPending(ModernMediaScanner.java:947)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.visitFile(ModernMediaScanner.java:853)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.visitFile(ModernMediaScanner.java:338)
+W/ModernMediaScanner( 1463): 	at java.nio.file.Files.walkFileTree(Files.java:2670)
+W/ModernMediaScanner( 1463): 	at java.nio.file.Files.walkFileTree(Files.java:2742)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.walkFileTree(ModernMediaScanner.java:454)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.runInternal(ModernMediaScanner.java:417)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.run(ModernMediaScanner.java:406)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner.scanDirectory(ModernMediaScanner.java:252)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.scanDirectory(MediaProvider.java:1939)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaService.onScanVolume(MediaService.java:204)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaService.onScanVolume(MediaService.java:172)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaService.onHandleWork(MediaService.java:95)
+W/ModernMediaScanner( 1463): 	at androidx.core.app.JobIntentService$CommandProcessor.doInBackground(JobIntentService.java:396)
+W/ModernMediaScanner( 1463): 	at androidx.core.app.JobIntentService$CommandProcessor.doInBackground(JobIntentService.java:387)
+W/ModernMediaScanner( 1463): 	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+W/ModernMediaScanner( 1463): 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+W/ModernMediaScanner( 1463): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+W/ModernMediaScanner( 1463): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+W/ModernMediaScanner( 1463): 	at java.lang.Thread.run(Thread.java:1012)
+W/ModernMediaScanner( 1463): Failed to apply ContentProviderOperation(type=insert uri=content://media/internal/file values={instance_id=null, compilation=null, disc_number=null, duration=1000, is_ringtone=0, album_artist=null, resolution=null, orientation=null, artist=pdx, author=null, height=null, is_drm=0, is_audiobook=0, date_modified=1702767290, writer=null, composer=null, _modifier=3, is_recording=0, datetaken=null, mime_type=audio/ogg, is_notification=1, bitrate=80000, cd_track_number=2dB214a, xmp=[], year=null, _data=/product/media/audio/notifications/arcturus.ogg, _size=7908, album=notifications, genre=null, is_alarm=0, title=Arcturus, track=null, width=null, is_music=0, document_id=null, is_podcast=0, capture_framerate=null, num_tracks=1, original_document_id=null, media_type=2} exceptionAllowed)
+W/ModernMediaScanner( 1463): android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteConnection.nativeExecuteForLastInsertedRowId(Native Method)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteConnection.executeForLastInsertedRowId(SQLiteConnection.java:961)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteSession.executeForLastInsertedRowId(SQLiteSession.java:790)
+W/ModernMediaScanner( 1463): 	at android.database.sqlite.SQLiteStatement.executeInsert(SQLiteStatement.java:89)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.DatabaseUtils.executeInsert(DatabaseUtils.java:488)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.insert(SQLiteQueryBuilder.java:611)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.lambda$insert$1(SQLiteQueryBuilder.java:575)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.$r8$lambda$z6PmNgi8nEawad46M5nyYc14aRM(SQLiteQueryBuilder.java:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder$$ExternalSyntheticLambda4.apply(R8$$SyntheticClass:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.DatabaseHelper.runWithTransaction(DatabaseHelper.java:850)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.util.SQLiteQueryBuilder.insert(SQLiteQueryBuilder.java:574)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.lambda$insertAllowingUpsert$20(MediaProvider.java:4846)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.$r8$lambda$A8_bSAcDGkyGiCcvRo57xoMQkf8(MediaProvider.java:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider$$ExternalSyntheticLambda39.apply(R8$$SyntheticClass:0)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.DatabaseHelper.runWithTransaction(DatabaseHelper.java:850)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insertAllowingUpsert(MediaProvider.java:4836)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insertFile(MediaProvider.java:4818)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insertInternal(MediaProvider.java:5287)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.insert(MediaProvider.java:4980)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProviderOperation.applyInternal(ContentProviderOperation.java:375)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProviderOperation.apply(ContentProviderOperation.java:347)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProvider.applyBatch(ContentProvider.java:2653)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.applyBatch(MediaProvider.java:5339)
+W/ModernMediaScanner( 1463): 	at android.content.ContentProvider.applyBatch(ContentProvider.java:2644)
+W/ModernMediaScanner( 1463): 	at android.content.ContentResolver.applyBatch(ContentResolver.java:2246)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.applyPending(ModernMediaScanner.java:957)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.maybeApplyPending(ModernMediaScanner.java:947)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.visitFile(ModernMediaScanner.java:853)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.visitFile(ModernMediaScanner.java:338)
+W/ModernMediaScanner( 1463): 	at java.nio.file.Files.walkFileTree(Files.java:2670)
+W/ModernMediaScanner( 1463): 	at java.nio.file.Files.walkFileTree(Files.java:2742)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.walkFileTree(ModernMediaScanner.java:454)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.runInternal(ModernMediaScanner.java:417)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner$Scan.run(ModernMediaScanner.java:406)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.scan.ModernMediaScanner.scanDirectory(ModernMediaScanner.java:252)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaProvider.scanDirectory(MediaProvider.java:1939)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaService.onScanVolume(MediaService.java:204)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaService.onScanVolume(MediaService.java:172)
+W/ModernMediaScanner( 1463): 	at com.android.providers.media.MediaService.onHandleWork(MediaService.java:95)
+W/ModernMediaScanner( 1463): 	at androidx.core.app.JobIntentService$CommandProcessor.doInBackground(JobIntentService.java:396)
+W/ModernMediaScanner( 1463): 	at androidx.core.app.JobIntentService$CommandProcessor.doInBackground(JobIntentService.java:387)
+W/ModernMediaScanner( 1463): 	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+W/ModernMediaScanner( 1463): 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+W/ModernMediaScanner( 1463): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+W/ModernMediaScanner( 1463): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+W/ModernMediaScanner( 1463): 	at java.lang.Thread.run(Thread.java:1012)
+W/MediaProvider( 1463): Didn't find any volume for getVolume(/product/media/audio/ringtones/Ring_Synth_04.ogg)
+W/MediaProvider( 1463): Didn't find any volume for getVolume(/product/media/audio/notifications/pixiedust.ogg)
+W/MediaProvider( 1463): Didn't find any volume for getVolume(/product/media/audio/alarms/Alarm_Classic.ogg)
+W/MediaProvider( 1463): isAppCloneUserPair for user 0: false
+W/MediaProvider( 1463): isAppCloneUserPair for user 0: false
+E/StorageManager( 1463): Failed to set extended attributes for /storage/emulated/0/Android to set project id.: Operation not permitted
+W/MediaProvider( 1463): Failed to update quota type for /storage/emulated/0/Android
+W/MediaProvider( 1463): java.io.IOException: Failed to update quota type for /storage/emulated/0/Android
+W/MediaProvider( 1463): 	at android.os.storage.StorageManager.updateExternalStorageFileQuotaType(StorageManager.java:2551)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForFileInternal(MediaProvider.java:882)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForUri(MediaProvider.java:857)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider.-$$Nest$mupdateQuotaTypeForUri(MediaProvider.java:0)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider$5.lambda$onInsert$0(MediaProvider.java:916)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider$5.$r8$lambda$fpXVCCb4tNgN0rBFXazZWCUznbc(MediaProvider.java:0)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider$5$$ExternalSyntheticLambda1.run(R8$$SyntheticClass:0)
+W/MediaProvider( 1463): 	at android.os.Handler.handleCallback(Handler.java:958)
+W/MediaProvider( 1463): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+W/MediaProvider( 1463): 	at android.os.Looper.loopOnce(Looper.java:205)
+W/MediaProvider( 1463): 	at android.os.Looper.loop(Looper.java:294)
+W/MediaProvider( 1463): 	at android.os.HandlerThread.run(HandlerThread.java:67)
+W/MediaProvider( 1463): isAppCloneUserPair for user 0: false
+E/StorageManager( 1463): Failed to set extended attributes for /storage/emulated/0/Android/media to set project id.: Operation not permitted
+W/MediaProvider( 1463): Failed to update quota type for /storage/emulated/0/Android/media
+W/MediaProvider( 1463): java.io.IOException: Failed to update quota type for /storage/emulated/0/Android/media
+W/MediaProvider( 1463): 	at android.os.storage.StorageManager.updateExternalStorageFileQuotaType(StorageManager.java:2551)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForFileInternal(MediaProvider.java:882)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForUri(MediaProvider.java:857)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider.-$$Nest$mupdateQuotaTypeForUri(MediaProvider.java:0)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider$5.lambda$onInsert$0(MediaProvider.java:916)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider$5.$r8$lambda$fpXVCCb4tNgN0rBFXazZWCUznbc(MediaProvider.java:0)
+W/MediaProvider( 1463): 	at com.android.providers.media.MediaProvider$5$$ExternalSyntheticLambda1.run(R8$$SyntheticClass:0)
+W/MediaProvider( 1463): 	at android.os.Handler.handleCallback(Handler.java:958)
+W/MediaProvider( 1463): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+W/MediaProvider( 1463): 	at android.os.Looper.loopOnce(Looper.java:205)
+W/MediaProvider( 1463): 	at android.os.Looper.loop(Looper.java:294)
+W/MediaProvider( 1463): 	at android.os.HandlerThread.run(HandlerThread.java:67)
+W/BpBinder( 2485): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2485): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.CAPTURE_BLACKOUT_CONTENT from uid=2000 pid=2485
+W/VoiceInteractionManager(  507): no available voice recognition services found for user 0
+W/OverlayManager(  507): service 'idmap' died
+W/GpuWork (  388): Failed to attach bpf program to power/gpu_work_period tracepoint [2(No such file or directory)]
+W/ndroid.settings( 1000): Cleared Reference was only reachable from finalizer (only reported once)
+W/putmethod.latin( 1382): Cleared Reference was only reachable from finalizer (only reported once)
+W/BpBinder( 2524): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2524): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/BpBinder( 2535): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2535): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/ProcessStats(  507): Tracking association SourceState{61d3f4b system/1000 BFgs #610} whose proc state 4 is better than process ProcessState{9c48fb0 com.android.inputmethod.latin/10109 pkg=com.android.inputmethod.latin} proc state 6 (2 skipped)
+W/RichInputMethodSubtype( 1382): Can't find emoji subtype
+W/RichInputMethodSubtype( 1382): No input method subtype found; returning placeholder subtype: Multi-lingual subtype: android.view.inputmethod.InputMethodSubtype@d78b2ed0, zz
+W/ViewPager( 1382): Requested offscreen page limit 0 too small; defaulting to 1
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.ROTATE_SURFACE_FLINGER from uid=10109 pid=0
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.INTERNAL_SYSTEM_WINDOW from uid=10109 pid=0
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10109 pid=1382
+W/ServiceManagerCppClient(  389): Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10109 pid=0
+W/OpenGLRenderer( 1382): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+W/ServiceManagerCppClient(  507): Permission failure: android.permission.ROTATE_SURFACE_FLINGER from uid=10109 pid=0
+W/ServiceManagerCppClient(  507): Permission failure: android.permission.INTERNAL_SYSTEM_WINDOW from uid=10109 pid=0
+W/ServiceManagerCppClient(  507): Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10109 pid=0
+W/BpBinder( 2554): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2554): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/BpBinder( 2560): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2560): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/BpBinder( 2564): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2564): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/WindowOnBackDispatcher( 2157): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@60887783 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@4c5d5f0
+W/FrameTracker( 2157): Missed App frame:UNKNOWN: 74, 3964, 0, CUJ=J<IME_INSETS_ANIMATION::0@1@com.m3athrazaq.qirtas>
+W/FrameTracker( 2157): Missed SF frame:UNKNOWN: 74, 3964, 0, CUJ=J<IME_INSETS_ANIMATION::0@1@com.m3athrazaq.qirtas>
+E/WifiHealthMonitor(  507):  Hit PackageManager exception
+E/WifiHealthMonitor(  507): android.content.pm.PackageManager$NameNotFoundException: No module info for package: com.android.wifi
+E/WifiHealthMonitor(  507): 	at android.app.ApplicationPackageManager.getModuleInfo(ApplicationPackageManager.java:1190)
+E/WifiHealthMonitor(  507): 	at com.android.server.wifi.WifiHealthMonitor.getWifiStackVersion(WifiHealthMonitor.java:367)
+E/WifiHealthMonitor(  507): 	at com.android.server.wifi.WifiHealthMonitor.extractCurrentSoftwareBuildInfo(WifiHealthMonitor.java:588)
+E/WifiHealthMonitor(  507): 	at com.android.server.wifi.WifiHealthMonitor.postBootSwBuildCheck(WifiHealthMonitor.java:523)
+E/WifiHealthMonitor(  507): 	at com.android.server.wifi.WifiHealthMonitor.postBootDetectionHandler(WifiHealthMonitor.java:514)
+E/WifiHealthMonitor(  507): 	at com.android.server.wifi.WifiHealthMonitor.-$$Nest$mpostBootDetectionHandler(WifiHealthMonitor.java:0)
+E/WifiHealthMonitor(  507): 	at com.android.server.wifi.WifiHealthMonitor$2.onAlarm(WifiHealthMonitor.java:190)
+E/WifiHealthMonitor(  507): 	at android.app.AlarmManager$ListenerWrapper.run(AlarmManager.java:375)
+E/WifiHealthMonitor(  507): 	at android.os.Handler.handleCallback(Handler.java:958)
+E/WifiHealthMonitor(  507): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+E/WifiHealthMonitor(  507): 	at com.android.server.wifi.RunnerHandler.dispatchMessage(RunnerHandler.java:122)
+E/WifiHealthMonitor(  507): 	at android.os.Looper.loopOnce(Looper.java:205)
+E/WifiHealthMonitor(  507): 	at android.os.Looper.loop(Looper.java:294)
+E/WifiHealthMonitor(  507): 	at android.os.HandlerThread.run(HandlerThread.java:67)
+W/BpBinder( 2581): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2581): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/BpBinder( 2585): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2585): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/Capacitor/Console( 2157): File: https://localhost/assets/history-B5P_zkD_.js - Line 5 - Msg: TextSelection endpoint not pointing into a node with inline content (callout)
+W/healthd (    0): battery l=100 v=5000 t=25.0 h=2 st=2 c=900000 fc=3000000 cc=10 chg=a
+W/BpBinder( 2589): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2589): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+E/FrameTracker( 2157): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.m3athrazaq.qirtas>
+W/BpBinder( 2601): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2601): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+E/Capacitor/Console( 2157): File:  - Line 330 - Msg: [object Object]
+W/MediaProvider( 1463): isAppCloneUserPair for user 0: false
+W/MediaProvider( 1463): isAppCloneUserPair for user 0: false
+E/Capacitor/Console( 2157): File:  - Line 330 - Msg: [object Object]
+W/BpBinder( 2611): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2611): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/BatteryExternalStatsWorker(  507): error reading Bluetooth stats: 11
+W/BpBinder( 2629): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2629): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/ProcessStats(  507): Tracking association SourceState{61d3f4b system/1000 BFgs #619} whose proc state 4 is better than process ProcessState{9c48fb0 com.android.inputmethod.latin/10109 pkg=com.android.inputmethod.latin} proc state 6 (0 skipped)
+W/BpBinder( 2636): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2636): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/BpBinder( 2643): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2643): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/WindowOnBackDispatcher( 2157): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@60887783 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@40fdeaa
+W/FrameTracker( 2157): Missed App frame:UNKNOWN: 88, 5685, 0, CUJ=J<IME_INSETS_ANIMATION::0@1@com.m3athrazaq.qirtas>
+W/FrameTracker( 2157): Missed SF frame:UNKNOWN: 88, 5685, 0, CUJ=J<IME_INSETS_ANIMATION::0@1@com.m3athrazaq.qirtas>
+W/resolv  (  325): SSL_connect ssl error =5, mark 0xf0064: Connection refused
+W/resolv  (  325): TLS Handshake failed
+W/resolv  (  325): query failed
+W/resolv  (  325): validateDnsTlsServer returned 0 for 10.0.2.3
+W/resolv  (  325): Validation failed
+W/WindowOnBackDispatcher(  795): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(  795): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 72, 7151, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missing HWUI jank callback for vsyncId: 7151, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 74, 7196, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 74, 7196, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missing HWUI jank callback for vsyncId: 7196, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+W/NotificationHistory(  507): Attempted to add notif for locked/gone/disabled user 0
+E/StackScroll(  795): Heads up view disappearing 0|com.m3athrazaq.qirtas|42|null|10141 for ANIMATION_TYPE_ADD
+W/BpBinder( 2670): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2670): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 74, 7380, 63978994, CUJ=J<NOTIFICATION_ADD>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 74, 7380, 63978994, CUJ=J<NOTIFICATION_ADD>
+W/Codec2Client(  446): query -- param skipped: index = 1107298332.
+W/Codec2Client(  446): query -- param skipped: index = 1342179345.
+W/Codec2Client(  446): query -- param skipped: index = 2415921170.
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 12, 7427, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Collapse>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 12, 7427, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Collapse>
+W/FrameTracker(  795): Missing HWUI jank callback for vsyncId: 7427, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Collapse>
+W/AMessage(  446): failed to post message as target looper for handler 0 is gone.
+E/FrameTracker( 2157): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.m3athrazaq.qirtas>
+W/ActivityTaskManager(  507): callingPackage for (uid=2000, pid=2698) has no WPC
+W/ProcessStats(  507): Tracking association SourceState{61d3f4b system/1000 BFgs #629} whose proc state 4 is better than process ProcessState{9c48fb0 com.android.inputmethod.latin/10109 pkg=com.android.inputmethod.latin} proc state 6 (0 skipped)
+W/BpBinder( 2704): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2704): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/WindowOnBackDispatcher( 2157): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@60887783 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@dfc1568
+W/FrameTracker( 2157): Missed SF frame:UNKNOWN: 80, 8081, 0, CUJ=J<IME_INSETS_ANIMATION::1@1@com.m3athrazaq.qirtas>
+W/WindowOnBackDispatcher( 2157): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@60887783 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@bfe1bfe
+W/FrameTracker( 2157): Missed App frame:UNKNOWN: 88, 8292, 0, CUJ=J<IME_INSETS_ANIMATION::0@1@com.m3athrazaq.qirtas>
+W/FrameTracker( 2157): Missed SF frame:UNKNOWN: 88, 8292, 0, CUJ=J<IME_INSETS_ANIMATION::0@1@com.m3athrazaq.qirtas>
+W/ActivityTaskManager(  507): callingPackage for (uid=2000, pid=2730) has no WPC
+W/OpenGLRenderer( 1032): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+W/OpenGLRenderer(  507): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+E/FrameTracker( 2157): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.m3athrazaq.qirtas>
+E/FrameTracker( 2157): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.m3athrazaq.qirtas>
+W/healthd (    0): battery l=100 v=5000 t=25.0 h=2 st=2 c=900000 fc=3000000 cc=10 chg=a
+W/NotificationHistory(  507): Attempted to add notif for locked/gone/disabled user 0
+W/TouchableRegionManager(  795): onHeadsUpPinnedModeChanged
+W/WindowOnBackDispatcher(  795): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(  795): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 74, 8976, 0, CUJ=J<NOTIFICATION_HEADS_UP_APPEAR>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 74, 8976, 0, CUJ=J<NOTIFICATION_HEADS_UP_APPEAR>
+W/FrameTracker(  795): Missing HWUI jank callback for vsyncId: 8976, CUJ=J<NOTIFICATION_HEADS_UP_APPEAR>
+W/Codec2Client(  446): query -- param skipped: index = 1107298332.
+W/Codec2Client(  446): query -- param skipped: index = 1342179345.
+W/Codec2Client(  446): query -- param skipped: index = 2415921170.
+W/AMessage(  446): failed to post message as target looper for handler 0 is gone.
+W/TouchableRegionManager(  795): onHeadsUpPinnedModeChanged
+W/healthd (    0): battery l=100 v=5000 t=25.0 h=2 st=2 c=900000 fc=3000000 cc=10 chg=a
+W/WindowOnBackDispatcher(  795): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(  795): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/RingtonePlayer(  795): STOP command without a player
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 10, 9200, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 10, 9200, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missing HWUI jank callback for vsyncId: 9200, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 72, 9215, 313328743, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+W/BpBinder( 2775): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2775): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 10, 9275, 18416403, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Collapse>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 10, 9275, 18416403, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Collapse>
+W/ActivityTaskManager(  507): callingPackage for (uid=2000, pid=2783) has no WPC
+E/Transition(  507): Trying to add a ready-group twice: Display{#0 state=ON size=1080x2400 ROTATION_0}
+W/WindowOnBackDispatcher( 2157): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 2157): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/OpenGLRenderer( 2157): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+W/Looper  (  795): Slow dispatch took 60ms wmshell.main h=android.os.Handler c=com.android.wm.shell.transition.Transitions$TransitionPlayerImpl$$ExternalSyntheticLambda0@b85a486 m=0
+W/Looper  (  795): Slow delivery took 40ms wmshell.main h=android.os.Handler c=com.android.wm.shell.bubbles.BubbleController$BubblesImpl$$ExternalSyntheticLambda1@5ac1147 m=0
+W/Looper  (  795): Drained
+W/Looper  (  795): Slow delivery took 47ms wmshell.anim h=android.view.Choreographer$FrameHandler c=android.view.Choreographer$FrameDisplayEventReceiver@e4ad364 m=0
+W/chromium( 2157): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+W/ziparchive(  507): Unable to open '/data/app/~~dCjhiefZ0piW2awDRaHvxA==/com.m3athrazaq.qirtas-wsKcUppwmKr-7w0SU7tGig==/base.dm': No such file or directory
+W/ActivityTaskManager(  507): Force removing ActivityRecord{751dd70 u0 com.m3athrazaq.qirtas/.MainActivity t8 f}}: app died, no saved state
+W/InputManager-JNI(  507): Input channel object '8e919d2 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity (client)' was disposed without first being removed with the input manager!
+W/WindowManager(  507): Failed to deliver inset control state change to w=Window{8e919d2 u0 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity EXITING}
+W/WindowManager(  507): android.os.DeadObjectException
+W/WindowManager(  507): 	at android.os.BinderProxy.transactNative(Native Method)
+W/WindowManager(  507): 	at android.os.BinderProxy.transact(BinderProxy.java:584)
+W/WindowManager(  507): 	at android.view.IWindow$Stub$Proxy.insetsControlChanged(IWindow.java:479)
+W/WindowManager(  507): 	at com.android.server.wm.WindowState.notifyInsetsControlChanged(WindowState.java:3802)
+W/WindowManager(  507): 	at com.android.server.wm.InsetsStateController.lambda$notifyPendingInsetsControlChanged$3(InsetsStateController.java:343)
+W/WindowManager(  507): 	at com.android.server.wm.InsetsStateController.$r8$lambda$8yykPRG1GyNq_J17QvL9d5xANMc(InsetsStateController.java:0)
+W/WindowManager(  507): 	at com.android.server.wm.InsetsStateController$$ExternalSyntheticLambda2.run(R8$$SyntheticClass:0)
+W/WindowManager(  507): 	at com.android.server.wm.WindowAnimator.executeAfterPrepareSurfacesRunnables(WindowAnimator.java:294)
+W/WindowManager(  507): 	at com.android.server.wm.WindowAnimator.animate(WindowAnimator.java:202)
+W/WindowManager(  507): 	at com.android.server.wm.WindowAnimator.lambda$new$1(WindowAnimator.java:99)
+W/WindowManager(  507): 	at com.android.server.wm.WindowAnimator.$r8$lambda$aHNu1uhcqxihX5NZc4McDDQPAyw(WindowAnimator.java:0)
+W/WindowManager(  507): 	at com.android.server.wm.WindowAnimator$$ExternalSyntheticLambda1.doFrame(R8$$SyntheticClass:0)
+W/WindowManager(  507): 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1337)
+W/WindowManager(  507): 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1348)
+W/WindowManager(  507): 	at android.view.Choreographer.doCallbacks(Choreographer.java:952)
+W/WindowManager(  507): 	at android.view.Choreographer.doFrame(Choreographer.java:878)
+W/WindowManager(  507): 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1322)
+W/WindowManager(  507): 	at android.os.Handler.handleCallback(Handler.java:958)
+W/WindowManager(  507): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+W/WindowManager(  507): 	at android.os.Looper.loopOnce(Looper.java:205)
+W/WindowManager(  507): 	at android.os.Looper.loop(Looper.java:294)
+W/WindowManager(  507): 	at android.os.HandlerThread.run(HandlerThread.java:67)
+W/WindowManager(  507): 	at com.android.server.ServiceThread.run(ServiceThread.java:46)
+W/KernelCpuProcStringReader(  507): File not found. It's normal if not implemented: /proc/uid_concurrent_policy_time
+W/Looper  (  795): Drained
+W/WindowManager(  507): Exception thrown during dispatchAppVisibility Window{8e919d2 u0 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity EXITING}
+W/WindowManager(  507): android.os.DeadObjectException
+W/WindowManager(  507): 	at android.os.BinderProxy.transactNative(Native Method)
+W/WindowManager(  507): 	at android.os.BinderProxy.transact(BinderProxy.java:584)
+W/WindowManager(  507): 	at android.view.IWindow$Stub$Proxy.dispatchAppVisibility(IWindow.java:546)
+W/WindowManager(  507): 	at com.android.server.wm.WindowState.sendAppVisibilityToClients(WindowState.java:3271)
+W/WindowManager(  507): 	at com.android.server.wm.WindowContainer.sendAppVisibilityToClients(WindowContainer.java:1221)
+W/WindowManager(  507): 	at com.android.server.wm.WindowToken.setClientVisible(WindowToken.java:409)
+W/WindowManager(  507): 	at com.android.server.wm.ActivityRecord.setClientVisible(ActivityRecord.java:6946)
+W/WindowManager(  507): 	at com.android.server.wm.ActivityRecord.postApplyAnimation(ActivityRecord.java:5637)
+W/WindowManager(  507): 	at com.android.server.wm.ActivityRecord.commitVisibility(ActivityRecord.java:5580)
+W/WindowManager(  507): 	at com.android.server.wm.Transition.finishTransition(Transition.java:1151)
+W/WindowManager(  507): 	at com.android.server.wm.TransitionController.finishTransition(TransitionController.java:868)
+W/WindowManager(  507): 	at com.android.server.wm.WindowOrganizerController.finishTransition(WindowOrganizerController.java:396)
+W/WindowManager(  507): 	at android.window.IWindowOrganizerController$Stub.onTransact(IWindowOrganizerController.java:286)
+W/WindowManager(  507): 	at com.android.server.wm.WindowOrganizerController.onTransact(WindowOrganizerController.java:181)
+W/WindowManager(  507): 	at android.os.Binder.execTransactInternal(Binder.java:1344)
+W/WindowManager(  507): 	at android.os.Binder.execTransact(Binder.java:1275)
+W/ActivityManager(  507): setHasOverlayUi called on unknown pid: 2157
+E/BpTransactionCompletedListener(  389): Failed to transact (-32)
+W/JavaBinder(  507): BinderProxy is being destroyed but the application did not call unlinkToDeath to unlink all of its death recipients beforehand.  Releasing leaked death recipient: com.android.server.am.ActivityManagerService$14
+E/TaskPersister(  507): File error accessing recents directory (directory doesn't exist?).
+W/ActivityTaskManager(  507): callingPackage for (uid=2000, pid=2805) has no WPC
+W/athrazaq.qirtas( 2808): Unexpected CPU variant for x86: x86_64.
+W/athrazaq.qirtas( 2808): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+W/ziparchive( 2808): Unable to open '/data/app/~~dCjhiefZ0piW2awDRaHvxA==/com.m3athrazaq.qirtas-wsKcUppwmKr-7w0SU7tGig==/base.dm': No such file or directory
+W/ziparchive( 2808): Unable to open '/data/app/~~dCjhiefZ0piW2awDRaHvxA==/com.m3athrazaq.qirtas-wsKcUppwmKr-7w0SU7tGig==/base.dm': No such file or directory
+W/athrazaq.qirtas( 2808): Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (unsupported, reflection, allowed)
+W/athrazaq.qirtas( 2808): Accessing hidden method Landroid/os/Trace;->isTagEnabled(J)Z (unsupported, reflection, allowed)
+W/athrazaq.qirtas( 2808): Accessing hidden method Landroid/os/Trace;->traceBegin(JLjava/lang/String;)V (unsupported, reflection, allowed)
+W/athrazaq.qirtas( 2808): Accessing hidden method Landroid/os/Trace;->traceEnd(J)V (unsupported, reflection, allowed)
+W/athrazaq.qirtas( 2808): Accessing hidden method Landroid/os/Trace;->asyncTraceBegin(JLjava/lang/String;I)V (unsupported, reflection, allowed)
+W/athrazaq.qirtas( 2808): Accessing hidden method Landroid/os/Trace;->asyncTraceEnd(JLjava/lang/String;I)V (unsupported, reflection, allowed)
+W/ocessService0:0( 2837): Unexpected CPU variant for x86: x86_64.
+W/ocessService0:0( 2837): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+E/ocessService0:0( 2837): Not starting debugger since process cannot load the jdwp agent.
+W/chromium( 2808): [WARNING:dns_config_service_android.cc(115)] Failed to read DnsConfig.
+W/SystemServiceRegistry( 2837): No service published for: virtualdevice
+E/SELinux (    0): avc:  denied  { find } for pid=2837 uid=99001 name=content_capture scontext=u:r:isolated_app:s0:c512,c768 tcontext=u:object_r:content_capture_service:s0 tclass=service_manager permissive=0
+W/Capacitor( 2808): Unable to read file at path public/plugins
+W/cr_media( 2808): BLUETOOTH_CONNECT permission is missing.
+W/cr_media( 2808): registerBluetoothIntentsIfNeeded: Requires BLUETOOTH permission
+W/WindowOnBackDispatcher( 2808): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 2808): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/SystemServiceRegistry( 2837): No service published for: uimode
+W/OpenGLRenderer( 2808): Unknown dataspace 0
+W/OpenGLRenderer( 2808): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+W/chromium( 2808): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+W/ziparchive(  507): Unable to open '/data/app/~~dCjhiefZ0piW2awDRaHvxA==/com.m3athrazaq.qirtas-wsKcUppwmKr-7w0SU7tGig==/base.dm': No such file or directory
+W/WindowOnBackDispatcher(  795): sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@1c50df6
+W/InputManager-JNI(  507): Input channel object '820445c Splash Screen com.m3athrazaq.qirtas (client)' was disposed without first being removed with the input manager!
+E/TaskPersister(  507): File error accessing recents directory (directory doesn't exist?).
+W/Looper  (  795): Slow dispatch took 40ms wmshell.main h=android.os.Handler c=com.android.wm.shell.transition.RemoteTransitionHandler$1$$ExternalSyntheticLambda0@bbc705c m=0
+W/healthd (    0): battery l=100 v=5000 t=25.0 h=2 st=2 c=900000 fc=3000000 cc=10 chg=a
+W/NotificationHistory(  507): Attempted to add notif for locked/gone/disabled user 0
+W/TouchableRegionManager(  795): onHeadsUpPinnedModeChanged
+W/WindowOnBackDispatcher(  795): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(  795): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 74, 10708, 203649357, CUJ=J<NOTIFICATION_HEADS_UP_APPEAR>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 74, 10708, 203649357, CUJ=J<NOTIFICATION_HEADS_UP_APPEAR>
+W/Codec2Client(  446): query -- param skipped: index = 1107298332.
+W/Codec2Client(  446): query -- param skipped: index = 1342179345.
+W/Codec2Client(  446): query -- param skipped: index = 2415921170.
+W/AMessage(  446): failed to post message as target looper for handler 0 is gone.
+W/TouchableRegionManager(  795): onHeadsUpPinnedModeChanged
+W/healthd (    0): battery l=100 v=5000 t=25.0 h=2 st=2 c=900000 fc=3000000 cc=10 chg=a
+W/WindowOnBackDispatcher(  795): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(  795): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/RingtonePlayer(  795): STOP command without a player
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+W/FrameTracker(  795): Missed App frame:JANK_APP_DEADLINE_MISSED, 10891, 198420412, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 74, 10906, 385243063, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 74, 10906, 385243063, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/BpBinder( 2942): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2942): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 24, 10967, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Collapse>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 24, 10967, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Collapse>
+W/FrameTracker(  795): Missing HWUI jank callback for vsyncId: 10967, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Collapse>
+W/ActivityTaskManager(  507): callingPackage for (uid=2000, pid=2950) has no WPC
+E/Transition(  507): Trying to add a ready-group twice: Display{#0 state=ON size=1080x2400 ROTATION_0}
+W/WindowOnBackDispatcher( 2808): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 2808): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/Looper  (  795): Slow dispatch took 49ms wmshell.main h=android.os.Handler c=com.android.wm.shell.transition.DefaultTransitionHandler$$ExternalSyntheticLambda7@fcada71 m=0
+W/Looper  (  795): Slow delivery took 44ms wmshell.main h=android.os.Handler c=com.android.wm.shell.bubbles.BubbleController$BubblesImpl$$ExternalSyntheticLambda1@c53a056 m=0
+W/Looper  (  795): Drained
+W/OpenGLRenderer( 2808): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+W/chromium( 2808): [WARNING:display_webview.cc(32)] WebView overlays are enabled!
+W/ziparchive(  507): Unable to open '/data/app/~~dCjhiefZ0piW2awDRaHvxA==/com.m3athrazaq.qirtas-wsKcUppwmKr-7w0SU7tGig==/base.dm': No such file or directory
+E/TaskPersister(  507): File error accessing recents directory (directory doesn't exist?).
+W/BpBinder( 2964): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2964): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/BpBinder( 2968): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 2968): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+E/GnssPsdsDownloader(  507): No Long-Term PSDS servers were specified in the GnssConfiguration
+W/healthd (    0): battery l=100 v=5000 t=25.0 h=2 st=2 c=900000 fc=3000000 cc=10 chg=a
+W/NotificationHistory(  507): Attempted to add notif for locked/gone/disabled user 0
+W/TouchableRegionManager(  795): onHeadsUpPinnedModeChanged
+W/WindowOnBackDispatcher(  795): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(  795): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+W/Codec2Client(  446): query -- param skipped: index = 1107298332.
+W/Codec2Client(  446): query -- param skipped: index = 1342179345.
+W/Codec2Client(  446): query -- param skipped: index = 2415921170.
+W/AMessage(  446): failed to post message as target looper for handler 0 is gone.
+W/TouchableRegionManager(  795): onHeadsUpPinnedModeChanged
+W/FrameTracker(  795): Missing SF jank callback for vsyncId: 11980, CUJ=J<NOTIFICATION_HEADS_UP_DISAPPEAR>
+W/WindowOnBackDispatcher(  795): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(  795): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/RingtonePlayer(  795): STOP command without a player
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 10, 12079, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 10, 12079, 0, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missing HWUI jank callback for vsyncId: 12079, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missed App frame:UNKNOWN: 74, 12094, 250273114, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+W/FrameTracker(  795): Missed SF frame:UNKNOWN: 74, 12094, 250273114, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Expand>
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+E/QuickAccessWalletKeyguardQuickAffordanceConfig(  795): Wallet card retrieval error, message: "null"
+W/BpBinder( 3009): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+W/ProcessState( 3009): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+W/FrameTracker(  795): Missing SF jank callback for vsyncId: 12167, CUJ=J<NOTIFICATION_SHADE_EXPAND_COLLAPSE::Collapse>

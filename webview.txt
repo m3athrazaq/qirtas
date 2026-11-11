@@ -1,0 +1,328 @@
+page: https://localhost/ قِرطاس
+[console.startGroupCollapsed] %cnative %cLocalNotifications.createChannel (#2172318) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cSystemBars.setStyle (#2172319) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cApp.addListener (#2172320) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cApp.addListener (#2172321) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cApp.getLaunchUrl (#2172322) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cLocalNotifications.createChannel (#2172318) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cLocalNotifications.addListener (#2172323) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cSystemBars.setStyle (#2172319) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cApp.getLaunchUrl (#2172322) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cApp.addListener (#2172324) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.getSharedContent (#2172325) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.getSharedContent (#2172325) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172326) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172326) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cLocalNotifications.getPending (#2172327) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cLocalNotifications.getPending (#2172327) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"notifications":[]}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.setReminders (#2172328) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.setReminders (#2172328) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"waiting":0,"exact":true}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cFilesystem.checkPermissions (#2172329) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.checkPermissions (#2172329) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"publicStorage":"granted"}
+[console.endGroup] console.groupEnd
+Runtime.enable: {"id":1,"result":{}}
+diagnostics: {
+ "ready": "complete",
+ "rootChildren": 1,
+ "sbItems": [
+  "بحث",
+  "اليوم",
+  "مهامي",
+  "القوالب",
+  "صفحة جديدة",
+  "المهملات",
+  "الإعدادات",
+  "سجّل الدخول للمزامنة"
+ ],
+ "fab": true,
+ "w": 412,
+ "h": 818,
+ "dpr": 2.625,
+ "ua": "Mozilla/5.0 (Linux; Android 14; Android SDK built for x86_64 Build/UE1A.230829.036.A1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/113.0.5672.136 Mobile Safari/537.36",
+ "calendar": "islamic-umalqura",
+ "hijriToday": "الأربعاء، ١ جمادى الآخرة ١٤٤٨ هـ",
+ "safeVar": "0px",
+ "idb": "object",
+ "timing": {
+  "qirtas:start": 955,
+  "qirtas:booted": 1285,
+  "qirtas:painted": 1311
+ },
+ "nav": {
+  "dcl": 960,
+  "load": 964
+ },
+ "bodyText": "ق\nقِرطاس\nبحث\nاليوم\nمهامي\nالقوالب\nالصفحات\n✍️\nأهلاً بك في قِرطاس\nصفحة جديدة\nالمهملات\nالإعدادات\nسجّل الدخول للمزامنة"
+}
+new page: ok
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172330) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172330) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172331) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172331) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172332) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172332) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+slash menu open: true
+slash pick: قائمة مهاممهام بمربعات اختيار[
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172333) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172333) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172334) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172334) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+page html: <p>سطر عربي ثم English line</p><ul><li><label><input aria-label="Task item checkbox for مهمة أولى" type="checkbox"><span>Task item checkbox for مهمة أولى</span></label><div><p>مهمة أولى</p></div></li></ul><p><br></p>
+[console.startGroupCollapsed] %cresult %cApp.addListener (#2172320) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"canGoBack":true}
+[console.endGroup] console.groupEnd
+after back: mCurrentFocus=Window{8e919d2 u0 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity} | route: #/
+templates: ok
+ramadan: ok
+[console.warning] TextSelection endpoint not pointing into a node with inline content (callout)
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172335) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172335) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cApp.addListener (#2172320) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"canGoBack":true}
+[console.endGroup] console.groupEnd
+after back from template page: mCurrentFocus=Window{8e919d2 u0 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity}
+[console.startGroupCollapsed] %cnative %cLocalNotifications.checkPermissions (#2172336) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cLocalNotifications.checkPermissions (#2172336) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"display":"granted"}
+[console.endGroup] console.groupEnd
+data settings: "النسخ الاحتياطي التلقائي\nالمستندات ← Qirtas\nملف كل يوم في «المستندات ← Qirtas» على هذا الهاتف. يبقى حتى لو حُذف التطبيق.\nلم تُحفظ نسخة بعد\nنسخة الآن\nنسخة في ملف\n\nملف واحد فيه كل صفحاتك وصورك. احفظه حيث تشاء، واستعده على أي جهاز.\n\nتنزيل نسخة احتياطية\nاستعادة من"
+backup now: ok
+[console.startGroupCollapsed] %cnative %cFilesystem.checkPermissions (#2172337) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.checkPermissions (#2172337) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"publicStorage":"granted"}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cFilesystem.mkdir (#2172338) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.mkdir (#2172338) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cFilesystem.deleteFile (#2172339) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.deleteFile (#2172339) font-style: italic; font-weight: lighter; color: red font-style: italic; font-weight: bold; color: #444
+[console.error] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cFilesystem.writeFile (#2172340) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.writeFile (#2172340) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"uri":"file:///storage/emulated/0/Documents/Qirtas/qirtas-backup-2026-11-11-tbl3.json.part"}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cFilesystem.appendFile (#2172341) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.appendFile (#2172341) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cFilesystem.stat (#2172342) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.stat (#2172342) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"name":"qirtas-backup-2026-11-11-tbl3.json.part","type":"file","size":32223,"mtime":1794423663786,"ctime":1794423663000,"uri":"file:///storage/emulated/0/Documents/Qirtas/qirtas-backup-2026-11-11-tbl3.json.part"}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cFilesystem.deleteFile (#2172343) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.deleteFile (#2172343) font-style: italic; font-weight: lighter; color: red font-style: italic; font-weight: bold; color: #444
+[console.error] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cFilesystem.rename (#2172344) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.rename (#2172344) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cFilesystem.readdir (#2172345) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cFilesystem.readdir (#2172345) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"files":[{"name":"qirtas-backup-2026-11-11-tbl3.json","type":"file","size":32223,"mtime":1794423663786,"ctime":1794423663000,"uri":"file:///storage/emulated/0/Documents/Qirtas/qirtas-backup-2026-11-11-tbl3.json"}]}
+[console.endGroup] console.groupEnd
+backup status: "آخر نسخة: اليوم ٧:٠١ م\nنسخة الآن"
+backup files: total 36
+-rw-rw---- 1 u0_a121 media_rw 32223 2026-11-11 19:01 qirtas-backup-2026-11-11-tbl3.json
+backup head: 
+backup tail: 
+[console.startGroupCollapsed] %cresult %cApp.addListener (#2172320) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"canGoBack":true}
+[console.endGroup] console.groupEnd
+today: ok
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172346) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172346) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+today route: #/p/day-8002e7652579-2026-11-11
+slash reminder: تذكيرتنبيه في الوقت الذي تختار
+[console.startGroupCollapsed] %cnative %cLocalNotifications.checkPermissions (#2172347) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cLocalNotifications.checkPermissions (#2172347) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"display":"granted"}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderHealth (#2172348) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172349) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderHealth (#2172348) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":0}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172349) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.setReminders (#2172350) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.setReminders (#2172350) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"waiting":1,"exact":true}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172351) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172351) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+reminder panel open: true
+preset: ok
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172352) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172352) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{}}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cLocalNotifications.checkPermissions (#2172353) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cLocalNotifications.checkPermissions (#2172353) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"display":"granted"}
+[console.endGroup] console.groupEnd
+notification permission: {"display":"granted"}
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderHealth (#2172354) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderHealth (#2172354) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+[console.endGroup] console.groupEnd
+reminder health: {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+alarms: tag=*walarm*:com.m3athrazaq.qirtas.REMINDER
+[console.startGroupCollapsed] %cnative %cLocalNotifications.checkPermissions (#2172355) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cLocalNotifications.checkPermissions (#2172355) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"display":"granted"}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderHealth (#2172356) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderHealth (#2172356) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"notifications":true,"exact":true,"battery":false,"restricted":false,"maker":"unknown","sdk":34,"waiting":1}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.testReminder (#2172357) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+test notification: ok
+[console.startGroupCollapsed] %cresult %cQirtasNative.testReminder (#2172357) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+posted notification: none
+[console.startGroupCollapsed] %cresult %cApp.addListener (#2172320) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"canGoBack":true}
+[console.endGroup] console.groupEnd
+Warning: Activity not started, intent has been delivered to currently running top-most instance.
+[console.startGroupCollapsed] %cresult %cApp.addListener (#2172321) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"url":"qirtas://capture"}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cApp.addListener (#2172324) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] undefined
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.getSharedContent (#2172358) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.getSharedContent (#2172358) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {}
+[console.endGroup] console.groupEnd
+qirtas://capture opens the quick note: true
+widget provider: [8] provider ProviderId{user:0, app:10141, cmp:ComponentInfo{com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.QuickWidget}}
+[console.startGroupCollapsed] %cresult %cApp.addListener (#2172320) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"canGoBack":true}
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cnative %cQirtasNative.reminderLog (#2172359) font-weight: lighter; color: gray font-weight: bold; color: #000
+[console.dir] Object
+[console.endGroup] console.groupEnd
+[console.startGroupCollapsed] %cresult %cQirtasNative.reminderLog (#2172359) font-style: italic; font-weight: lighter; color: gray font-style: italic; font-weight: bold; color: #444
+[console.dir] {"shown":{"42@1794423687396":{"t":1794423690408}}}
+[console.endGroup] console.groupEnd
+after back on home: mCurrentFocus=Window{8e919d2 u0 com.m3athrazaq.qirtas/com.m3athrazaq.qirtas.MainActivity}
+done
+exit=0
