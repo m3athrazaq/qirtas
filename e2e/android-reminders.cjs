@@ -151,7 +151,22 @@ async function shade(name) {
   const notes = Object.entries(log?.shown ?? {}).filter(([k]) => k.startsWith('7001@') || k.startsWith('7002@'))
   console.log('3. noted as shown:', JSON.stringify(notes.map(([k, v]) => [k.split('@')[0], Math.round((v.t - Number(k.split('@')[1])) / 1000) + 's late', v.r ?? ''])))
   console.log('health after:', JSON.stringify(await native(c, 'reminderHealth()')))
+
+  // 4. The settings: what keeps reminders from arriving, each with its fix
+  await evaluate(c, `window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'general' }))`)
+  await sleep(2000)
+  console.log('4. checks in the settings:', JSON.stringify(await evaluate(c, `(() => { const el = document.querySelector('.rem-health'); if (!el) return 'missing'; el.scrollIntoView({ block: 'center' }); return [...el.querySelectorAll('li')].map((li) => li.className + ': ' + li.textContent.trim()) })()`)))
+  await sleep(800)
+  shot('22-settings-reminders')
+  console.log('test in a minute:', await evaluate(c, `(() => { const b = [...document.querySelectorAll('.rem-health button')].find((x) => x.textContent.includes('دقيقة')); if (!b) return 'missing'; b.click(); return 'ok' })()`))
+  await sleep(1500)
+  shot('23-test-in-a-minute')
   c.close()
+  adb('input keyevent 3') // home: the test notification arrives with the app closed
+  await sleep(70_000)
+  const test = shown(42)
+  console.log('5. "test in a minute" with the app closed:', test.length ? 'YES' : 'NO')
+  await shade('24-test-notification')
   console.log('done')
   process.exit(0)
 })().catch((e) => {
