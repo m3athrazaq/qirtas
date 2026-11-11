@@ -5,6 +5,7 @@ import { openSettingsAt } from './SettingsDialog'
 import { t } from '../lib/i18n'
 import { copyText } from '../lib/platform'
 import { syncAvailable } from '../sync/config'
+import { friendlyError } from '../sync/errors'
 import type { Role } from '../sync/engine'
 import {
   appBaseUrl,
@@ -90,7 +91,7 @@ function ShareBody({ role }: { role: Role }) {
                   toast(t('linkCopied'))
                   void reload()
                 } catch (err) {
-                  toast((err as Error).message)
+                  toast(friendlyError(err))
                 }
               }}
             >

@@ -5,6 +5,7 @@ import { useStore } from '../data/store'
 import { openSettingsAt } from './SettingsDialog'
 import { t } from '../lib/i18n'
 import { syncAvailable } from '../sync/config'
+import { friendlyError } from '../sync/errors'
 import { acceptInvite, inviteInfo, useSession } from '../sync/session'
 import { Modal } from '../ui/Modal'
 
@@ -52,7 +53,7 @@ export function JoinDialog() {
                 try {
                   await acceptInvite(token)
                 } catch (err) {
-                  useStore.getState().toast((err as Error).message)
+                  useStore.getState().toast(friendlyError(err))
                   setBusy(false)
                 }
               }}

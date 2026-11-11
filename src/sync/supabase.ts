@@ -1,6 +1,9 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { SUPABASE_KEY, SUPABASE_URL, syncAvailable } from './config'
 
+/** Where the sign-in session is kept in the browser. */
+export const AUTH_STORAGE_KEY = 'qirtas.auth'
+
 let client: SupabaseClient | null = null
 
 export function supa(): SupabaseClient | null {
@@ -8,7 +11,7 @@ export function supa(): SupabaseClient | null {
   if (!client) {
     client = createClient(SUPABASE_URL, SUPABASE_KEY, {
       // Sessions from links in the address are handled by hand, after the user confirms (session.ts)
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'qirtas.auth' },
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: AUTH_STORAGE_KEY },
       realtime: { params: { eventsPerSecond: 20 } },
     })
   }

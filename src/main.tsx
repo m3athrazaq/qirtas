@@ -11,13 +11,24 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import { boot } from './data/boot'
 import { useStore } from './data/store'
+import { offerUpdate } from './data/update'
 import { initNative } from './lib/native'
 import { isNative } from './lib/platform'
 import { AppBoundary } from './ui/ErrorBoundary'
 
 // Offline support and "install app" for the web version (the Android app ships its own files)
 if (import.meta.env.PROD && !import.meta.env.VITE_PREVIEW && !isNative() && 'serviceWorker' in navigator) {
-  void import('virtual:pwa-register').then(({ registerSW }) => registerSW({ immediate: true }))
+  void import('virtual:pwa-register').then(({ registerSW }) => {
+    const update = registerSW({
+      immediate: true,
+      // A new version waits until it can take over without a reload in the middle of typing
+      onNeedRefresh: () => offerUpdate(() => update(true)),
+      // An app left open for days still hears about new versions
+      onRegisteredSW: (_url, registration) => {
+        if (registration) setInterval(() => void registration.update().catch(() => {}), 60 * 60 * 1000)
+      },
+    })
+  })
 }
 
 const root = createRoot(document.getElementById('root')!)

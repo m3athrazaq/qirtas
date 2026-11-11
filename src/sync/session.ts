@@ -3,14 +3,16 @@ import { isAuthRetryableFetchError, type User } from '@supabase/supabase-js'
 import * as Y from 'yjs'
 import { create } from 'zustand'
 import { setAssetUploadHook, setRemoteAssetResolver } from '../data/assets'
-import { getAsset, kvGet, kvSet, outboxClearWorkspace, putAsset, wipeAll } from '../data/idb'
-import { flushWrites, getDoc, resetDocs } from '../data/docs'
+import { getAsset, kvGet, kvSet, outboxAll, outboxClearWorkspace, putAsset, wipeAll } from '../data/idb'
+import { flushWrites, getDoc, hasUnsaved, resetDocs } from '../data/docs'
+import { takeSnapshot } from '../data/snapshots'
+import { wipeVault } from '../data/vault'
 import { useStore } from '../data/store'
 import { getActor, setActor } from '../data/workspace'
 import { setServerAi } from '../ai/client'
 import { SyncEngine, workspaceDocIds, type PresenceUser, type Role } from './engine'
 import { SUPABASE_KEY, SUPABASE_URL } from './config'
-import { supa, toB64 } from './supabase'
+import { AUTH_STORAGE_KEY, supa, toB64 } from './supabase'
 import { t } from '../lib/i18n'
 import { askConfirm } from '../ui/dialogs'
 import { takeAuthRedirect } from '../data/authLink'
@@ -168,18 +170,25 @@ async function connect(user: User) {
   try {
     workspaces = await loadWorkspaces(user.id)
   } catch {
-    // No connection for the first link: try again once it's back
+    // No connection for the first link: try again when it's back, and every minute meanwhile
+    // (the device can be online while the server is not)
     useStore.setState({ syncStatus: 'offline' })
-    window.addEventListener(
-      'online',
-      () => {
-        connecting = null
-        void connectOnce(user)
-      },
-      { once: true },
-    )
+    let done = false
+    const retry = () => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      window.removeEventListener('online', retry)
+      if (useSession.getState().user?.id !== user.id) return // signed out meanwhile
+      connecting = null
+      void connectOnce(user)
+    }
+    const timer = setTimeout(retry, 60_000)
+    window.addEventListener('online', retry)
     return
   }
+  // The first link changes where this device's pages live: keep a restore point of them as they are
+  if (!w.isPristine()) await takeSnapshot('before-signin')
   let role = workspaces.find((x) => x.id === w.id)?.role ?? null
   let upload = false
 
@@ -332,6 +341,11 @@ async function mergeLocalInto(targetId: string) {
 
 export async function switchWorkspace(id: string, remote = true) {
   await flushWrites()
+  // Changes that could not be written to the device would be lost by the reload
+  if (hasUnsaved()) {
+    useStore.getState().toast(t('saveFailing'))
+    return
+  }
   if (remote) await kvSet(`sync:remote:${id}`, true)
   await kvSet('currentWs', id)
   location.hash = '#/'
@@ -364,13 +378,46 @@ export async function updatePassword(password: string) {
   if (error) throw error
 }
 
+/** Is there work on this device that the account doesn't have yet? Signing out would delete it. */
+export async function hasUnsyncedWork(): Promise<boolean> {
+  await flushWrites()
+  if (hasUnsaved()) return true
+  // One more try before deciding
+  await engine?.flush().catch(() => {})
+  try {
+    if ((await outboxAll()).length) return true
+    if (((await kvGet<string[]>('sync:pendingAssets')) ?? []).length) return true
+    const w = useStore.getState().ws
+    // Signed in, but this device's pages never reached the account (no connection at the first link)
+    if (w && !w.isPristine() && !(await kvGet(`sync:linked:${w.id}`))) return true
+  } catch {
+    return true // can't tell: treat it as unsynced
+  }
+  return false
+}
+
 /** Sign out and clear this device, so the next person starts fresh. */
 export async function signOut() {
   engine?.stop()
   engine = null
-  await supa()?.auth.signOut()
+  const sb = supa()
+  if (sb) {
+    await sb.auth.signOut().catch(() => {})
+    // Without a connection the library keeps the session; signing out must still work on this device
+    const { data } = await sb.auth.getSession().catch(() => ({ data: { session: null } }))
+    if (data.session) {
+      try {
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith(AUTH_STORAGE_KEY))
+          .forEach((k) => localStorage.removeItem(k))
+      } catch {
+        /* ignore */
+      }
+    }
+  }
   resetDocs()
   await wipeAll()
+  await wipeVault().catch(() => {})
   localStorage.removeItem('qirtas.recent')
   location.hash = '#/'
   location.reload()

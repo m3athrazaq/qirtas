@@ -3,9 +3,13 @@ import { useState } from 'react'
 import { useStore } from '../data/store'
 import { t } from '../lib/i18n'
 import { Row } from '../shell/SettingsDialog'
+import { emergencyBackup } from '../data/autobackup'
+import { num } from '../lib/hijri'
+import { formatWhen } from '../lib/when'
 import { askConfirm, askText } from '../ui/dialogs'
 import { syncAvailable } from './config'
-import { deleteAccount, resetPassword, signIn, signOut, signUp, updatePassword, useSession } from './session'
+import { friendlyError } from './errors'
+import { deleteAccount, hasUnsyncedWork, resetPassword, signIn, signOut, signUp, updatePassword, useSession } from './session'
 
 export function AccountSection() {
   const user = useSession((s) => s.user)
@@ -41,7 +45,7 @@ function AuthForm() {
         if (needsConfirm) setMsg(t('confirmEmail'))
       }
     } catch (err) {
-      setMsg((err as Error).message)
+      setMsg(friendlyError(err))
     } finally {
       setBusy(false)
     }
@@ -96,7 +100,7 @@ function AuthForm() {
                 await resetPassword(email.trim())
                 setMsg(t('resetSent'))
               } catch (err) {
-                setMsg((err as Error).message)
+                setMsg(friendlyError(err))
               }
             }}
           >
@@ -112,13 +116,48 @@ function SignedIn() {
   const user = useSession((s) => s.user)!
   const role = useSession((s) => s.role)
   const status = useStore((s) => s.syncStatus)
+  const pendingSync = useStore((s) => s.pendingSync)
+  const lastSyncedAt = useStore((s) => s.lastSyncedAt)
+  const settings = useStore((s) => s.settings)
   const toast = useStore((s) => s.toast)
   const [pw, setPw] = useState('')
+  const [leaving, setLeaving] = useState(false)
+
+  // Signing out clears this device: anything the account doesn't have yet is saved to a file first
+  const leave = async () => {
+    if (leaving) return
+    setLeaving(true)
+    try {
+      if (await hasUnsyncedWork()) {
+        if (!(await askConfirm(t('signOutUnsynced'), { confirmLabel: t('signOutBackupFirst') }))) return
+        let where: string
+        try {
+          where = await emergencyBackup()
+        } catch {
+          toast(t('bkFailed'))
+          return
+        }
+        if (!(await askConfirm(where ? t('signOutSavedDevice', { where }) : t('signOutSavedDownload'), { confirmLabel: t('signOut'), danger: true }))) return
+      } else if (!(await askConfirm(t('signOutConfirm'), { confirmLabel: t('signOut') }))) return
+      await signOut()
+    } finally {
+      setLeaving(false)
+    }
+  }
+
+  const syncNote = [
+    pendingSync > 0 ? t('syncPending', { n: num(pendingSync, settings.numerals) }) : '',
+    lastSyncedAt ? t('syncLast', { when: formatWhen(lastSyncedAt, settings) }) : '',
+  ]
+    .filter(Boolean)
+    .join(' — ')
+
   return (
     <>
       <Row label={t('signedInAs')} desc={user.email ?? ''}>
         <span className={'sync-pill is-' + status}>{status === 'synced' ? t('syncedNow') : status === 'syncing' ? t('syncing') : status === 'offline' ? t('offline') : t('syncOff')}</span>
       </Row>
+      {syncNote && <p className="muted small set-note sync-note">{syncNote}</p>}
       {role && (
         <Row label={t('workspace')}>
           <span className="muted">{role === 'owner' ? t('owner') : role === 'editor' ? t('canEdit') : t('canView')}</span>
@@ -135,7 +174,7 @@ function SignedIn() {
               setPw('')
               toast(t('passwordChanged'))
             } catch (err) {
-              toast((err as Error).message)
+              toast(friendlyError(err))
             }
           }}
         >
@@ -146,7 +185,7 @@ function SignedIn() {
         </form>
       </Row>
       <div className="settings-actions">
-        <button type="button" className="btn" onClick={async () => (await askConfirm(t('signOutConfirm'), { confirmLabel: t('signOut') })) && void signOut()}>
+        <button type="button" className="btn" disabled={leaving} onClick={() => void leave()}>
           <LogOut size={15} /> {t('signOut')}
         </button>
       </div>
@@ -160,7 +199,7 @@ function SignedIn() {
             try {
               await deleteAccount()
             } catch (err) {
-              toast((err as Error).message)
+              toast(friendlyError(err))
             }
           }}
         >

@@ -47,6 +47,16 @@ export function onDocUpdate(fn: (docId: string, doc: Y.Doc, origin: unknown) => 
   return () => updateListeners.delete(fn)
 }
 
+/** Apply a change that came from outside this tab (the server, a backup).
+ *  Parts of it that build on an earlier change which hasn't arrived yet are held back by Yjs in
+ *  memory, without any event. They must reach the device too, or a reload would lose them for good:
+ *  the update itself is stored and waits there with the rest. */
+export function applyOutside(docId: string, doc: Y.Doc, update: Uint8Array, origin: unknown) {
+  Y.applyUpdate(doc, update, origin)
+  const store = doc.store as unknown as { pendingStructs: unknown; pendingDs: unknown }
+  if (store.pendingStructs || store.pendingDs) queueWrite(docId, update)
+}
+
 const docListeners = new Set<(docId: string) => void>()
 /** Notified when a doc finishes loading (used by the sync engine). */
 export function onDocLoaded(fn: (docId: string) => void) {
