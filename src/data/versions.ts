@@ -194,7 +194,13 @@ export async function versionJson(versionId: number): Promise<JSONContent | null
 export async function restoreVersion(pageId: string, versionId: number): Promise<{ ok: boolean; previous: VersionMeta | null }> {
   const json = await versionJson(versionId)
   if (!json) return { ok: false, previous: null }
-  const previous = await captureVersion(pageId, 'before-restore')
+  // Either a new version of what the page holds now, or the one that already holds exactly that
+  let previous = await captureVersion(pageId, 'before-restore')
+  if (!previous) {
+    const doc = peekDoc(pageDocId(pageId))
+    const hash = doc ? fingerprint([Y.encodeStateAsUpdate(doc)]) : ''
+    previous = (await listVersions(pageId).catch(() => [])).find((v) => v.hash === hash) ?? null
+  }
   await writePageContent(pageId, json)
   // The page now holds a version that is already in the history: nothing new to record until it changes again
   const t = tracks.get(pageId)

@@ -89,7 +89,8 @@ interface State {
   setSettings: (patch: Partial<Settings>) => void
   openModal: (m: Modal) => void
   closeModal: () => void
-  toast: (text: string, action?: Toast['action']) => void
+  /** `ms`: how long it stays (3 s, or 6 s with an action, when not given). */
+  toast: (text: string, action?: Toast['action'], ms?: number) => void
   dismissToast: (id: number) => void
 }
 
@@ -131,10 +132,10 @@ export const useStore = create<State>((set, get) => ({
   },
   openModal: (modal) => set({ modal }),
   closeModal: () => set({ modal: null }),
-  toast: (text, action) => {
+  toast: (text, action, ms) => {
     const id = ++toastId
     set({ toasts: [...get().toasts, { id, text, action }] })
-    setTimeout(() => get().dismissToast(id), action ? 6000 : 3000)
+    setTimeout(() => get().dismissToast(id), ms ?? (action ? 6000 : 3000))
   },
   dismissToast: (id) => set({ toasts: get().toasts.filter((x) => x.id !== id) }),
 }))

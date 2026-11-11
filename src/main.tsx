@@ -10,6 +10,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import { boot } from './data/boot'
+import { useStore } from './data/store'
 import { initNative } from './lib/native'
 import { isNative } from './lib/platform'
 import { AppBoundary } from './ui/ErrorBoundary'
@@ -22,7 +23,10 @@ if (import.meta.env.PROD && !import.meta.env.VITE_PREVIEW && !isNative() && 'ser
 const root = createRoot(document.getElementById('root')!)
 performance.mark('qirtas:start')
 boot()
-  .catch((err) => console.error('boot failed', err))
+  .catch((err) => {
+    console.error('boot failed', err)
+    useStore.setState({ bootError: String((err as Error)?.message ?? err) })
+  })
   .finally(() => {
     performance.mark('qirtas:booted')
     root.render(

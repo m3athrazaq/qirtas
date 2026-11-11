@@ -106,11 +106,12 @@ function HistoryInner({ pageId, onClose }: { pageId: string; onClose: () => void
           <div className="history-list">
             {list === null && <div className="menu-empty">{t('loading')}</div>}
             {list?.length === 0 && <div className="menu-empty">{t('historyEmpty')}</div>}
-            {list?.map((v) => (
+            {list?.map((v, i) => (
               <button type="button" key={v.id} className={'history-item' + (v.id === sel ? ' is-active' : '')} onClick={() => setSel(v.id)}>
                 <span className="history-when">{formatWhen(v.ts, settings)}</span>
-                <span className="muted small">
-                  {t(REASON[v.reason] ?? 'hv_auto')} · {t('historyChars', { n: num(v.chars, settings.numerals) })}
+                <span className="history-meta muted small">
+                  <span>{i === 0 ? t('historyCurrent') : t(REASON[v.reason] ?? 'hv_auto')}</span>
+                  <span>{t('historyChars', { n: num(v.chars, settings.numerals) })}</span>
                 </span>
               </button>
             ))}
