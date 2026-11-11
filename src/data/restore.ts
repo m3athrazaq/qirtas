@@ -43,7 +43,7 @@ export interface RestorePlan {
 
 export interface RestoreResult {
   pages: number
-  /** Pages created again. */
+  /** Pages that were not in the workspace before and are now (out of its trash). */
   revived: number
   /** Pages whose content differed: filed in their history (merge) or put back (rollback). */
   changed: number
@@ -157,6 +157,7 @@ export async function restoreData(b: BackupData, mode: RestoreMode, onProgress?:
   const bPages = readPages(b.docs.get(wsDocId)!)
   const result: RestoreResult = { pages: 0, revived: 0, changed: 0, assets: 0, failed: 0 }
   const wasPristine = w.isPristine()
+  const had = new Set(w.pages.keys())
 
   await takeSnapshot('before-restore')
 
@@ -206,7 +207,11 @@ export async function restoreData(b: BackupData, mode: RestoreMode, onProgress?:
       }
     }
   }, ORIGIN_SYSTEM)
-  result.revived = revived.filter((id) => !w.pages.get(id)?.get('deletedAt')).length
+  // Counted together: pages this workspace didn't have (a new device) and pages it had deleted for good
+  bPages.forEach((_p, id) => {
+    const m = w.pages.get(id)
+    if (m && !had.has(id) && !m.get('deletedAt')) result.revived++
+  })
 
   // 3. Pages that exist on both sides with different content
   const changed = new Set<string>()

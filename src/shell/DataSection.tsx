@@ -167,9 +167,8 @@ export function DataSection() {
           <div key={p.id} className="point-row">
             <History size={15} className="muted" />
             <span className="point-when">{when(p.ts)}</span>
-            <span className="muted small">
-              {t(REASON[p.reason] ?? 'rp_auto')} · {t('rpPages', { n: num(p.pages, settings.numerals) })}
-            </span>
+            <span className="muted small">{t(REASON[p.reason] ?? 'rp_auto')}</span>
+            <span className="muted small">{t('rpPages', { n: num(p.pages, settings.numerals) })}</span>
             <span className="spacer" />
             <button type="button" className="btn-text" disabled={!canEdit} onClick={() => void restoreFromPoint(p)}>
               <RotateCcw size={14} /> {t('restore')}

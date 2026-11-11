@@ -19,6 +19,7 @@ import { TrashDialog } from './shell/TrashDialog'
 import { compareOrder } from './lib/ids'
 import { t } from './lib/i18n'
 import { isReachable } from './shell/pageOps'
+import { Rescue } from './ui/ErrorBoundary'
 
 export default function App() {
   const ready = useStore((s) => s.ready)
@@ -41,7 +42,8 @@ export default function App() {
     if (target) navigate(target, { replace: true })
   }, [ready, isMobile, route.name])
 
-  if (!ready) return <div className="boot">{t('loading')}</div>
+  const bootError = useStore((s) => s.bootError)
+  if (!ready) return bootError ? <Rescue message={t('bootFailed')} /> : <div className="boot">{t('loading')}</div>
   const pageId = route.name === 'page' ? route.id : null
 
   return (
@@ -53,6 +55,7 @@ export default function App() {
         </aside>
       )}
       <main className="main">
+        <SaveAlert />
         {isMobile && !pageId ? (
           <Sidebar variant="home" />
         ) : (
@@ -76,6 +79,20 @@ export default function App() {
       <JoinDialog />
       <DialogHost />
       <Toasts />
+    </div>
+  )
+}
+
+/** Shown while changes can't be written to the device: the one case where closing the app would lose work. */
+function SaveAlert() {
+  const failing = useStore((s) => s.saveFailing)
+  if (!failing) return null
+  return (
+    <div className="save-alert" role="alert">
+      <span>{t('saveFailing')}</span>
+      <button type="button" className="btn btn-small" onClick={() => void import('./data/autobackup').then((m) => m.downloadBackup()).catch(() => {})}>
+        {t('backupExport')}
+      </button>
     </div>
   )
 }

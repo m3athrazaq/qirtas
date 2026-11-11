@@ -1,5 +1,5 @@
 // A failure while drawing part of the screen must never blank the whole app.
-import { Component, type ReactNode } from 'react'
+import { Component, useState, type ReactNode } from 'react'
 import { t } from '../lib/i18n'
 
 /** For helpers drawn over the editor (table handles, toolbars): hide on error, try again a moment
@@ -42,13 +42,38 @@ export class AppBoundary extends Component<{ children: ReactNode }, { failed: bo
 
   render() {
     if (!this.state.failed) return this.props.children
-    return (
-      <div className="app-crash" role="alert">
-        <p>{t('appCrashed')}</p>
+    return <Rescue message={t('appCrashed')} />
+  }
+}
+
+/** The screen for when the app can't be drawn or the data can't be opened: reload, or take the data
+ *  out as a backup file first. The backup doesn't depend on anything on screen working. */
+export function Rescue({ message }: { message: string }) {
+  const [state, setState] = useState<'idle' | 'busy' | 'done' | 'failed'>('idle')
+  return (
+    <div className="app-crash" role="alert">
+      <p>{message}</p>
+      <div className="app-crash-actions">
         <button type="button" className="btn btn-primary" onClick={() => location.reload()}>
           {t('reload')}
         </button>
+        <button
+          type="button"
+          className="btn"
+          disabled={state === 'busy'}
+          onClick={async () => {
+            setState('busy')
+            try {
+              await (await import('../data/autobackup')).downloadBackup()
+              setState('done')
+            } catch {
+              setState('failed')
+            }
+          }}
+        >
+          {state === 'done' ? t('backupDone') : state === 'failed' ? t('bkFailed') : t('backupExport')}
+        </button>
       </div>
-    )
-  }
+    </div>
+  )
 }

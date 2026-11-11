@@ -4,11 +4,14 @@ import { setLang, t } from '../lib/i18n'
 import { todayIso } from '../lib/hijri'
 import { b, callout, code, date, doc, h2, p, pageLink, setPageContent, tasks } from '../templates/build'
 import { captureAuthRedirect } from './authLink'
-import { setSyncHook } from './docs'
+import { grantFolderAccess, noteNudgeShown, startBackupSchedule } from './autobackup'
+import { onSaveHealth, setSyncHook } from './docs'
 import { attachWorkspaceHistory, historyRedo, historyUndo } from './history'
 import { kvGet, kvSet, outboxAdd } from './idb'
 import { initRouter, navigate, takePendingAction } from './nav'
+import { startSnapshotSchedule } from './snapshots'
 import { useStore, type Settings } from './store'
+import { startVersionCapture } from './versions'
 import { getActor, setActor, Workspace } from './workspace'
 
 function resolveTheme(theme: Settings['theme']): 'light' | 'dark' {
@@ -65,6 +68,34 @@ async function seedWelcome(w: Workspace) {
   return welcome
 }
 
+/** Restore points, automatic backups, and keeping the browser from clearing the data by itself. */
+function startSafetyNet() {
+  startSnapshotSchedule()
+  const openData = () => window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'data' }))
+  startBackupSchedule((nudge) => {
+    const st = useStore.getState()
+    // Never on top of a dialog, and not while a page is being written in
+    if (st.modal || st.peek) return
+    if (nudge === 'permission') {
+      st.toast(t('bkNudgePermission'), { label: t('bkAllow'), run: () => void grantFolderAccess().then((ok) => ok && useStore.getState().toast(t('backupDone'))) }, 12000)
+    } else if (nudge === 'stale') {
+      noteNudgeShown()
+      st.toast(t('bkNudgeStale'), { label: t('bkSetUp'), run: openData }, 12000)
+    } else {
+      st.toast(t('bkNudgeFailed'), { label: t('bkSetUp'), run: openData }, 12000)
+    }
+  })
+  // Chromium grants this silently for sites that are used; Firefox would ask at once, so there it
+  // is left to the button in the settings
+  try {
+    if (navigator.storage?.persist && !/firefox/i.test(navigator.userAgent)) {
+      void navigator.storage.persisted().then((p) => !p && navigator.storage.persist())
+    }
+  } catch {
+    /* not available */
+  }
+}
+
 export async function boot() {
   // Before the router sees the address: a sign-in link must not be lost or applied by accident
   captureAuthRedirect()
@@ -103,6 +134,13 @@ export async function boot() {
   if (w.pages.size === 0 && !(await kvGet(`sync:remote:${wsId}`))) firstPage = await seedWelcome(w)
   // From here on, the user's own changes can be undone (the welcome pages are not one of them)
   attachWorkspaceHistory(w.pages)
+  // …and every page keeps a history of its versions
+  startVersionCapture()
+  onSaveHealth((ok) => {
+    const st = useStore.getState()
+    if (ok && st.saveFailing) st.toast(t('saveRecovered'))
+    if (st.saveFailing === ok) useStore.setState({ saveFailing: !ok })
+  })
 
   const actorId = () => getActor().id
   useStore.setState({
@@ -130,6 +168,7 @@ export async function boot() {
   if (action === 'new') navigate(w.createPage({ parentId: null }), { replace: true })
   else if (action === 'search') useStore.getState().openModal('search')
   void import('../sync/session').then((m) => m.initSync()).catch(() => {})
+  startSafetyNet()
 
   window.addEventListener('keydown', (e) => {
     const mod = e.metaKey || e.ctrlKey

@@ -27,6 +27,8 @@ interface Saved {
   /** Last backup of any kind, a downloaded file included (for the reminder). */
   lastAnyAt: number
   lastNagAt: number
+  /** When this device first ran a version with backups: the reminder waits a few days from then. */
+  since: number
 }
 
 export interface BackupState extends Saved {
@@ -38,7 +40,7 @@ export interface BackupState extends Saved {
 }
 
 function load(): Saved {
-  const base: Saved = { enabled: false, lastAt: 0, lastHash: '', lastName: '', lastError: '', lastAnyAt: 0, lastNagAt: 0 }
+  const base: Saved = { enabled: false, lastAt: 0, lastHash: '', lastName: '', lastError: '', lastAnyAt: 0, lastNagAt: 0, since: 0 }
   try {
     return { ...base, ...(JSON.parse(localStorage.getItem(KEY) || '{}') as Partial<Saved>) }
   } catch {
@@ -56,6 +58,7 @@ function save(patch: Partial<Saved>) {
     lastError: cur.lastError,
     lastAnyAt: cur.lastAnyAt,
     lastNagAt: cur.lastNagAt,
+    since: cur.since,
     ...patch,
   }
   try {
@@ -128,7 +131,10 @@ async function applyDefaults(kind: BackupKind) {
   } catch {
     return
   }
-  if (!first) return
+  if (!first) {
+    if (!useBackup.getState().since) save({ since: Date.now() })
+    return
+  }
   let enabled = false
   if (kind === 'device') {
     try {
@@ -138,7 +144,7 @@ async function applyDefaults(kind: BackupKind) {
       enabled = false
     }
   }
-  save({ enabled })
+  save({ enabled, since: Date.now() })
 }
 
 /** Read the saved choices and whether the folder can be written to right now. */
@@ -328,7 +334,9 @@ export function backupNudge(now = Date.now()): BackupNudge {
   if (!ws || ws.isPristine()) return null
   if (st.enabled && st.kind === 'folder' && st.needsPermission) return 'permission'
   if (st.enabled && st.lastError && now - st.lastAt > 2 * DAY) return 'failed'
-  if (!st.enabled && now - st.lastAnyAt > 14 * DAY && now - st.lastNagAt > 7 * DAY) return 'stale'
+  // No backup at all: say so after a few days of use, then weekly; with an old one, after two weeks
+  const last = Math.max(st.lastAnyAt, st.since)
+  if (!st.enabled && last && now - last > (st.lastAnyAt ? 14 : 3) * DAY && now - st.lastNagAt > 7 * DAY) return 'stale'
   return null
 }
 
