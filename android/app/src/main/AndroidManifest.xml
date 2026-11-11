@@ -62,6 +62,17 @@
                 android:resource="@xml/widget_quick_info" />
         </receiver>
 
+        <!-- Reminders: the alarm that shows each one, and setting them again after a restart or an update -->
+        <receiver
+            android:name=".ReminderReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -84,6 +95,10 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- Reminders ring at their minute (granted with the app on Android 13 and later) -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Lets the app ask (with Android's own question) to be spared battery restrictions, which on
+         some phones hold reminders back while the app is closed -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Daily backup file in Documents/Qirtas. Android 13+ needs no permission for files the app
          creates there; these two only apply to older versions. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />

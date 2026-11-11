@@ -14,4 +14,5 @@
     <string name="widget_description">ملاحظة سريعة، وصفحة اليوم، وصفحة جديدة، والبحث بضغطة</string>
     <string name="widget_capture">ملاحظة</string>
     <string name="widget_new">جديدة</string>
+    <string name="channel_reminders">التذكيرات</string>
 </resources>

@@ -203,9 +203,9 @@ async function evaluate(c, expression, timeout) {
     console.log('preset:', await pick('.reminder-presets .chip-btn', 'بعد ساعة'))
     await sleep(5000)
     console.log('notification permission:', JSON.stringify(await evaluate(c, `window.Capacitor.Plugins.LocalNotifications.checkPermissions()`, 10000)))
-    console.log('pending reminders:', JSON.stringify(await evaluate(c, `window.Capacitor.Plugins.LocalNotifications.getPending().then((r) => r.notifications.map((n) => ({ id: n.id, title: n.title, body: n.body, at: n.schedule && n.schedule.at })))`, 10000)))
+    console.log('reminder health:', JSON.stringify(await evaluate(c, `window.Capacitor.Plugins.QirtasNative.reminderHealth()`, 10000)))
     try {
-      console.log('alarms:', adb('dumpsys alarm').split('\n').filter((l) => l.includes('com.m3athrazaq.qirtas')).slice(0, 4).map((l) => l.trim()).join(' | '))
+      console.log('alarms:', adb('dumpsys alarm').split('\n').filter((l) => l.includes('com.m3athrazaq.qirtas.REMINDER')).slice(0, 4).map((l) => l.trim()).join(' | '))
     } catch (e) {
       console.log('alarms check failed:', e.message.slice(0, 200))
     }

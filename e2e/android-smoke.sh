@@ -21,6 +21,9 @@ echo "pid=$PID" >> smoke/start.txt
 adb forward tcp:9222 "localabstract:webview_devtools_remote_${PID}" >> smoke/start.txt 2>&1
 node e2e/android-webview.cjs > smoke/webview.txt 2>&1
 echo "exit=$?" >> smoke/webview.txt
+# Reminders with the app in the background, and after the app was stopped
+node e2e/android-reminders.cjs > smoke/reminders.txt 2>&1
+echo "exit=$?" >> smoke/reminders.txt
 adb shell dumpsys window | grep -E "mCurrentFocus|mFocusedApp|Splash" >> smoke/start.txt 2>&1
 adb logcat -d -v brief '*:W' > smoke/logcat-warnings.txt 2>&1
 adb logcat -d -v brief -s Capacitor:V Capacitor/Console:V chromium:V > smoke/logcat-app.txt 2>&1
