@@ -183,7 +183,7 @@ public class QirtasNativePlugin extends Plugin {
     @PluginMethod
     public void allowBackground(PluginCall call) {
         String pkg = getContext().getPackageName();
-        if (!open(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + pkg))) {
+        if (!open(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + pkg)))) {
             if (!open(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))) open(appDetails());
         }
         call.resolve();
