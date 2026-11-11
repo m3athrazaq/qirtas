@@ -7,7 +7,6 @@
 import { num } from '../lib/hijri'
 import { t } from '../lib/i18n'
 import { isNative, QirtasNative, type ReminderHealth, type ReminderLog } from '../lib/platform'
-import { askConfirm } from '../ui/dialogs'
 import { isReachable } from '../shell/pageOps'
 import { navigate } from './nav'
 import { usePageIndex, type PageIndexEntry } from './pageIndex'
@@ -110,6 +109,7 @@ function check() {
     return
   }
   // On the phone, first ask Android which reminders it showed
+  if (isNative()) markPluginShown()
   if (isNative())
     void QirtasNative.reminderLog().then(
       (l) => review(l.shown),
@@ -241,13 +241,37 @@ async function syncNative() {
   if (list === handedList) return
   await QirtasNative.setReminders({ ws: wsId, items })
   handedList = list
-  // Remember what Android will show, so it isn't reported as missed when the app opens later
+  // Remember what Android will show, so it isn't reported as missed when the app opens later (a
+  // reminder that was already due when handed over is not one the phone could have held back)
   const handed = loadMap(NATIVE_KEY)
-  for (const r of wanted) handed[keyOf(r)] = r.at
+  for (const r of wanted) if (r.at > now) handed[keyOf(r)] = r.at
   saveMap(NATIVE_KEY, handed)
 }
 
 const LEFT_PLUGIN_KEY = 'qirtas.reminders.v2'
+let pluginMarked = false
+/** Before the switch: reminders handed over the older way that came due meanwhile were shown by
+ *  the plugin, which notes nothing; they are done (not "held back"). */
+function markPluginShown() {
+  if (pluginMarked) return
+  pluginMarked = true
+  try {
+    if (localStorage.getItem(LEFT_PLUGIN_KEY)) return
+    const handed = loadMap(NATIVE_KEY)
+    const fired = loadMap(FIRED_KEY)
+    const now = Date.now()
+    let changed = false
+    for (const [k, at] of Object.entries(handed))
+      if (at <= now && fired[k] !== at) {
+        fired[k] = at
+        changed = true
+      }
+    if (changed) saveMap(FIRED_KEY, fired)
+  } catch {
+    /* ignore */
+  }
+}
+
 let leftPlugin = false
 /** Reminders used to be scheduled through the notifications plugin: take those off once, the app's
  *  own alarms replace them. */
@@ -388,10 +412,8 @@ export async function askReminderPermission() {
   } catch {
     return
   }
-  if (await askConfirm(t('remBackgroundAsk'), { confirmLabel: t('remBackgroundAllow') })) {
-    if (health.restricted) void openAppSettings()
-    else void allowBackground()
-  }
+  // A message rather than a dialog: the reminder's time panel is open at this moment
+  useStore.getState().toast(t('remBackgroundAsk'), { label: t('remBackgroundAllow'), run: () => void (health.restricted ? openAppSettings() : allowBackground()) }, 20000)
 }
 
 let started = false
