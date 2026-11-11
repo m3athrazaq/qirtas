@@ -219,8 +219,8 @@ async function evaluate(c, expression, timeout) {
     await sleep(4000)
     try {
       const lines = adb('dumpsys notification --noredact').split('\n')
-      const i = lines.findIndex((l) => l.includes('pkg=com.m3athrazaq.qirtas'))
-      console.log('posted notification:', i < 0 ? 'none' : lines.slice(i, i + 12).map((l) => l.trim()).filter((l) => /pkg=|channel|icon|android.title|android.text/.test(l)).join(' | '))
+      const posted = lines.filter((l) => l.includes('NotificationRecord') && l.includes('com.m3athrazaq.qirtas'))
+      console.log('posted notification:', posted.length ? posted.map((l) => l.trim().slice(0, 160)).join(' | ') : 'none')
     } catch (e) {
       console.log('notification check failed:', e.message.slice(0, 200))
     }
