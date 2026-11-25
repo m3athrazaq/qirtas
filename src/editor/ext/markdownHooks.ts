@@ -1,5 +1,7 @@
 // Late-bound helpers used when turning custom nodes into text/Markdown.
 // The app fills these in at startup so the editor schema stays free of store imports.
+import { cleanRef, refLabel } from '../../quran/quran'
+
 export const markdownHooks = {
   pageTitle: (_id: string): string => '',
   pageLink: (_id: string): string => '',
@@ -11,4 +13,8 @@ export const markdownHooks = {
     return `⏰ ${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`
   },
   database: (_id: string): string => '',
+  quranRef: (surah: number, from: number, to: number): string => {
+    const r = cleanRef(surah, from, to)
+    return r ? refLabel(r, 'ar', 'arab') : ''
+  },
 }

@@ -6,6 +6,7 @@ import { useStore } from '../data/store'
 import type { PageMeta } from '../data/types'
 import { schemaExtensions } from '../editor/ext'
 import { markdownHooks } from '../editor/ext/markdownHooks'
+import { cleanRef, refLabel } from '../quran/quran'
 import { compareOrder } from './ids'
 import { formatDual } from './hijri'
 import { t } from './i18n'
@@ -30,6 +31,11 @@ export function installMarkdownHooks() {
     return formatDual(iso, s.calendar, { lang: s.lang, numerals: s.numerals })
   }
   markdownHooks.database = (id) => databaseToMarkdown(id)
+  markdownHooks.quranRef = (surah, from, to) => {
+    const r = cleanRef(surah, from, to)
+    const s = useStore.getState().settings
+    return r ? refLabel(r, s.lang, s.numerals) : ''
+  }
 }
 
 function rowsOf(dbId: string): PageMeta[] {

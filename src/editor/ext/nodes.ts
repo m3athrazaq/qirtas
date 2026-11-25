@@ -8,6 +8,8 @@ import { ReactNodeViewRenderer } from '@tiptap/react'
 import { uid } from '../../lib/ids'
 import { CalloutView, DatabaseBlockView, DateChipView, ImageView, PageLinkView, PageMentionView } from '../views'
 import { ReminderView } from '../views/ReminderView'
+import { QuranVerseView } from '../views/QuranView'
+import { quotation } from '../../quran/quran'
 import { markdownHooks } from './markdownHooks'
 
 declare module '@tiptap/core' {
@@ -276,6 +278,62 @@ export const DatabaseBlock = Node.create({
     return markdownHooks.database(node.attrs?.databaseId as string)
   },
 })
+
+/** A quotation from the Quran: whole verses of one surah. The verses' text is kept in the block, so
+ *  the page reads the same everywhere (other devices, exports, search) without the Quran's data. */
+export const QuranVerse = Node.create({
+  name: 'quranVerse',
+  group: 'block',
+  atom: true,
+  selectable: true,
+  draggable: true,
+  addAttributes() {
+    const number = (name: string) => ({
+      default: 1,
+      parseHTML: (el: HTMLElement) => Number(el.getAttribute(`data-${name}`)) || 1,
+      renderHTML: (a: Record<string, unknown>) => ({ [`data-${name}`]: String(a[name]) }),
+    })
+    return {
+      surah: number('surah'),
+      from: number('from'),
+      to: number('to'),
+      /** The verses, one per line. */
+      text: {
+        default: '',
+        parseHTML: (el) => el.getAttribute('data-text') ?? '',
+        renderHTML: (a) => (a.text ? { 'data-text': a.text } : {}),
+      },
+    }
+  },
+  parseHTML() {
+    return [{ tag: 'figure[data-quran]' }]
+  },
+  renderHTML({ node, HTMLAttributes }) {
+    return [
+      'figure',
+      mergeAttributes(HTMLAttributes, { 'data-quran': '', class: 'quran-verse', dir: 'rtl', lang: 'ar' }),
+      ['blockquote', {}, quranQuote(node.attrs)],
+      ['figcaption', {}, markdownHooks.quranRef(node.attrs.surah, node.attrs.from, node.attrs.to)],
+    ]
+  },
+  renderText({ node }) {
+    return quranPlain(node.attrs)
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(QuranVerseView)
+  },
+  renderMarkdown(node) {
+    return `> ${quranPlain(node.attrs ?? {})}`
+  },
+})
+
+const quranQuote = (a: Record<string, unknown>) => {
+  const text = String(a.text ?? '')
+  return text ? quotation(text.split('\n'), Number(a.from) || 1) : ''
+}
+
+/** The quotation with its reference, as it is copied and searched: ﴿…﴾ [البقرة: ٢٥٥] */
+const quranPlain = (a: Record<string, unknown>) => `${quranQuote(a)} ${markdownHooks.quranRef(Number(a.surah), Number(a.from), Number(a.to))}`.trim()
 
 export const LocalImage = Image.extend({
   draggable: true,
