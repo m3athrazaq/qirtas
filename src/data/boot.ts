@@ -129,8 +129,8 @@ export async function boot() {
   // before the sync layer connects (or while offline).
   const user = await kvGet<{ id: string; name: string }>('sync:user')
   setActor(user ?? { id: 'local', name: store.settings.userName })
-  const role = await kvGet<string>(`sync:role:${wsId}`)
-  if (user && role && role !== 'viewer' && (await kvGet(`sync:linked:${wsId}`))) {
+  const role = await kvGet<string>(`cf:role:${wsId}`)
+  if (user && role && role !== 'viewer' && (await kvGet(`cf:linked:${wsId}`))) {
     setSyncHook((docId, update) => void outboxAdd(docId, update, wsId))
   }
   const w = await Workspace.open(wsId)

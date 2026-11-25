@@ -55,7 +55,7 @@ let settled = false
 async function settleSync() {
   const st = useStore.getState()
   if (settled || !st.ws || st.syncStatus === 'synced' || st.syncStatus === 'offline') return
-  if (!(await kvGet(`sync:linked:${st.ws.id}`).catch(() => null))) return
+  if (!(await kvGet(`cf:linked:${st.ws.id}`).catch(() => null))) return
   settled = true
   // Not started yet (it may never start, e.g. signed out meanwhile): a shorter wait
   const ms = st.syncStatus === 'syncing' ? 5000 : 2000

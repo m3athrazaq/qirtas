@@ -29,3 +29,5 @@ out/
 *.keystore
 .env
 dist-preview
+sync-shots/
+.wrangler/

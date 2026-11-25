@@ -1,14 +1,14 @@
 // Keeps the local Yjs documents and the server's update log in step.
-// Local changes go to an IndexedDB outbox and are pushed in small batches;
-// remote changes arrive through realtime inserts and are merged by Yjs.
-import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
+// Local changes go to an IndexedDB outbox and are pushed in small batches; changes from other
+// devices are pulled after a bookmark and merged by Yjs. While the app is on screen a request waits
+// on the server for the next change (long polling), so they arrive within a second or two.
 import * as Y from 'yjs'
 import { applyOutside, getDoc, ORIGIN_REMOTE, pageDocId, setSyncHook } from '../data/docs'
 import { allDocIds, kvGet, kvSet, outboxAdd, outboxAll, outboxDelete } from '../data/idb'
 import { useStore } from '../data/store'
 import type { Workspace } from '../data/workspace'
 import { uid } from '../lib/ids'
-import { fromB64, toB64 } from './supabase'
+import { api, ApiError, fromB64, toB64 } from './api'
 
 export type Role = 'owner' | 'editor' | 'viewer'
 
@@ -19,11 +19,17 @@ interface Row {
   client_id: string | null
 }
 
-/** How far behind the bookmark a pull looks for rows it has not seen (see recheck). */
-const RECHECK_WINDOW = 300
-const RECHECK_EVERY = 2 * 60_000
+interface WaitResult {
+  latest: number
+  version: number
+  presence: { client_id: string; user_id: string; name: string | null; page_id: string | null; color: string | null }[]
+}
+
 /** A document's history is squashed only when no row for it arrived for this long. */
 const COMPACT_QUIET = 60_000
+/** Rows per push, and bytes (the server takes at most 20 rows and ~24 MB per request). */
+const PUSH_ROWS = 20
+const PUSH_BYTES = 8_000_000
 
 export interface PresenceUser {
   userId: string
@@ -40,38 +46,39 @@ export async function workspaceDocIds(w: Workspace): Promise<string[]> {
 
 const COLORS = ['#2a47a8', '#1f6f6b', '#b5443a', '#7650ad', '#c2621b', '#2b7a4b', '#ad437c']
 
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
+/** Where this device is in a workspace's log (kept per workspace; "cf" = this server's numbering). */
+export const bookmarkKey = (wsId: string) => `cf:last:${wsId}`
+
 export class SyncEngine {
   readonly clientId = uid(10)
-  private channel: RealtimeChannel | null = null
   private lastId = 0
+  private version = -1
   private flushing = false
   private flushTimer: ReturnType<typeof setTimeout> | null = null
   private saveTimer: ReturnType<typeof setTimeout> | null = null
   private pending: Promise<unknown> = Promise.resolve()
   private stopped = false
   private perDocCount = new Map<string, { n: number; maxId: number; at: number }>()
-  /** Ids of recent rows this device has taken in (applied, or its own): what recheck compares against. */
-  private recent = new Set<number>()
-  private lastRecheck = 0
   /** Documents whose change could not be queued: their whole state is sent on the next flush. */
   private resync = new Set<string>()
   private live = false
-  private pollTimer: ReturnType<typeof setInterval> | null = null
-  private catchUpTimer: ReturnType<typeof setTimeout> | null = null
+  private looping = false
+  private waiting: AbortController | null = null
+  private wake: (() => void) | null = null
   private lastPull = 0
-  /** Rows already applied from the live channel but not yet covered by the pull bookmark. */
-  private seen = new Set<number>()
   private pulling: Promise<void> | null = null
   onPresence: (users: PresenceUser[]) => void = () => {}
   onMembersChanged: () => void = () => {}
+  /** The server no longer lets this device in (unlinked, or no longer a member). */
+  onDenied: (err: ApiError) => void = () => {}
   private me: PresenceUser
 
-  private sb: SupabaseClient
   readonly wsId: string
   readonly role: Role
 
-  constructor(sb: SupabaseClient, wsId: string, role: Role, user: { id: string; name: string }) {
-    this.sb = sb
+  constructor(wsId: string, role: Role, user: { id: string; name: string }) {
     this.wsId = wsId
     this.role = role
     const color = COLORS[[...user.id].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length]
@@ -83,8 +90,7 @@ export class SyncEngine {
   }
 
   async start(opts: { upload?: boolean } = {}) {
-    this.lastId = (await kvGet<number>(`sync:last:${this.wsId}`)) ?? 0
-    ;((await kvGet<number[]>(`sync:recent:${this.wsId}`)) ?? []).forEach((id) => this.recent.add(id))
+    this.lastId = (await kvGet<number>(bookmarkKey(this.wsId))) ?? 0
     useStore.setState({ lastSyncedAt: (await kvGet<number>(`sync:ok:${this.wsId}`)) ?? null })
     void this.countPending()
     if (this.role !== 'viewer') setSyncHook((docId, update) => this.enqueue(docId, update))
@@ -94,11 +100,12 @@ export class SyncEngine {
     if (opts.upload) await this.uploadAll()
     try {
       await this.pull()
-    } catch {
+    } catch (err) {
+      if (this.denied(err)) return
       this.status('offline')
     }
-    this.subscribe()
     void this.flush()
+    void this.loop()
   }
 
   stop() {
@@ -107,36 +114,33 @@ export class SyncEngine {
     window.removeEventListener('online', this.onOnline)
     window.removeEventListener('offline', this.onOffline)
     document.removeEventListener('visibilitychange', this.onVisible)
-    this.stopPolling()
-    if (this.catchUpTimer) clearTimeout(this.catchUpTimer)
-    if (this.channel) void this.sb.removeChannel(this.channel)
-    this.channel = null
+    this.waiting?.abort()
+    this.wake?.()
   }
 
-  // Without a live connection (blocked websockets, flaky network) keep checking every so often.
-  private startPolling(every = 20000) {
-    this.stopPolling()
-    if (this.stopped) return
-    this.pollTimer = setInterval(() => {
-      if (document.visibilityState === 'visible') void this.pull().catch(() => this.status('offline'))
-    }, every)
+  /** Answers that mean this device can't use the workspace any more. */
+  private denied(err: unknown): boolean {
+    if (!(err instanceof ApiError) || ![401, 403, 404].includes(err.status) || err.code === 'no_server') return false
+    this.onDenied(err)
+    return true
   }
 
-  private stopPolling() {
-    if (this.pollTimer) clearInterval(this.pollTimer)
-    this.pollTimer = null
-  }
-
-  // Coming back to the app (phones pause background tabs): catch up straight away.
+  // Coming back to the app (phones pause apps in the background): catch up straight away.
   private onVisible = () => {
-    if (document.visibilityState !== 'visible' || this.stopped) return
-    if (Date.now() - this.lastPull > 15000) void this.pull().catch(() => this.status('offline'))
+    if (this.stopped) return
+    if (document.visibilityState !== 'visible') {
+      this.waiting?.abort() // no waiting on the server while nobody is looking
+      return
+    }
+    if (Date.now() - this.lastPull > 5000) void this.pull().catch((err) => this.denied(err) || this.status('offline'))
     void this.flush()
+    this.wake?.()
   }
 
   private onOnline = () => {
     void this.pull().catch(() => {})
     void this.flush()
+    this.wake?.()
   }
 
   private onOffline = () => this.status('offline')
@@ -202,24 +206,31 @@ export class SyncEngine {
         byDoc.set(i.docId, l)
       })
       for (const docId of whole) byDoc.set(docId, [Y.encodeStateAsUpdate(await getDoc(docId))])
-      const rows = [...byDoc].map(([docId, list]) => ({
-        workspace_id: this.wsId,
-        doc_id: docId,
-        data: toB64(list.length === 1 ? list[0] : Y.mergeUpdates(list)),
-        client_id: this.clientId,
-      }))
-      for (let i = 0; i < rows.length; i += 40) {
-        const { error } = await this.sb.from('doc_updates').insert(rows.slice(i, i + 40))
-        if (error) throw error
+      const rows = [...byDoc].map(([docId, list]) => ({ doc: docId, data: toB64(list.length === 1 ? list[0] : Y.mergeUpdates(list)), client: this.clientId }))
+      // In batches the server takes at once
+      let batch: typeof rows = []
+      let bytes = 0
+      const send = async () => {
+        if (batch.length) await api(`/workspaces/${this.wsId}/updates`, { body: { rows: batch }, timeout: 120_000 })
+        batch = []
+        bytes = 0
       }
+      for (const r of rows) {
+        if (batch.length >= PUSH_ROWS || (batch.length && bytes + r.data.length > PUSH_BYTES)) await send()
+        batch.push(r)
+        bytes += r.data.length
+      }
+      await send()
       await outboxDelete(items.map((i) => i.id!).filter((x) => x !== undefined))
       whole.length = 0
       this.status('synced')
       this.synced()
       again = (await outboxAll()).some(this.mine) || this.resync.size > 0
-    } catch {
-      this.status('offline')
-      if (!this.stopped) this.flushTimer = setTimeout(() => void this.flush(), 6000)
+    } catch (err) {
+      if (!this.denied(err)) {
+        this.status('offline')
+        if (!this.stopped) this.flushTimer = setTimeout(() => void this.flush(), 6000)
+      }
     } finally {
       // Not sent: they go back in the set
       whole.forEach((d) => this.resync.add(d))
@@ -252,64 +263,18 @@ export class SyncEngine {
     this.lastPull = Date.now()
     if (!this.live) this.status('syncing')
     for (;;) {
-      const { data, error } = await this.sb
-        .from('doc_updates')
-        .select('id, doc_id, data, client_id')
-        .eq('workspace_id', this.wsId)
-        .gt('id', this.lastId)
-        .order('id', { ascending: true })
-        .limit(500)
-      if (error) throw error
-      const rows = (data ?? []) as Row[]
+      const { rows, more } = await api<{ rows: Row[]; more: boolean }>(`/workspaces/${this.wsId}/updates?after=${this.lastId}`, { timeout: 120_000 })
       for (const r of rows) await this.apply(r)
-      if (rows.length < 500) break
+      if (!more || !rows.length) break
     }
-    for (const id of this.seen) if (id <= this.lastId) this.seen.delete(id)
-    await this.recheck()
     this.saveLast()
     this.status('synced')
     this.synced()
     void this.compact().catch(() => {})
   }
 
-  /** Rows get their number when they are written but become visible when their write completes, so
-   *  a row can show up *behind* the bookmark (two devices writing in the same instant). A pull that
-   *  only asks for "newer than the bookmark" would never fetch it. Every so often, compare the ids
-   *  just behind the bookmark with the ones this device has taken in, and fetch any it lacks. */
-  private async recheck() {
-    if (this.lastId <= 0) return
-    const now = Date.now()
-    if (now - this.lastRecheck < RECHECK_EVERY) return
-    const floor = this.lastId - RECHECK_WINDOW
-    const { data, error } = await this.sb.from('doc_updates').select('id').eq('workspace_id', this.wsId).gt('id', floor).lte('id', this.lastId).limit(RECHECK_WINDOW)
-    if (error) throw error
-    this.lastRecheck = now
-    const missing = ((data ?? []) as { id: number }[]).map((r) => r.id).filter((id) => !this.recent.has(id))
-    for (let i = 0; i < missing.length; i += 50) {
-      const { data: rows, error: e2 } = await this.sb.from('doc_updates').select('id, doc_id, data, client_id').eq('workspace_id', this.wsId).in('id', missing.slice(i, i + 50))
-      if (e2) throw e2
-      for (const r of (rows ?? []) as Row[]) await this.apply(r, true)
-    }
-    for (const id of this.recent) if (id <= floor - RECHECK_WINDOW) this.recent.delete(id)
-    // Remembered at once, so the same rows are not fetched again after a restart
-    if (missing.length) await this.writeBookmark().catch(() => {})
-  }
-
-  /** Pull a little later (after live changes settle) so the bookmark moves forward. */
-  private schedulePull(ms: number) {
-    if (this.catchUpTimer) clearTimeout(this.catchUpTimer)
-    this.catchUpTimer = setTimeout(() => {
-      this.catchUpTimer = null
-      if (!this.stopped) void this.pull().catch(() => this.status('offline'))
-    }, ms)
-  }
-
-  // Rows from a pull move the bookmark; rows from the live channel don't (one could have been
-  // missed while reconnecting, and the next pull must still fetch it).
-  private async apply(r: Row, live = false) {
-    if (!live && r.id > this.lastId) this.lastId = r.id
-    if (this.seen.has(r.id)) return
-    if (live) this.seen.add(r.id)
+  private async apply(r: Row) {
+    if (r.id > this.lastId) this.lastId = r.id
     const c = this.perDocCount.get(r.doc_id) ?? { n: 0, maxId: 0, at: 0 }
     c.n++
     c.maxId = Math.max(c.maxId, r.id)
@@ -324,21 +289,15 @@ export class SyncEngine {
         /* malformed update: skip */
       }
     }
-    this.recent.add(r.id)
-    if (!live) this.saveLast()
+    this.saveLast()
   }
 
   private saveLast() {
     if (this.saveTimer) return
     this.saveTimer = setTimeout(() => {
       this.saveTimer = null
-      void this.writeBookmark().catch(() => {})
+      void kvSet(bookmarkKey(this.wsId), this.lastId).catch(() => {})
     }, 800)
-  }
-
-  private async writeBookmark() {
-    await kvSet(`sync:last:${this.wsId}`, this.lastId)
-    await kvSet(`sync:recent:${this.wsId}`, [...this.recent].filter((id) => id > this.lastId - 2 * RECHECK_WINDOW))
   }
 
   /** Squash long histories into one update so new devices download less. Only for a document that
@@ -346,60 +305,66 @@ export class SyncEngine {
    *  that another device is writing at that very moment must not be among them. */
   private async compact() {
     if (this.role === 'viewer') return
-    let checked = false
     for (const [docId, c] of this.perDocCount) {
       if (c.n < 150 || Date.now() - c.at < COMPACT_QUIET) continue
-      if (!checked) {
-        // Look behind the bookmark once more right now; a row found there resets the quiet time
-        checked = true
-        this.lastRecheck = 0
-        await this.recheck()
-        if (Date.now() - c.at < COMPACT_QUIET) continue
-      }
       const doc = await getDoc(docId.startsWith('ws:') ? `ws:${this.wsId}` : docId)
-      const { error } = await this.sb.rpc('compact_doc', { ws: this.wsId, doc: docId, upto: c.maxId, merged: toB64(Y.encodeStateAsUpdate(doc)) })
-      if (!error) this.perDocCount.delete(docId)
+      await api(`/workspaces/${this.wsId}/compact`, { body: { doc: docId, upto: c.maxId, merged: toB64(Y.encodeStateAsUpdate(doc)) }, timeout: 120_000 })
+      this.perDocCount.delete(docId)
     }
   }
 
-  private subscribe() {
-    const ch = this.sb.channel(`ws-${this.wsId}`, { config: { presence: { key: this.clientId } } })
-    ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'doc_updates', filter: `workspace_id=eq.${this.wsId}` }, (payload) => {
-      const row = payload.new as Partial<Row>
-      // Very large rows arrive without their data: fetch them normally
-      if (typeof row?.id !== 'number' || typeof row.data !== 'string') return this.schedulePull(200)
-      void this.apply(row as Row, true)
-      this.schedulePull(5000)
-    })
-    // Someone changed the members (a role, a removal): let the session re-check
-    ch.on('postgres_changes', { event: '*', schema: 'public', table: 'members', filter: `workspace_id=eq.${this.wsId}` }, () => {
-      this.onMembersChanged()
-    })
-    ch.on('presence', { event: 'sync' }, () => {
-      const state = ch.presenceState<PresenceUser>()
-      const users: PresenceUser[] = []
-      Object.values(state).forEach((list) => list.forEach((u) => users.push(u)))
-      this.onPresence(users)
-    })
-    ch.subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
-        this.live = true
-        this.startPolling(60000) // light catch-up while live
-        void ch.track(this.me)
-        // catch anything that landed while we were connecting
-        void this.pull().catch(() => this.status('offline'))
-      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-        // the live channel retries by itself; meanwhile fall back to checking periodically
-        this.live = false
-        this.startPolling(20000)
+  /** While the app is on screen: wait on the server for the next change, then fetch it. */
+  private async loop() {
+    if (this.looping) return
+    this.looping = true
+    let failures = 0
+    try {
+      while (!this.stopped) {
+        if (document.visibilityState !== 'visible' || !navigator.onLine) {
+          this.live = false
+          if (!navigator.onLine) this.status('offline')
+          await new Promise<void>((r) => (this.wake = r))
+          this.wake = null
+          continue
+        }
+        this.waiting = new AbortController()
+        try {
+          const q = new URLSearchParams({ after: String(this.lastId), v: String(this.version), client: this.clientId, name: this.me.name, page: this.me.pageId ?? '', color: this.me.color })
+          const r = await api<WaitResult>(`/workspaces/${this.wsId}/wait?${q}`, { signal: this.waiting.signal, timeout: 45_000 })
+          failures = 0
+          this.live = true
+          if (this.version !== -1 && r.version !== this.version) this.onMembersChanged()
+          this.version = r.version
+          this.onPresence(
+            r.presence
+              .filter((p) => p.client_id !== this.clientId)
+              .map((p) => ({ userId: p.user_id, name: p.name ?? '', pageId: p.page_id, color: p.color || COLORS[0] })),
+          )
+          if (r.latest > this.lastId) await this.pull()
+          else this.status('synced')
+        } catch (err) {
+          if (this.stopped) break
+          if (err instanceof ApiError && err.code === 'aborted') continue // hidden, or the page changed
+          if (this.denied(err)) break
+          this.live = false
+          failures++
+          this.status('offline')
+          // Back off, but keep trying (and come back at once when the network does)
+          await Promise.race([sleep(Math.min(30_000, 1500 * 2 ** Math.min(failures, 5))), new Promise<void>((r) => (this.wake = r))])
+          this.wake = null
+        } finally {
+          this.waiting = null
+        }
       }
-    })
-    this.channel = ch
+    } finally {
+      this.looping = false
+    }
   }
 
   setPage(pageId: string | null) {
+    if (this.me.pageId === pageId) return
     this.me = { ...this.me, pageId }
-    if (this.channel) void this.channel.track(this.me)
+    this.waiting?.abort() // tell the others now, not at the next round
   }
 
   /** Every row of one document, whatever the bookmark says: for a page deleted for good on this
@@ -408,16 +373,7 @@ export class SyncEngine {
     const doc = await getDoc(docId)
     let after = 0
     for (;;) {
-      const { data, error } = await this.sb
-        .from('doc_updates')
-        .select('id, doc_id, data, client_id')
-        .eq('workspace_id', this.wsId)
-        .eq('doc_id', docId)
-        .gt('id', after)
-        .order('id', { ascending: true })
-        .limit(200)
-      if (error) throw error
-      const rows = (data ?? []) as Row[]
+      const { rows, more } = await api<{ rows: Row[]; more: boolean }>(`/workspaces/${this.wsId}/updates?doc=${encodeURIComponent(docId)}&after=${after}`, { timeout: 120_000 })
       for (const r of rows) {
         try {
           applyOutside(docId, doc, fromB64(r.data), ORIGIN_REMOTE)
@@ -426,7 +382,7 @@ export class SyncEngine {
         }
         after = r.id
       }
-      if (rows.length < 200) break
+      if (!more || !rows.length) break
     }
   }
 
