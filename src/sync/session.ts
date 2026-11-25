@@ -1,9 +1,12 @@
 // Accounts, workspaces, invitations and the sync engine's lifecycle.
-import { isAuthRetryableFetchError, type User } from '@supabase/supabase-js'
+//
+// An account has no e-mail or password: the first device starts it, and every other device joins
+// it with a one-time link code made on a device that already belongs (or with the account's
+// recovery key). A linked device stays linked until it is unlinked; nothing expires.
 import * as Y from 'yjs'
 import { create } from 'zustand'
 import { setAssetUploadHook, setRemoteAssetResolver } from '../data/assets'
-import { getAsset, kvGet, kvSet, outboxAll, outboxClearWorkspace, putAsset, wipeAll } from '../data/idb'
+import { allDocIds, getAsset, kvGet, kvSet, loadUpdates, outboxAll, outboxClearWorkspace, putAsset, wipeAll } from '../data/idb'
 import { flushWrites, getDoc, hasUnsaved, resetDocs } from '../data/docs'
 import { anyRevived, forgetPurged, purgedDocs } from '../data/purged'
 import { takeSnapshot } from '../data/snapshots'
@@ -13,12 +16,16 @@ import { wipeVault } from '../data/vault'
 import { useStore } from '../data/store'
 import { getActor, setActor } from '../data/workspace'
 import { setServerAi } from '../ai/client'
-import { SyncEngine, workspaceDocIds, type PresenceUser, type Role } from './engine'
-import { SUPABASE_KEY, SUPABASE_URL } from './config'
-import { AUTH_STORAGE_KEY, supa, toB64 } from './supabase'
+import { isNative } from '../lib/platform'
+import { bookmarkKey, SyncEngine, workspaceDocIds, type PresenceUser, type Role } from './engine'
+import { api, ApiError, loadCredentials, saveCredentials, toB64, type Credentials } from './api'
+import { apiBase, syncAvailable } from './config'
 import { t } from '../lib/i18n'
-import { askConfirm } from '../ui/dialogs'
-import { takeAuthRedirect } from '../data/authLink'
+
+export interface SyncUser {
+  id: string
+  name: string
+}
 
 export interface WorkspaceInfo {
   id: string
@@ -34,7 +41,7 @@ export interface Member {
 }
 
 interface SessionState {
-  user: User | null
+  user: SyncUser | null
   role: Role | null
   workspaces: WorkspaceInfo[]
   presence: PresenceUser[]
@@ -46,94 +53,41 @@ export const useSession = create<SessionState>(() => ({ user: null, role: null, 
 let engine: SyncEngine | null = null
 export const getEngine = () => engine
 
-function displayName(user: User): string {
-  const s = useStore.getState().settings
-  return s.userName || (user.user_metadata?.name as string) || user.email?.split('@')[0] || ''
+// Flags kept on the device for each workspace ("cf": this server; "sync:" ones are the old server's)
+const LINKED = (ws: string) => `cf:linked:${ws}`
+const ROLE = (ws: string) => `cf:role:${ws}`
+const OWNER = (ws: string) => `cf:owner:${ws}`
+
+function displayName(user: SyncUser): string {
+  return useStore.getState().settings.userName || user.name || ''
+}
+
+/** What this device is called in the account's list of devices. */
+export function deviceLabel(): string {
+  const ua = navigator.userAgent
+  const os = /Android/i.test(ua) ? 'Android' : /iPhone|iPad/i.test(ua) ? 'iOS' : /Windows/i.test(ua) ? 'Windows' : /Mac OS/i.test(ua) ? 'Mac' : /Linux/i.test(ua) ? 'Linux' : ''
+  if (isNative()) return `${os || 'Android'} · ${t('appName')}`
+  const browser = /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera' : /Firefox\//.test(ua) ? 'Firefox' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : ''
+  return [os, browser].filter(Boolean).join(' · ') || t('thisDevice')
 }
 
 /** Called once after the local workspace is open. */
 export async function initSync() {
-  const sb = supa()
-  if (!sb) return
-  sb.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_OUT') {
-      useSession.setState({ user: null, role: null, workspaces: [] })
-      return
-    }
-    // A sign-in link is being checked: nothing connects until it passes (see applyAuthLink)
-    if (checkingLink) return
-    if (event === 'PASSWORD_RECOVERY') {
-      // Arrived from a "reset password" email: go straight to choosing a new one
-      setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'account' }))
-        useStore.getState().toast(t('setNewPassword'))
-      }, 400)
-    }
-    if (session?.user && useSession.getState().user?.id !== session.user.id) void connectOnce(session.user)
-  })
-  await applyAuthLink()
-  const { data } = await sb.auth.getSession()
-  if (data.session?.user) await connectOnce(data.session.user)
+  if (!syncAvailable()) return
+  const c = loadCredentials()
+  if (c) await connectOnce(c.account)
 }
 
-let checkingLink = false
-
-/** A sign-in link from an e-mail (password reset): show whose account it is and ask first. */
-async function applyAuthLink() {
-  const link = takeAuthRedirect()
-  if (!link) return
-  const sb = supa()!
-  const fail = () => useStore.getState().toast(t('authLinkFailed'))
-  if (link.get('error_description') || link.get('error')) return fail()
-  const access_token = link.get('access_token')
-  const refresh_token = link.get('refresh_token')
-  if (!access_token || !refresh_token) return
-  checkingLink = true
-  try {
-    // Anyone can write a link: the server says whose token it is (it checks the signature and the
-    // expiry). A fake or expired token stops here; supabase-js would otherwise sign in with the
-    // link's refresh token, which can belong to a different account than the one shown.
-    const { data: owner, error: ownerError } = await sb.auth.getUser(access_token)
-    if (ownerError && isAuthRetryableFetchError(ownerError)) return useStore.getState().toast(t('authLinkOffline'))
-    if (ownerError || !owner.user) return fail()
-    const ok = await askConfirm(t('authLinkConfirm', { email: owner.user.email || '—' }), { confirmLabel: t('signIn') })
-    if (!ok) return
-    const { data, error } = await sb.auth.setSession({ access_token, refresh_token })
-    if (error || data.user?.id !== owner.user.id) {
-      // Signed into some other account after all: leave it before anything is shared with it
-      if (!error) await sb.auth.signOut({ scope: 'local' })
-      return fail()
-    }
-  } finally {
-    checkingLink = false
-  }
-  if (link.get('type') === 'recovery') {
-    // Arrived from a "reset password" email: go straight to choosing a new one
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'account' }))
-      useStore.getState().toast(t('setNewPassword'))
-    }, 400)
-  }
-}
-
-// The initial session is reported twice (auth event + getSession); connect only once per user.
 let connecting: { userId: string; done: Promise<void> } | null = null
-function connectOnce(user: User): Promise<void> {
+function connectOnce(user: SyncUser): Promise<void> {
   if (connecting?.userId === user.id) return connecting.done
   const done = connect(user)
   connecting = { userId: user.id, done }
   return done
 }
 
-async function loadWorkspaces(userId: string): Promise<WorkspaceInfo[]> {
-  const sb = supa()!
-  const { data, error } = await sb.from('members').select('workspace_id, role, workspaces(name)').eq('user_id', userId)
-  if (error) throw error
-  return ((data ?? []) as unknown as { workspace_id: string; role: Role; workspaces: { name: string } | null }[]).map((r) => ({
-    id: r.workspace_id,
-    name: r.workspaces?.name ?? '',
-    role: r.role,
-  }))
+async function loadWorkspaces(): Promise<WorkspaceInfo[]> {
+  return (await api<{ workspaces: WorkspaceInfo[] }>('/workspaces')).workspaces
 }
 
 function setRole(role: Role | null) {
@@ -141,54 +95,42 @@ function setRole(role: Role | null) {
   useStore.setState({ wsRole: role })
 }
 
-async function connect(user: User) {
-  const sb = supa()!
+async function connect(user: SyncUser) {
   const w = useStore.getState().ws
   if (!w) return
   const name = displayName(user)
-  // Favorites saved before signing in move to the account
-  const localFavs = w.favorites('local')
-  setActor({ id: user.id, name })
-  void kvSet('sync:user', { id: user.id, name })
-  if (localFavs.length) {
-    localFavs.forEach((f) => {
+  // Favorites saved before linking (or under the old server's account) move to this account
+  const before = await kvGet<SyncUser>('sync:user')
+  for (const from of ['local', before && before.id !== user.id ? before.id : '']) {
+    if (!from) continue
+    const favs = w.favorites(from)
+    favs.forEach((f) => {
       if (!w.favorites(user.id).includes(f)) w.toggleFavorite(user.id, f)
     })
-    w.prefs.delete('local')
+    if (favs.length) w.prefs.delete(from)
   }
+  setActor({ id: user.id, name })
+  void kvSet('sync:user', { id: user.id, name })
   useStore.setState({ favorites: w.favorites(user.id) })
   useSession.setState({ user })
 
   // A workspace this device already syncs starts right away (offline too); the role is re-checked after
-  const linked = await kvGet<boolean>(`sync:linked:${w.id}`)
-  const knownRole = await kvGet<Role>(`sync:role:${w.id}`)
+  const linked = await kvGet<boolean>(LINKED(w.id))
+  const knownRole = await kvGet<Role>(ROLE(w.id))
   if (linked && knownRole) {
     setRole(knownRole)
     await startEngine(user, knownRole, false)
     void refreshMembership(user)
+    void carryOverOthers()
     return
   }
 
   let workspaces: WorkspaceInfo[]
   try {
-    workspaces = await loadWorkspaces(user.id)
-  } catch {
-    // No connection for the first link: try again when it's back, and every minute meanwhile
-    // (the device can be online while the server is not)
-    useStore.setState({ syncStatus: 'offline' })
-    let done = false
-    const retry = () => {
-      if (done) return
-      done = true
-      clearTimeout(timer)
-      window.removeEventListener('online', retry)
-      if (useSession.getState().user?.id !== user.id) return // signed out meanwhile
-      connecting = null
-      void connectOnce(user)
-    }
-    const timer = setTimeout(retry, 60_000)
-    window.addEventListener('online', retry)
-    return
+    workspaces = await loadWorkspaces()
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 401) return unlinkedElsewhere()
+    return retryLater(user)
   }
   // The first link changes where this device's pages live: keep a restore point of them as they are
   if (!w.isPristine()) await takeSnapshot('before-signin')
@@ -196,8 +138,16 @@ async function connect(user: User) {
   let upload = false
 
   if (!role) {
-    const linkedTo = await kvGet<string>(`sync:owner:${w.id}`)
-    if (workspaces.length && !linkedTo) {
+    const carried = await carriedOver(w.id)
+    if (carried === 'shared') {
+      // Shared with this person on the old server by someone else: that person shares it again
+      setRole(null)
+      useStore.setState({ syncStatus: 'local' })
+      useStore.getState().toast(t('sharedNeedsNewInvite'), undefined, 15000)
+      void carryOverOthers()
+      return
+    }
+    if (workspaces.length && !carried && !(await kvGet(OWNER(w.id)))) {
       // The account already has pages: bring this device's own pages into the main workspace
       const target = workspaces.find((x) => x.role === 'owner') ?? workspaces[0]
       try {
@@ -210,15 +160,21 @@ async function connect(user: User) {
       await switchWorkspace(target.id)
       return
     }
-    const { error } = await sb.rpc('create_workspace', { ws: w.id, ws_name: (w.meta.get('name') as string) || '', my_name: name })
-    if (error) {
-      useStore.setState({ syncStatus: 'local' })
-      return
+    // A new workspace, or one this device synced with the old server: it goes up as it is
+    try {
+      role = (await api<{ role: Role }>('/workspaces', { body: { id: w.id, name: (w.meta.get('name') as string) || '', my_name: name } })).role
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 403) {
+        // The same workspace belongs to another account (both devices started their own account)
+        useStore.setState({ syncStatus: 'local' })
+        useStore.getState().toast(t('wsOtherAccount'), { label: t('relinkShort'), run: () => window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'account' })) }, 30000)
+        return
+      }
+      return retryLater(user)
     }
-    role = 'owner'
-    upload = true
-    await kvSet(`sync:owner:${w.id}`, user.id)
-    workspaces = await loadWorkspaces(user.id).catch(() => workspaces)
+    upload = role !== 'viewer'
+    await kvSet(OWNER(w.id), user.id)
+    workspaces = await loadWorkspaces().catch(() => workspaces)
   } else {
     upload = role !== 'viewer' && !w.isPristine()
   }
@@ -226,6 +182,79 @@ async function connect(user: User) {
   useSession.setState({ workspaces })
   setRole(role)
   await startEngine(user, role, upload)
+  void carryOverOthers()
+}
+
+/** No connection for the first link: try again when it's back, and every minute meanwhile. */
+function retryLater(user: SyncUser) {
+  useStore.setState({ syncStatus: 'offline' })
+  let done = false
+  const retry = () => {
+    if (done) return
+    done = true
+    clearTimeout(timer)
+    window.removeEventListener('online', retry)
+    if (useSession.getState().user?.id !== user.id) return // unlinked meanwhile
+    connecting = null
+    void connectOnce(user)
+  }
+  const timer = setTimeout(retry, 60_000)
+  window.addEventListener('online', retry)
+}
+
+/** Was this workspace synced with the old server (before the move to this one)? As whose? */
+async function carriedOver(wsId: string): Promise<'own' | 'shared' | null> {
+  if (!(await kvGet(`sync:linked:${wsId}`))) return null
+  return (await kvGet<string>(`sync:role:${wsId}`)) === 'owner' ? 'own' : 'shared'
+}
+
+let carrying = false
+/** Other workspaces on this device that the old server synced (this account's own): they go up
+ *  too, read straight from storage, so the account has every one of them. */
+async function carryOverOthers() {
+  if (carrying) return
+  carrying = true
+  try {
+    const current = useStore.getState().ws?.id
+    const stored = await allDocIds()
+    const name = getActor().name
+    for (const docId of stored) {
+      if (!docId.startsWith('ws:')) continue
+      const wsId = docId.slice(3)
+      if (wsId === current || (await kvGet(LINKED(wsId))) || (await carriedOver(wsId)) !== 'own') continue
+      const merged = await storedState(docId)
+      if (!merged) continue
+      const doc = new Y.Doc()
+      Y.applyUpdate(doc, merged)
+      const pages = [...doc.getMap('pages').keys()].map((id) => `pg:${id}`).filter((d) => stored.includes(d))
+      const role = (await api<{ role: Role }>('/workspaces', { body: { id: wsId, name: (doc.getMap('meta').get('name') as string) || '', my_name: name } })).role
+      if (role === 'viewer') continue
+      let rows: { doc: string; data: string }[] = [{ doc: docId, data: toB64(merged) }]
+      for (const d of pages) {
+        const state = await storedState(d)
+        if (state) rows.push({ doc: d, data: toB64(state) })
+        if (rows.length >= 10) {
+          await api(`/workspaces/${wsId}/updates`, { body: { rows }, timeout: 120_000 })
+          rows = []
+        }
+      }
+      if (rows.length) await api(`/workspaces/${wsId}/updates`, { body: { rows }, timeout: 120_000 })
+      await kvSet(LINKED(wsId), true)
+      await kvSet(ROLE(wsId), role)
+      await kvSet(OWNER(wsId), getActor().id)
+    }
+    useSession.setState({ workspaces: await loadWorkspaces() })
+  } catch {
+    /* tried again at the next start */
+  } finally {
+    carrying = false
+  }
+}
+
+async function storedState(docId: string): Promise<Uint8Array | null> {
+  const list = await loadUpdates(docId)
+  if (!list.length) return null
+  return list.length === 1 ? list[0].update : Y.mergeUpdates(list.map((u) => u.update))
 }
 
 let hooksReady = false
@@ -256,17 +285,20 @@ async function refetchRevived() {
   if (failed) refetchSoon(60_000) // offline or the server failed: again in a minute
 }
 
-async function startEngine(user: User, role: Role, upload: boolean) {
-  const sb = supa()!
+async function startEngine(user: SyncUser, role: Role, upload: boolean) {
   const w = useStore.getState().ws!
   const name = displayName(user)
   engine?.stop()
   if (role === 'viewer') await outboxClearWorkspace(w.id) // a viewer's edits can't be sent (other workspaces' stay queued)
-  engine = new SyncEngine(sb, w.id, role, { id: user.id, name })
+  engine = new SyncEngine(w.id, role, { id: user.id, name })
   engine.onPresence = (users) => useSession.setState({ presence: users.filter((u) => u.userId !== user.id) })
   engine.onMembersChanged = () => void refreshMembership(user)
-  await kvSet(`sync:linked:${w.id}`, true)
-  await kvSet(`sync:role:${w.id}`, role)
+  engine.onDenied = (err) => {
+    if (err.status === 401) void unlinkedElsewhere()
+    else void refreshMembership(user)
+  }
+  await kvSet(LINKED(w.id), true)
+  await kvSet(ROLE(w.id), role)
   await engine.start({ upload })
   const route = useStore.getState().route
   engine.setPage(route.name === 'page' ? route.id : null)
@@ -284,18 +316,21 @@ async function startEngine(user: User, role: Role, upload: boolean) {
   // Images: upload new ones, fetch missing ones on demand
   setAssetUploadHook((id, blob) => void uploadAsset(w.id, id, blob))
   setRemoteAssetResolver(async (id) => {
-    const { data } = await sb.storage.from('assets').download(`${w.id}/${id}`)
-    if (!data) return null
-    await putAsset({ id, blob: data, type: data.type, createdAt: Date.now() })
-    return URL.createObjectURL(data)
+    try {
+      const blob = await api<Blob>(`/workspaces/${w.id}/assets/${encodeURIComponent(id)}`, { blob: true, timeout: 60_000 })
+      await putAsset({ id, blob, type: blob.type, createdAt: Date.now() })
+      return URL.createObjectURL(blob)
+    } catch {
+      return null
+    }
   })
-  // Assistant through the server for signed-in users without a personal key
+  // The writing assistant through the server, for linked devices without a personal key
   setServerAi(async (body, signal) => {
-    const { data } = await sb.auth.getSession()
-    return fetch(`${SUPABASE_URL}/functions/v1/ai`, {
+    const base = apiBase() ?? ''
+    return fetch(`${base}/ai`, {
       method: 'POST',
       signal,
-      headers: { 'content-type': 'application/json', authorization: `Bearer ${data.session?.access_token ?? ''}`, apikey: SUPABASE_KEY },
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${loadCredentials()?.token ?? ''}` },
       body: JSON.stringify(body),
     })
   })
@@ -304,13 +339,14 @@ async function startEngine(user: User, role: Role, upload: boolean) {
 }
 
 /** Re-read this account's workspaces; follow role changes and removals. */
-async function refreshMembership(user: User) {
+async function refreshMembership(user: SyncUser) {
   const w = useStore.getState().ws
   if (!w) return
   let list: WorkspaceInfo[]
   try {
-    list = await loadWorkspaces(user.id)
-  } catch {
+    list = await loadWorkspaces()
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 401) void unlinkedElsewhere()
     return
   }
   useSession.setState({ workspaces: list })
@@ -323,8 +359,8 @@ async function refreshMembership(user: User) {
     // Removed from this workspace (or it was deleted)
     engine?.stop()
     engine = null
-    await kvSet(`sync:linked:${w.id}`, false)
-    await kvSet(`sync:role:${w.id}`, null)
+    await kvSet(LINKED(w.id), false)
+    await kvSet(ROLE(w.id), null)
     useStore.getState().toast(t('removedFromWorkspace'))
     const next = list.find((x) => x.role === 'owner') ?? list[0]
     await switchWorkspace(next ? next.id : crypto.randomUUID(), !!next)
@@ -334,11 +370,29 @@ async function refreshMembership(user: User) {
   await startEngine(user, role, false)
 }
 
+/** This device was removed from the account (on another device): it stops syncing and says so.
+ *  Its pages stay here; linking it again brings them back together. */
+async function unlinkedElsewhere() {
+  if (!loadCredentials()) return
+  engine?.stop()
+  engine = null
+  saveCredentials(null)
+  connecting = null
+  const w = useStore.getState().ws
+  if (w) {
+    await kvSet(LINKED(w.id), false)
+    await kvSet(ROLE(w.id), null)
+  }
+  setRole(null)
+  useSession.setState({ user: null, workspaces: [], presence: [] })
+  useStore.setState({ syncStatus: 'local' })
+  useStore.getState().toast(t('deviceUnlinked'), { label: t('linkAgain'), run: () => window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'account' })) }, 20000)
+}
+
 async function uploadAsset(wsId: string, id: string, blob: Blob) {
-  const sb = supa()
-  if (!sb) return
-  const { error } = await sb.storage.from('assets').upload(`${wsId}/${id}`, blob, { upsert: true, contentType: blob.type })
-  if (error) {
+  try {
+    await api(`/workspaces/${wsId}/assets/${encodeURIComponent(id)}`, { method: 'PUT', raw: blob, timeout: 120_000 })
+  } catch {
     const list = (await kvGet<string[]>('sync:pendingAssets')) ?? []
     if (!list.includes(id)) await kvSet('sync:pendingAssets', [...list, id])
   }
@@ -356,7 +410,6 @@ async function uploadPendingAssets(wsId: string) {
 
 /** Copy this device's workspace into another workspace (used when an account already has pages). */
 async function mergeLocalInto(targetId: string) {
-  const sb = supa()!
   const w = useStore.getState().ws!
   // Untouched starter pages stay behind, so the account doesn't get a second copy of them
   const starters = [...w.pages.keys()].filter(
@@ -368,12 +421,9 @@ async function mergeLocalInto(targetId: string) {
   const rows = []
   for (const docId of ids) {
     const doc = await getDoc(docId)
-    rows.push({ workspace_id: targetId, doc_id: docId.startsWith('ws:') ? `ws:${targetId}` : docId, data: toB64(Y.encodeStateAsUpdate(doc)) })
+    rows.push({ doc: docId.startsWith('ws:') ? `ws:${targetId}` : docId, data: toB64(Y.encodeStateAsUpdate(doc)) })
   }
-  for (let i = 0; i < rows.length; i += 25) {
-    const { error } = await sb.from('doc_updates').insert(rows.slice(i, i + 25))
-    if (error) throw error
-  }
+  for (let i = 0; i < rows.length; i += 10) await api(`/workspaces/${targetId}/updates`, { body: { rows: rows.slice(i, i + 10) }, timeout: 120_000 })
 }
 
 export async function switchWorkspace(id: string, remote = true) {
@@ -389,33 +439,86 @@ export async function switchWorkspace(id: string, remote = true) {
   location.reload()
 }
 
-// ---------------- auth
+// ---------------- the account and its devices
 
-export async function signIn(email: string, password: string) {
-  const { error } = await supa()!.auth.signInWithPassword({ email, password })
-  if (error) throw error
+function linked(c: Credentials) {
+  saveCredentials(c)
+  connecting = null
+  void connectOnce(c.account)
 }
 
-export async function signUp(email: string, password: string, name: string) {
-  const { data, error } = await supa()!.auth.signUp({ email, password, options: { data: { name } } })
-  if (error) throw error
-  return { needsConfirm: !data.session }
+/** Start syncing: a new account with this device in it. Returns the recovery key (shown once). */
+export async function startAccount(name: string): Promise<string> {
+  const r = await api<Credentials & { recovery: string }>('/account', { body: { name, label: deviceLabel() } })
+  linked({ token: r.token, account: { id: r.account.id, name: r.account.name } })
+  return r.recovery
 }
 
-export async function resetPassword(email: string) {
-  // The link in the email opens the web app (inside the Android app there's no address to return to,
-  // so Supabase falls back to the Site URL).
-  const base = appBaseUrl()
-  const { error } = await supa()!.auth.resetPasswordForEmail(email, base ? { redirectTo: `${base}/` } : undefined)
-  if (error) throw error
+/** Join the account of another device with the code it shows. */
+export async function linkWithCode(code: string) {
+  const r = await api<Credentials>('/link/claim', { body: { code, label: deviceLabel() } })
+  linked({ token: r.token, account: { id: r.account.id, name: r.account.name } })
 }
 
-export async function updatePassword(password: string) {
-  const { error } = await supa()!.auth.updateUser({ password })
-  if (error) throw error
+/** Move this linked device to another account (it was linked to the wrong one): its pages stay and
+ *  go up to the other account, which gets them merged with its own. */
+export async function relinkWithCode(code: string) {
+  const r = await api<Credentials>('/link/claim', { body: { code, label: deviceLabel() } })
+  // The old account forgets this device (the new link is already made; if this fails it only lingers)
+  await api('/signout', { method: 'POST', timeout: 8000 }).catch(() => {})
+  engine?.stop()
+  engine = null
+  const w = useStore.getState().ws
+  if (w) {
+    await kvSet(LINKED(w.id), false)
+    await kvSet(ROLE(w.id), null)
+    await kvSet(OWNER(w.id), null)
+    await kvSet(bookmarkKey(w.id), 0)
+  }
+  setRole(null)
+  useSession.setState({ user: null, workspaces: [], presence: [] })
+  linked({ token: r.token, account: { id: r.account.id, name: r.account.name } })
 }
 
-/** Is there work on this device that the account doesn't have yet? Signing out would delete it. */
+/** Join an account with its recovery key (when none of its devices is at hand). */
+export async function linkWithRecoveryKey(key: string) {
+  const r = await api<Credentials>('/recover', { body: { key, label: deviceLabel() } })
+  linked({ token: r.token, account: { id: r.account.id, name: r.account.name } })
+}
+
+/** A one-time code for linking another device (valid a few minutes). */
+export async function makeLinkCode(): Promise<{ code: string; expires_at: number }> {
+  return api('/link', { method: 'POST' })
+}
+
+export interface DeviceInfo {
+  id: string
+  label: string
+  created_at: number
+  seen_at: number
+  current: boolean
+}
+
+export async function accountDevices(): Promise<DeviceInfo[]> {
+  return (await api<{ devices: DeviceInfo[] }>('/account')).devices
+}
+
+export async function removeDevice(id: string) {
+  await api(`/devices/${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+/** A new recovery key; the old one stops working. */
+export async function newRecoveryKey(): Promise<string> {
+  return (await api<{ recovery: string }>('/account/recovery', { method: 'POST' })).recovery
+}
+
+export async function renameAccount(name: string) {
+  await api('/account', { method: 'PATCH', body: { name } })
+  const c = loadCredentials()
+  if (c) saveCredentials({ ...c, account: { ...c.account, name } })
+}
+
+/** Is there work on this device that the account doesn't have yet? Unlinking would delete it. */
 export async function hasUnsyncedWork(): Promise<boolean> {
   await flushWrites()
   if (hasUnsaved()) return true
@@ -425,33 +528,21 @@ export async function hasUnsyncedWork(): Promise<boolean> {
     if ((await outboxAll()).length) return true
     if (((await kvGet<string[]>('sync:pendingAssets')) ?? []).length) return true
     const w = useStore.getState().ws
-    // Signed in, but this device's pages never reached the account (no connection at the first link)
-    if (w && !w.isPristine() && !(await kvGet(`sync:linked:${w.id}`))) return true
+    // Linked, but this device's pages never reached the account (no connection at the first link)
+    if (w && !w.isPristine() && !(await kvGet(LINKED(w.id)))) return true
   } catch {
     return true // can't tell: treat it as unsynced
   }
   return false
 }
 
-/** Sign out and clear this device, so the next person starts fresh. */
+/** Unlink this device and clear it, so the next person starts fresh. */
 export async function signOut() {
   engine?.stop()
   engine = null
-  const sb = supa()
-  if (sb) {
-    await sb.auth.signOut().catch(() => {})
-    // Without a connection the library keeps the session; signing out must still work on this device
-    const { data } = await sb.auth.getSession().catch(() => ({ data: { session: null } }))
-    if (data.session) {
-      try {
-        Object.keys(localStorage)
-          .filter((k) => k.startsWith(AUTH_STORAGE_KEY))
-          .forEach((k) => localStorage.removeItem(k))
-      } catch {
-        /* ignore */
-      }
-    }
-  }
+  // The server forgets this device (if it can be reached; without a connection it is forgotten here)
+  await api('/signout', { method: 'POST', timeout: 8000 }).catch(() => {})
+  saveCredentials(null)
   resetDocs()
   await wipeAll()
   await wipeVault().catch(() => {})
@@ -463,20 +554,16 @@ export async function signOut() {
 }
 
 export async function deleteAccount() {
-  const sb = supa()!
-  const { error } = await sb.rpc('delete_my_account')
-  if (error) throw error
+  await api('/account', { method: 'DELETE' })
   await signOut()
 }
 
 // ---------------- workspaces & sharing
 
 export async function createWorkspace(name: string) {
-  const sb = supa()!
   const id = crypto.randomUUID()
-  const { error } = await sb.rpc('create_workspace', { ws: id, ws_name: name, my_name: getActor().name })
-  if (error) throw error
-  await kvSet(`sync:owner:${id}`, getActor().id)
+  await api('/workspaces', { body: { id, name, my_name: getActor().name } })
+  await kvSet(OWNER(id), getActor().id)
   // name the new workspace locally too
   const doc = await getDoc(`ws:${id}`)
   doc.getMap('meta').set('name', name)
@@ -484,72 +571,54 @@ export async function createWorkspace(name: string) {
 }
 
 export async function renameRemoteWorkspace(id: string, name: string) {
-  await supa()?.from('workspaces').update({ name }).eq('id', id)
+  await api(`/workspaces/${id}`, { method: 'PATCH', body: { name } }).catch(() => {})
 }
 
 export async function listMembers(wsId: string): Promise<Member[]> {
-  const { data } = await supa()!.from('members').select('user_id, role, display_name, email').eq('workspace_id', wsId)
-  return (data ?? []) as Member[]
+  return (await api<{ members: Member[] }>(`/workspaces/${wsId}/members`)).members
 }
 
 export async function setMemberRole(wsId: string, userId: string, role: Role) {
-  const { error } = await supa()!.from('members').update({ role }).eq('workspace_id', wsId).eq('user_id', userId)
-  if (error) throw error
+  await api(`/workspaces/${wsId}/members/${encodeURIComponent(userId)}`, { method: 'PATCH', body: { role } })
 }
 
-async function deleteMembership(wsId: string, userId: string) {
-  const { error } = await supa()!.from('members').delete().eq('workspace_id', wsId).eq('user_id', userId)
-  if (error) throw error
-}
-
-/** The owner removes someone. */
+/** The owner removes someone (their old invitation links stop working too). */
 export async function removeMember(wsId: string, userId: string) {
-  await deleteMembership(wsId, userId)
-  // Invitation links work for anyone who has them: a removed member could rejoin with an old one
-  await supa()!.from('invites').update({ revoked: true }).eq('workspace_id', wsId).eq('revoked', false)
+  await api(`/workspaces/${wsId}/members/${encodeURIComponent(userId)}`, { method: 'DELETE' })
 }
 
 export async function createInvite(wsId: string, role: 'editor' | 'viewer'): Promise<string> {
-  const { data, error } = await supa()!.from('invites').insert({ workspace_id: wsId, role, created_by: getActor().id }).select('token').single()
-  if (error) throw error
-  return (data as { token: string }).token
+  return (await api<{ token: string }>(`/workspaces/${wsId}/invites`, { body: { role } })).token
 }
 
 export interface Invite {
   token: string
   role: 'editor' | 'viewer'
   created_at: string
-  /** Set once migration 002 has run; links stop working after it. */
   expires_at?: string | null
 }
 
 export async function listInvites(wsId: string): Promise<Invite[]> {
-  // '*' rather than naming expires_at: the list keeps working before migration 002 adds that column
-  const { data } = await supa()!.from('invites').select('*').eq('workspace_id', wsId).eq('revoked', false).order('created_at', { ascending: false })
-  const now = Date.now()
-  return ((data ?? []) as Invite[]).filter((inv) => !inv.expires_at || Date.parse(inv.expires_at) > now)
+  return (await api<{ invites: Invite[] }>(`/workspaces/${wsId}/invites`)).invites
 }
 
 export async function revokeInvite(token: string) {
-  await supa()!.from('invites').update({ revoked: true }).eq('token', token)
+  await api(`/invites/${encodeURIComponent(token)}`, { method: 'DELETE' }).catch(() => {})
 }
 
 export async function inviteInfo(token: string) {
-  const { data } = await supa()!.rpc('invite_info', { invite_token: token })
-  const row = (data as { workspace_id: string; name: string; role: Role }[] | null)?.[0]
-  return row ?? null
+  return (await api<{ invite: { workspace_id: string; name: string; role: Role } | null }>(`/invites/${encodeURIComponent(token)}`)).invite
 }
 
 export async function acceptInvite(token: string) {
-  const { data, error } = await supa()!.rpc('accept_invite', { invite_token: token, my_name: getActor().name })
-  if (error) throw error
-  await switchWorkspace(data as string)
+  const { workspace_id } = await api<{ workspace_id: string }>(`/invites/${encodeURIComponent(token)}/accept`, { body: { name: getActor().name } })
+  await switchWorkspace(workspace_id)
 }
 
 export async function leaveWorkspace(wsId: string) {
   const user = useSession.getState().user
   if (!user) return
-  await deleteMembership(wsId, user.id)
+  await api(`/workspaces/${wsId}/members/${encodeURIComponent(user.id)}`, { method: 'DELETE' })
   const rest = useSession.getState().workspaces.filter((x) => x.id !== wsId)
   if (rest[0]) await switchWorkspace(rest[0].id)
 }

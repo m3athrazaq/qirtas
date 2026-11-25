@@ -1,5 +1,6 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Repeat as RepeatIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { describeRepeat, kindOf, REPEAT_KINDS, repeatFor, type Repeat, type RepeatKind } from '../data/recurring'
 import { useStore } from '../data/store'
 import { t } from '../lib/i18n'
 import {
@@ -19,9 +20,19 @@ interface Props {
   onChange: (iso: string | null) => void
   allowClear?: boolean
   footer?: React.ReactNode
+  /** A date in a task can repeat: the choice is shown under the month. */
+  repeat?: { value: Repeat | null; onChange: (r: Repeat | null) => void }
 }
 
-export function DatePicker({ value, onChange, allowClear = true, footer }: Props) {
+const KIND_LABEL: Record<RepeatKind, 'repeatDaily' | 'repeatWeekdays' | 'repeatWeekly' | 'repeatMonthly' | 'repeatYearly'> = {
+  daily: 'repeatDaily',
+  weekdays: 'repeatWeekdays',
+  weekly: 'repeatWeekly',
+  monthly: 'repeatMonthly',
+  yearly: 'repeatYearly',
+}
+
+export function DatePicker({ value, onChange, allowClear = true, footer, repeat }: Props) {
   const settings = useStore((s) => s.settings)
   const [system, setSystem] = useState<CalendarSystem>(settings.calendar)
   const [anchor, setAnchor] = useState(() => currentMonth(system, value ?? todayIso()))
@@ -37,6 +48,9 @@ export function DatePicker({ value, onChange, allowClear = true, footer }: Props
   const switchSystem = (s: CalendarSystem) => {
     setSystem(s)
     setAnchor(currentMonth(s, value ?? todayIso()))
+    // A monthly or yearly repeat follows the calendar the date is chosen in
+    const r = repeat?.value
+    if (r && (kindOf(r) === 'monthly' || kindOf(r) === 'yearly') && repeatFor(kindOf(r), s) !== r) repeat.onChange(repeatFor(kindOf(r), s))
   }
 
   return (
@@ -90,6 +104,28 @@ export function DatePicker({ value, onChange, allowClear = true, footer }: Props
           </button>
         )}
       </div>
+      {repeat && (
+        <div className="dc-repeat-row">
+          <div className="dc-repeat-head">
+            <RepeatIcon size={14} />
+            <span>{t('repeat')}</span>
+          </div>
+          <div className="dc-repeat-chips" role="radiogroup" aria-label={t('repeat')}>
+            <button type="button" role="radio" aria-checked={!repeat.value} className={'chip-btn' + (!repeat.value ? ' is-on' : '')} onClick={() => repeat.onChange(null)}>
+              {t('repeatNone')}
+            </button>
+            {REPEAT_KINDS.map((k) => {
+              const on = !!repeat.value && kindOf(repeat.value) === k
+              return (
+                <button type="button" key={k} role="radio" aria-checked={on} className={'chip-btn' + (on ? ' is-on' : '')} onClick={() => repeat.onChange(repeatFor(k, system))}>
+                  {t(KIND_LABEL[k])}
+                </button>
+              )
+            })}
+          </div>
+          <p className="dc-repeat-desc muted small">{repeat.value && value ? describeRepeat(repeat.value, value, settings) : t('repeatHint')}</p>
+        </div>
+      )}
     </div>
   )
 }

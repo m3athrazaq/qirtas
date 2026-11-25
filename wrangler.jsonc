@@ -1,10 +1,16 @@
-// Only used if the web app is deployed as a Cloudflare Worker with static assets
-// (Cloudflare Pages ignores this file and uses its own build settings).
+// Cloudflare Pages settings for the web app and its sync server (functions/api).
+// The D1 database keeps the accounts and every workspace's update log; the server creates its
+// tables on first use. Bindings set here replace the ones in the Pages dashboard (secrets, such as
+// ANTHROPIC_API_KEY for the writing assistant, stay in the dashboard).
 {
   "name": "qirtas",
+  "pages_build_output_dir": "./dist",
   "compatibility_date": "2026-10-01",
-  "assets": {
-    "directory": "./dist",
-    "not_found_handling": "single-page-application"
-  }
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "qirtas-sync",
+      "database_id": "ba786bd4-ceb4-4468-8423-612b7dcba268"
+    }
+  ]
 }

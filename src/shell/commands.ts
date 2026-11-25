@@ -29,6 +29,7 @@ export function listCommands(): Command[] {
     canEdit && cmd('capture', 'capture', () => runAction('capture'), alt('Q')),
     cmd('tasks', 'tasks', () => runAction('tasks'), alt('M')),
     canEdit && cmd('templates', 'templates', () => st.openModal('templates')),
+    canEdit && cmd('import', 'impTitle', () => st.openModal('import')),
     page && page.type !== 'database' && cmd('history', 'history', () => st.openHistory(page.id)),
     cmd('backup', 'backupExport', () =>
       void downloadBackup()

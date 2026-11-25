@@ -8,7 +8,7 @@ import { useStore } from '../data/store'
 import { dayOfPage, ensureDayPage } from '../data/today'
 import { addDays, formatGregorian, formatHijri, num } from '../lib/hijri'
 import { t } from '../lib/i18n'
-import { Group, useAgenda, useToday } from '../shell/TasksDialog'
+import { Group, Progress, useAgenda, useProgress, useToday } from '../shell/TasksDialog'
 
 export function DayPanel({ pageId }: { pageId: string }) {
   const day = dayOfPage(pageId)
@@ -17,6 +17,7 @@ export function DayPanel({ pageId }: { pageId: string }) {
   const numerals = useStore((s) => s.settings.numerals)
   const calendar = useStore((s) => s.settings.calendar)
   const agenda = useAgenda()
+  const progress = useProgress()
   if (!day) return null
   const rtl = lang === 'ar'
   const Prev = rtl ? ChevronRight : ChevronLeft
@@ -49,6 +50,7 @@ export function DayPanel({ pageId }: { pageId: string }) {
           {agenda.count > 0 && <span className="count">{num(agenda.count, numerals)}</span>}
         </button>
       </div>
+      {day === today && <Progress {...progress} />}
       {(overdue.length > 0 || due.length > 0) && (
         <div className="day-due">
           {overdue.length > 0 && <Group title={t('tasksOverdue')} items={overdue} onOpen={(i) => (i.kind === 'row' ? useStore.setState({ peek: i.pageId }) : navigate(i.pageId))} late />}

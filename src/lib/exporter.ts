@@ -2,10 +2,12 @@ import { MarkdownManager } from '@tiptap/markdown'
 import { yXmlFragmentToProsemirrorJSON } from '@tiptap/y-tiptap'
 import { getDoc, pageDocId } from '../data/docs'
 import { valueText, viewRows } from '../data/dbops'
+import { describeRepeat, isRepeat } from '../data/recurring'
 import { useStore } from '../data/store'
 import type { PageMeta } from '../data/types'
 import { schemaExtensions } from '../editor/ext'
 import { markdownHooks } from '../editor/ext/markdownHooks'
+import { cleanRef, refLabel } from '../quran/quran'
 import { compareOrder } from './ids'
 import { formatDual } from './hijri'
 import { t } from './i18n'
@@ -24,12 +26,18 @@ export function installMarkdownHooks() {
     const p = pages()[id]
     return `[${p?.icon ? p.icon + ' ' : ''}${p?.title || t('untitled')}](#/p/${id})`
   }
-  markdownHooks.date = (iso) => {
+  markdownHooks.date = (iso, repeat) => {
     if (!iso) return ''
     const s = useStore.getState().settings
-    return formatDual(iso, s.calendar, { lang: s.lang, numerals: s.numerals })
+    const date = formatDual(iso, s.calendar, { lang: s.lang, numerals: s.numerals })
+    return isRepeat(repeat) ? `${date} (🔁 ${describeRepeat(repeat, iso, s)})` : date
   }
   markdownHooks.database = (id) => databaseToMarkdown(id)
+  markdownHooks.quranRef = (surah, from, to) => {
+    const r = cleanRef(surah, from, to)
+    const s = useStore.getState().settings
+    return r ? refLabel(r, s.lang, s.numerals) : ''
+  }
 }
 
 function rowsOf(dbId: string): PageMeta[] {

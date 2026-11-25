@@ -1,9 +1,10 @@
 // "Tasks": every open task, reminder and dated row from all pages in one list, by day.
-import { Bell, CalendarDays, Table2 } from 'lucide-react'
+import { Bell, CalendarDays, Repeat as RepeatIcon, Table2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { buildAgenda, type Agenda, type AgendaItem } from '../data/agenda'
+import { buildAgenda, progressOf, type Agenda, type AgendaItem } from '../data/agenda'
 import { navigate } from '../data/nav'
 import { setTaskChecked, updateReminder, usePageIndex } from '../data/pageIndex'
+import { describeRepeat } from '../data/recurring'
 import { useStore } from '../data/store'
 import { formatGregorian, formatHijri, num, todayIso, WEEKDAYS_AR, WEEKDAYS_EN, weekday } from '../lib/hijri'
 import { t } from '../lib/i18n'
@@ -26,6 +27,27 @@ export function useAgenda(): Agenda {
   return useMemo(() => buildAgenda(entries, pages, today), [entries, pages, today])
 }
 
+/** Today's tasks done, of all of today's. */
+export function useProgress(): { done: number; total: number } {
+  const entries = usePageIndex((s) => s.entries)
+  const pages = useStore((s) => s.pages)
+  const today = useToday()
+  return useMemo(() => progressOf(entries, pages, today), [entries, pages, today])
+}
+
+export function Progress({ done, total }: { done: number; total: number }) {
+  const numerals = useStore((s) => s.settings.numerals)
+  if (!total) return null
+  return (
+    <div className="tasks-progress">
+      <div className="tp-bar" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done} aria-label={t('tasksProgress', { done: num(done, numerals), total: num(total, numerals) })}>
+        <span style={{ width: `${Math.round((100 * done) / total)}%` }} />
+      </div>
+      <span className="tp-text muted small">{t('tasksProgress', { done: num(done, numerals), total: num(total, numerals) })}</span>
+    </div>
+  )
+}
+
 type Tab = 'today' | 'upcoming' | 'all'
 
 export function TasksDialog() {
@@ -37,6 +59,7 @@ export function TasksDialog() {
 
 function TasksInner({ onClose }: { onClose: () => void }) {
   const agenda = useAgenda()
+  const progress = useProgress()
   const ready = usePageIndex((s) => s.ready)
   const settings = useStore((s) => s.settings)
   const [tab, setTab] = useState<Tab>('today')
@@ -65,6 +88,7 @@ function TasksInner({ onClose }: { onClose: () => void }) {
           </button>
         ))}
       </div>
+      {tab === 'today' && <Progress {...progress} />}
       <div className="tasks-body">
         {nothing && <div className="menu-empty">{ready ? t(tab === 'today' ? 'tasksNoneToday' : 'tasksNone') : t('loading')}</div>}
         {tab !== 'upcoming' && agenda.overdue.length > 0 && <Group title={t('tasksOverdue')} items={agenda.overdue} onOpen={open} late />}
@@ -103,7 +127,8 @@ function AgendaRow({ item, onOpen, hidePage }: { item: AgendaItem; onOpen: (i: A
     try {
       if (item.kind === 'task') {
         const ok = await setTaskChecked(item.pageId, item.n, item.text, true)
-        if (ok) toast(t('taskDone'), { label: t('undo'), run: () => void setTaskChecked(item.pageId, item.n, item.text, false) })
+        // A repeating task moves on to its next date a moment later, and says so itself
+        if (ok && !item.repeat) toast(t('taskDone'), { label: t('undo'), run: () => void setTaskChecked(item.pageId, item.n, item.text, false) })
       } else if (item.kind === 'reminder' && item.id) {
         const id = item.id
         const ok = await updateReminder(item.pageId, id, { done: true })
@@ -135,6 +160,11 @@ function AgendaRow({ item, onOpen, hidePage }: { item: AgendaItem; onOpen: (i: A
           {time && (
             <span className="task-time">
               <Bell size={12} /> {time}
+            </span>
+          )}
+          {item.kind === 'task' && item.repeat && item.day && (
+            <span className="task-repeat" title={describeRepeat(item.repeat, item.day, settings)}>
+              <RepeatIcon size={12} />
             </span>
           )}
           {item.kind === 'row' && <CalendarDays size={12} />}

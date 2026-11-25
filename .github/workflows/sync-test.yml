@@ -1,17 +1,23 @@
 name: Sync test
 
-# Manual end-to-end check against the real Supabase project: two temporary accounts sign up,
-# share a workspace, edit live, swap an image, then delete themselves.
+# The sync server (functions/api) with a local database, and the app talking to it from several
+# browsers: linking devices, edits both ways, offline edits, pictures, invitations, removals.
+# Runs on changes to the server or the sync code, and by hand.
 on:
   workflow_dispatch:
+  push:
+    paths: ['functions/**', 'src/sync/**', 'e2e/sync_*', '.github/workflows/sync-test.yml']
+  pull_request:
+    paths: ['functions/**', 'src/sync/**', 'e2e/sync_*', '.github/workflows/sync-test.yml']
 
 permissions:
   contents: read
 
 jobs:
-  e2e:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+  sync:
+    # A fixed image: test browsers support each Ubuntu release some time after it comes out
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -24,19 +30,33 @@ jobs:
         run: npm ci
 
       - name: Build web app
-        run: npx vite build
+        run: npm run build
 
-      - name: Install a test browser
+      - name: Install the test tools
         run: |
-          npm i --no-save playwright@1.63.0
-          # System packages come from Ubuntu's mirrors; when those can't be reached, the runner's own
-          # libraries are enough for Chromium
-          npx playwright install --with-deps chromium || npx playwright install chromium
+          pip install playwright
+          python -m playwright install --with-deps chromium || python -m playwright install chromium
 
-      - name: Run the test
-        env:
-          BASE_URL: http://127.0.0.1:4173/
+      - name: Start the server with a local database
         run: |
-          npx vite preview --host 127.0.0.1 --port 4173 --strictPort > preview.log 2>&1 &
-          sleep 4
-          node e2e/sync.e2e.cjs
+          npx --yes wrangler@4 pages dev dist --port 8788 --ip 127.0.0.1 > server.log 2>&1 &
+          for i in $(seq 1 90); do curl -s -o /dev/null http://127.0.0.1:8788/api/health && break; sleep 1; done
+          curl -s http://127.0.0.1:8788/api/health
+
+      - name: The API
+        run: python e2e/sync_api_test.py | tee api.txt; ! grep -q '^FAIL' api.txt
+
+      - name: Devices in browsers
+        run: python e2e/sync_devices_test.py | tee devices.txt; ! grep -q '^FAIL' devices.txt
+
+      - name: A device moved to the right account
+        run: python e2e/sync_relink_test.py | tee relink.txt; ! grep -q '^FAIL' relink.txt
+
+      - name: Keep the server log and pictures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-test
+          path: |
+            server.log
+            sync-shots/

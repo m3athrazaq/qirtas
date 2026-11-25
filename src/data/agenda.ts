@@ -4,10 +4,11 @@ import { t } from '../lib/i18n'
 import { isReachable } from '../shell/pageOps'
 import { inTemplates } from './today'
 import type { PageIndexEntry } from './pageIndex'
+import type { Repeat } from './recurring'
 import type { PageMeta } from './types'
 
 export type AgendaItem =
-  | { kind: 'task'; key: string; pageId: string; pageTitle: string; n: number; text: string; day: string | null; remindAt: number | null; reminderId: string | null }
+  | { kind: 'task'; key: string; pageId: string; pageTitle: string; n: number; text: string; day: string | null; remindAt: number | null; reminderId: string | null; repeat: Repeat | null }
   | { kind: 'reminder'; key: string; pageId: string; pageTitle: string; id: string | null; text: string; day: string; at: number }
   | { kind: 'row'; key: string; pageId: string; pageTitle: string; text: string; day: string }
 
@@ -34,7 +35,7 @@ export function buildAgenda(entries: Record<string, PageIndexEntry>, pages: Reco
     for (const task of e.tasks) {
       if (task.checked) continue
       const day = task.due ?? (task.remindAt ? dayOf(task.remindAt) : null)
-      const item: AgendaItem = { kind: 'task', key: `t:${pageId}:${task.n}`, pageId, pageTitle: title(pageId), n: task.n, text: task.text, day, remindAt: task.remindAt, reminderId: task.reminderId }
+      const item: AgendaItem = { kind: 'task', key: `t:${pageId}:${task.n}`, pageId, pageTitle: title(pageId), n: task.n, text: task.text, day, remindAt: task.remindAt, reminderId: task.reminderId, repeat: task.repeat ?? null }
       if (day) dated.push(item)
       else {
         const l = undated.get(pageId) ?? []
@@ -84,4 +85,25 @@ export function buildAgenda(entries: Record<string, PageIndexEntry>, pages: Reco
     undated: [...undated].map(([pageId, items]) => ({ pageId, pageTitle: title(pageId), items })).sort((a, b) => (pages[b.pageId]?.updatedAt ?? 0) - (pages[a.pageId]?.updatedAt ?? 0)),
     count: overdue.length + now.length,
   }
+}
+
+/** How far today has gone: tasks of today that are done (a repeating task counts on the day it was
+ *  done, though its date has moved on), of all of today's tasks. */
+export function progressOf(entries: Record<string, PageIndexEntry>, pages: Record<string, PageMeta>, today: string): { done: number; total: number } {
+  let done = 0
+  let open = 0
+  for (const [pageId, e] of Object.entries(entries)) {
+    if (!e.tasks.length || !isReachable(pageId, pages) || inTemplates(pageId, pages)) continue
+    for (const task of e.tasks) {
+      if (task.repeat && task.doneOn === today && !task.checked) {
+        done++
+        continue
+      }
+      const day = task.due ?? (task.remindAt ? dayOf(task.remindAt) : null)
+      if (day !== today) continue
+      if (task.checked) done++
+      else open++
+    }
+  }
+  return { done, total: done + open }
 }

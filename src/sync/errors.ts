@@ -1,21 +1,36 @@
-// Server and network errors in words the user can act on (the raw ones are English and technical).
-import { isAuthRetryableFetchError } from '@supabase/supabase-js'
+// Server and network errors in words the user can act on.
 import { t } from '../lib/i18n'
+import { ApiError } from './api'
 
 export function isNetworkError(err: unknown): boolean {
+  if (err instanceof ApiError) return err.status === 0 || err.code === 'no_server' || err.status >= 500
   const msg = String((err as { message?: unknown })?.message ?? err ?? '')
-  return isAuthRetryableFetchError(err) || /failed to fetch|networkerror|load failed|network request failed|fetch failed|err_name_not_resolved|err_internet/i.test(msg)
+  return /failed to fetch|networkerror|load failed|network request failed|fetch failed|err_name_not_resolved|err_internet/i.test(msg)
 }
 
 export function friendlyError(err: unknown): string {
-  const msg = String((err as { message?: unknown })?.message ?? err ?? '')
-  const status = (err as { status?: number })?.status
+  if (err instanceof ApiError) {
+    switch (err.code) {
+      case 'bad_code':
+        return t('errLinkCode')
+      case 'code_expired':
+        return t('errLinkCodeExpired')
+      case 'bad_key':
+        return t('errRecoveryKey')
+      case 'rate':
+        return t('errRate')
+      case 'bad_invite':
+        return t('inviteInvalid')
+      case 'forbidden':
+      case 'not_member':
+        return t('errForbidden')
+      case 'unauthorized':
+        return t('errUnlinked')
+      case 'too_large':
+        return t('errTooLarge')
+    }
+  }
   if (isNetworkError(err)) return t('errNetwork')
-  if (/invalid login credentials/i.test(msg)) return t('errCredentials')
-  if (/already registered|already been registered|user already exists/i.test(msg)) return t('errExists')
-  if (/email not confirmed/i.test(msg)) return t('errNotConfirmed')
-  if (/password should be at least|weak password|password is too short/i.test(msg)) return t('errWeakPassword')
-  if (status === 429 || /rate limit|too many requests|for security purposes/i.test(msg)) return t('errRate')
-  if (/invalid email|unable to validate email/i.test(msg)) return t('errEmail')
+  const msg = String((err as { message?: unknown })?.message ?? err ?? '')
   return msg ? t('errGeneric', { msg }) : t('errUnknown')
 }

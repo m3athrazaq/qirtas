@@ -1555,6 +1555,46 @@ mark {
   padding-top: 6px;
 }
 
+/* a task's date that repeats */
+.dc-repeat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--rule);
+  padding-top: 8px;
+}
+
+.dc-repeat-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.dc-repeat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dc-repeat-chips .chip-btn {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 12.5px;
+}
+
+.dc-repeat-chips .chip-btn.is-on {
+  background: var(--lapis-softer);
+  border-color: var(--lapis);
+  color: var(--lapis);
+}
+
+.dc-repeat-desc {
+  margin: 0;
+  line-height: 1.55;
+}
+
 .check-row {
   display: inline-flex;
   align-items: center;
@@ -2566,6 +2606,40 @@ button.sb-brand:hover {
   color: var(--tag-orange-fg);
 }
 
+.task-repeat {
+  display: inline-flex;
+  align-items: center;
+  color: var(--lapis);
+}
+
+/* how far today has gone */
+.tasks-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 20px 8px;
+}
+
+.tp-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--hover);
+  overflow: hidden;
+}
+
+.tp-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--lapis);
+  transition: width 0.3s ease;
+}
+
+.tp-text {
+  white-space: nowrap;
+}
+
 .task-page {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2691,7 +2765,8 @@ button.sb-brand:hover {
 }
 
 @media (max-width: 760px) {
-  .tasks-tabs {
+  .tasks-tabs,
+  .tasks-progress {
     margin-inline: 14px;
   }
   .tasks-body {
@@ -2786,4 +2861,507 @@ button.sb-brand:hover {
   flex: 1;
   min-width: 0;
   line-height: 1.6;
+}
+
+/* ---------- inserting verses from the Quran ---------- */
+
+.quran-modal {
+  height: min(740px, calc(100dvh - 48px));
+}
+
+.q-hint {
+  margin: 8px 18px 2px;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.q-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 10px 10px;
+}
+
+.q-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  text-align: start;
+}
+
+.q-row:hover,
+.q-row.is-active {
+  background: var(--hover);
+}
+
+.q-num {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--paper-3);
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.q-surah-name {
+  font-family: 'Amiri Quran', var(--font-naskh);
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.q-surah-en,
+.q-surah-count {
+  font-size: 12.5px;
+}
+
+.q-surah-count {
+  margin-inline-start: auto;
+}
+
+.q-verse {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+.q-verse-text {
+  direction: rtl;
+  font-family: 'Amiri Quran', var(--font-naskh);
+  font-size: 20px;
+  line-height: 2.1;
+  text-align: right;
+  color: var(--ink);
+}
+
+.q-verse-ref {
+  align-self: flex-end;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.q-verse.is-on,
+.q-verse.is-on:hover {
+  background: var(--lapis-soft);
+}
+
+.q-empty,
+.q-more {
+  margin: 0;
+  padding: 12px;
+  font-size: 13px;
+}
+
+.q-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--rule);
+  flex: none;
+}
+
+.q-range {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 13.5px;
+}
+
+.q-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+}
+
+.q-field input {
+  width: 64px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-s);
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+}
+
+.q-foot > .btn-primary {
+  margin-inline-start: auto;
+}
+
+.q-source {
+  margin: 0;
+  padding: 0 16px 12px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  flex: none;
+}
+
+.q-source a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .quran-modal {
+    height: 92dvh;
+  }
+}
+
+.q-links {
+  white-space: nowrap;
+}
+
+/* ---------- import from other apps ---------- */
+
+.imp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 20px 20px;
+  overflow-y: auto;
+}
+
+.imp-body p {
+  margin: 0;
+  line-height: 1.65;
+}
+
+.imp-sources {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.imp-source {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.imp-mark {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.imp-mark.is-notion {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.imp-mark.is-obsidian {
+  color: #7c3aed;
+}
+
+.imp-mark.is-files {
+  font-size: 10.5px;
+}
+
+.imp-source-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.55;
+}
+
+.imp-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border: 1.5px dashed var(--rule-2);
+  border-radius: var(--radius-l);
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.imp-drop.is-over {
+  background: var(--lapis-softer);
+  border-color: var(--lapis);
+}
+
+.imp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.imp-actions label {
+  cursor: pointer;
+}
+
+.imp-error {
+  color: var(--tc-red);
+}
+
+.imp-wait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 0;
+  color: var(--ink-2);
+}
+
+.imp-bar {
+  width: 100%;
+  max-width: 360px;
+  flex: none;
+}
+
+.imp-found {
+  font-weight: 600;
+}
+
+.imp-preview {
+  margin: 0;
+  padding: 8px 10px;
+  list-style: none;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.imp-preview li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.imp-icon {
+  width: 20px;
+  text-align: center;
+}
+
+.imp-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imp-skipped {
+  overflow-wrap: anywhere;
+}
+
+.imp-done {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--tc-green, var(--ink));
+}
+
+/* ---------- linking devices (settings → account) ---------- */
+
+.link-setup {
+  max-width: 460px;
+}
+
+.link-choices {
+  display: grid;
+  gap: 8px;
+}
+
+.link-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper);
+  text-align: start;
+  color: var(--ink);
+}
+
+.link-choice > svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--ink-3);
+}
+
+.link-choice span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.link-choice:hover {
+  background: var(--hover);
+}
+
+.link-choice.is-on {
+  border-color: var(--lapis);
+  box-shadow: 0 0 0 3px var(--lapis-softer);
+}
+
+.link-choice.is-on > svg {
+  color: var(--lapis);
+}
+
+.link-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 2px;
+}
+
+.link-form .btn-primary {
+  align-self: flex-start;
+}
+
+.link-form p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.link-code-input {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.link-lost {
+  align-self: flex-start;
+  font-size: 13px;
+}
+
+.recovery-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--lapis);
+  border-radius: var(--radius-l);
+  background: var(--lapis-softer);
+}
+
+.recovery-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--lapis);
+}
+
+.recovery-box p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.recovery-key,
+.link-code {
+  align-self: center;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  user-select: all;
+  word-break: break-all;
+  text-align: center;
+}
+
+.link-code {
+  font-size: 26px;
+  letter-spacing: 0.12em;
+}
+
+.recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.devices {
+  margin: 10px 0 4px;
+  padding: 12px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.devices-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.link-code-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-l);
+  background: var(--paper-2);
+  text-align: center;
+}
+
+.link-code-box p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.device-list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.device-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-height: 36px;
+  padding: 4px 2px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.device-list li:last-child {
+  border-bottom: 0;
+}
+
+.device-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
 }

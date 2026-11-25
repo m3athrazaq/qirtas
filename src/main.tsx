@@ -1,6 +1,8 @@
 import '@fontsource-variable/readex-pro'
 import '@fontsource-variable/markazi-text'
 import '@fontsource-variable/jetbrains-mono'
+// Quran quotations (downloaded only when one is on screen)
+import '@fontsource/amiri-quran/arabic-400.css'
 import './styles/tokens.css'
 import './styles/app.css'
 import './styles/editor.css'

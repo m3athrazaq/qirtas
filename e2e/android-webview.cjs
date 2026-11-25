@@ -235,6 +235,48 @@ async function evaluate(c, expression, timeout) {
     }
     adb('input keyevent 4') // closes the settings
     await sleep(1200)
+    // A Quran verse from the slash menu, in the Quran font; a repeating task ticked; the import dialog.
+    // (The page on screen: other editors may be in the page too, out of sight.)
+    const ED = `([...document.querySelectorAll('.ProseMirror')].find((e) => e.offsetParent !== null) || document.querySelector('.ProseMirror'))`
+    try {
+      await evaluate(c, `(() => { ${ED}.editor.chain().focus('end').splitBlock().run(); return 'ok' })()`, 10000)
+      await sleep(400)
+      await type('/')
+      await sleep(1200)
+      await type('آية')
+      await sleep(800)
+      console.log('quran from the slash menu:', await evaluate(c, `(() => { const el = document.querySelector('.slash-menu .is-active'); if (!el) return 'no active item'; el.click(); return el.textContent.trim().slice(0, 30) })()`, 5000))
+      await sleep(2500)
+      console.log('quran picker:', await evaluate(c, `document.querySelectorAll('.quran-modal .q-surah').length`, 5000))
+      await type('البقرة ٢٥٥')
+      await sleep(2000)
+      console.log('insert:', await evaluate(c, `(() => { const b = document.querySelector('.quran-modal .q-foot .btn-primary'); if (!b) return 'no button'; b.click(); return 'ok' })()`, 5000))
+      await sleep(1500)
+      console.log('verse:', await evaluate(c, `(() => { const v = document.querySelector('.ProseMirror .quran-verse'); return v ? v.querySelector('.qv-ref').textContent + ' | font: ' + document.fonts.check('24px "Amiri Quran"', 'بِسۡمِ') : 'none' })()`, 5000))
+      adb('input keyevent 4') // closes the keyboard
+      await sleep(800)
+      shot('16-quran')
+      shot('16-quran')
+      const today = await evaluate(c, `(() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') })()`, 5000)
+      await evaluate(c, `(() => { const ed = ${ED}.editor; ed.chain().focus('end').insertContent({ type: 'taskList', content: [{ type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'ورد يومي ' }, { type: 'dateChip', attrs: { date: '${today}', repeat: 'daily' } }] }] }] }).run(); return 'ok' })()`, 5000)
+      await sleep(800)
+      await evaluate(c, `(() => { const boxes = ${ED}.querySelectorAll('ul[data-type=taskList] > li > label input'); boxes[boxes.length - 1].click(); return boxes.length })()`, 5000)
+      await sleep(2000)
+      console.log('repeating task after a tick (date, checked):', await evaluate(c, `(() => { const out = []; const walk = (n) => { if (n.type === 'taskItem') { const chip = (n.content?.[0]?.content || []).find((x) => x.type === 'dateChip'); if (chip?.attrs?.repeat) out.push([chip.attrs.date, n.attrs.checked]) } (n.content || []).forEach(walk) }; walk(${ED}.editor.getJSON()); return JSON.stringify(out) + ' today ${today}' })()`, 5000))
+      shot('17-repeat')
+      adb('input keyevent 4') // closes the keyboard, if open
+      await sleep(800)
+      await evaluate(c, `window.dispatchEvent(new CustomEvent('qirtas:settings', { detail: 'data' }))`, 5000)
+      await sleep(2000)
+      console.log('import button:', await evaluate(c, `(() => { const b = [...document.querySelectorAll('.settings-actions .btn')].find((x) => x.textContent.includes('Notion')); if (!b) return 'missing'; b.click(); return 'ok' })()`, 5000))
+      await sleep(2500)
+      console.log('import dialog:', await evaluate(c, `document.querySelectorAll('.import-modal .imp-source').length + ' sources, folder button: ' + !!document.querySelector('.import-modal input[type=file]:not([accept])')`, 5000))
+      shot('18-import')
+      adb('input keyevent 4') // closes the dialog
+      await sleep(1200)
+    } catch (e) {
+      console.log('new features failed:', e.message.slice(0, 300))
+    }
     // The address the widget and the launcher shortcut use for a quick note
     try {
       adb('am start -a android.intent.action.VIEW -d qirtas://capture -n com.m3athrazaq.qirtas/.MainActivity')

@@ -10,6 +10,7 @@ import type { ViewType } from '../data/types'
 import { uid } from '../lib/ids'
 import { t } from '../lib/i18n'
 import { todayIso } from '../lib/hijri'
+import { requestQuran } from '../quran/bus'
 import { requestPagePicker } from '../ui/pickerBus'
 import { openDateChipNext } from './views/dateChipBus'
 
@@ -159,6 +160,19 @@ export function insertPageMention(editor: Editor, range?: Range) {
       .chain()
       .focus()
       .insertContentAt(pos, [{ type: 'pageMention', attrs: { pageId: id } }, { type: 'text', text: ' ' }])
+      .run()
+  })
+}
+
+/** A quotation from the Quran, chosen in the verse picker, where the slash was typed. */
+export function insertQuran(editor: Editor, range?: Range) {
+  if (range) editor.chain().focus().deleteRange(range).run()
+  requestQuran((r, verses) => {
+    if (editor.isDestroyed) return
+    editor
+      .chain()
+      .focus()
+      .insertContent([{ type: 'quranVerse', attrs: { ...r, text: verses.join('\n') } }, { type: 'paragraph' }])
       .run()
   })
 }

@@ -1,5 +1,5 @@
 // Settings → Data: automatic backups, backup files, restore points, storage, and erasing the device.
-import { Download, FolderOpen, History, RotateCcw, ShieldCheck, Upload } from 'lucide-react'
+import { Download, FileUp, FolderOpen, History, RotateCcw, ShieldCheck, Upload } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { pickFile } from '../data/assets'
 import { chooseBackupFolder, downloadBackup, grantFolderAccess, refreshBackupState, runBackup, setAutoBackup, useBackup } from '../data/autobackup'
@@ -157,6 +157,14 @@ export function DataSection() {
         </button>
         <button type="button" className="btn" disabled={!canEdit} onClick={() => void restoreFromFile()}>
           <Upload size={15} /> {t('backupImport')}
+        </button>
+      </div>
+
+      <h3 className="set-head">{t('impTitle')}</h3>
+      <p className="muted small set-note">{t('impSettingsDesc')}</p>
+      <div className="settings-actions">
+        <button type="button" className="btn" disabled={!canEdit} onClick={() => useStore.getState().openModal('import')}>
+          <FileUp size={15} /> {t('impOpenDialog')}
         </button>
       </div>
 
