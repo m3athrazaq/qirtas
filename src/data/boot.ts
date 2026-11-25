@@ -5,6 +5,7 @@ import { todayIso } from '../lib/hijri'
 import { b, callout, code, date, doc, h2, p, pageLink, setPageContent, tasks } from '../templates/build'
 import { runAction, type AppAction } from './actions'
 import { startPageIndex } from './pageIndex'
+import { startRecurring } from './recurring'
 import { startReminders } from './reminders'
 import { captureAuthRedirect } from './authLink'
 import { grantFolderAccess, noteNudgeShown, startBackupSchedule } from './autobackup'
@@ -189,6 +190,8 @@ export async function boot() {
       setTimeout(() => document.querySelector('.rem-health')?.scrollIntoView({ block: 'center' }), 350)
     },
   )
+  // A repeating task that is ticked comes back on its next date
+  startRecurring()
 
   window.addEventListener('keydown', (e) => {
     const mod = e.metaKey || e.ctrlKey

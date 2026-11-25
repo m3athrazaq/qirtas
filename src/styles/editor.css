@@ -618,6 +618,13 @@
   content: ')';
 }
 
+/* a repeating task's date */
+.dc-repeat {
+  display: inline-flex;
+  align-self: center;
+  opacity: 0.85;
+}
+
 /* page link block */
 .page-link {
   margin: 2px 0;
@@ -1222,6 +1229,11 @@
 
 .day-panel {
   margin: 4px 0 14px;
+}
+
+.day-panel .tasks-progress {
+  margin: 10px 0 0;
+  max-width: 420px;
 }
 
 .day-nav {

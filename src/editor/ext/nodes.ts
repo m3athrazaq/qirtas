@@ -150,6 +150,18 @@ export const DateChip = Node.create({
         parseHTML: (el) => el.getAttribute('data-date'),
         renderHTML: (a) => ({ 'data-date': a.date }),
       },
+      /** In a task: the date comes round again (recurring.ts), "weekly", "hmonthly"… */
+      repeat: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('data-repeat'),
+        renderHTML: (a) => (a.repeat ? { 'data-repeat': a.repeat } : {}),
+      },
+      /** The day the repeating task was last done (for today's progress). */
+      doneOn: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('data-done-on'),
+        renderHTML: (a) => (a.doneOn ? { 'data-done-on': a.doneOn } : {}),
+      },
     }
   },
   parseHTML() {
@@ -159,13 +171,13 @@ export const DateChip = Node.create({
     return ['span', mergeAttributes(HTMLAttributes, { 'data-date-chip': '' })]
   },
   renderText({ node }) {
-    return markdownHooks.date(node.attrs.date)
+    return markdownHooks.date(node.attrs.date, node.attrs.repeat)
   },
   addNodeView() {
     return ReactNodeViewRenderer(DateChipView, { as: 'span' })
   },
   renderMarkdown(node) {
-    return markdownHooks.date(node.attrs?.date as string)
+    return markdownHooks.date(node.attrs?.date as string, node.attrs?.repeat as string | null)
   },
 })
 

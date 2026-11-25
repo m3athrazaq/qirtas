@@ -5,7 +5,7 @@ import { cleanRef, refLabel } from '../../quran/quran'
 export const markdownHooks = {
   pageTitle: (_id: string): string => '',
   pageLink: (_id: string): string => '',
-  date: (iso: string): string => iso ?? '',
+  date: (iso: string, _repeat?: string | null): string => iso ?? '',
   reminder: (at: number): string => {
     if (!at) return ''
     const d = new Date(at)

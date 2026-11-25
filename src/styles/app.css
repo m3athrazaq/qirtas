@@ -1555,6 +1555,46 @@ mark {
   padding-top: 6px;
 }
 
+/* a task's date that repeats */
+.dc-repeat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--rule);
+  padding-top: 8px;
+}
+
+.dc-repeat-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.dc-repeat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dc-repeat-chips .chip-btn {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 12.5px;
+}
+
+.dc-repeat-chips .chip-btn.is-on {
+  background: var(--lapis-softer);
+  border-color: var(--lapis);
+  color: var(--lapis);
+}
+
+.dc-repeat-desc {
+  margin: 0;
+  line-height: 1.55;
+}
+
 .check-row {
   display: inline-flex;
   align-items: center;
@@ -2566,6 +2606,40 @@ button.sb-brand:hover {
   color: var(--tag-orange-fg);
 }
 
+.task-repeat {
+  display: inline-flex;
+  align-items: center;
+  color: var(--lapis);
+}
+
+/* how far today has gone */
+.tasks-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 20px 8px;
+}
+
+.tp-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--hover);
+  overflow: hidden;
+}
+
+.tp-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--lapis);
+  transition: width 0.3s ease;
+}
+
+.tp-text {
+  white-space: nowrap;
+}
+
 .task-page {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2691,7 +2765,8 @@ button.sb-brand:hover {
 }
 
 @media (max-width: 760px) {
-  .tasks-tabs {
+  .tasks-tabs,
+  .tasks-progress {
     margin-inline: 14px;
   }
   .tasks-body {

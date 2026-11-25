@@ -7,6 +7,7 @@ import * as Y from 'yjs'
 import { create } from 'zustand'
 import { getDoc, onDocDestroy, onDocLoaded, onDocUpdate, pageDocId, peekDoc } from './docs'
 import { kvGet, kvSet, loadUpdates } from './idb'
+import type { Repeat } from './recurring'
 import { useStore } from './store'
 import type { PageMeta } from './types'
 
@@ -17,6 +18,10 @@ export interface IndexedTask {
   checked: boolean
   /** The date written in the task (a date chip), if any. */
   due: string | null
+  /** That date repeats: ticking the task moves it on (recurring.ts). */
+  repeat?: Repeat | null
+  /** The day a repeating task was last done. */
+  doneOn?: string | null
   reminderId: string | null
   remindAt: number | null
 }
@@ -53,12 +58,13 @@ const INLINE_ATOMS = new Set(['dateChip', 'reminder', 'pageMention', 'hardBreak'
 
 function inlineInfo(block: JSONContent) {
   let text = ''
-  const dates: string[] = []
+  const dates: { date: string; repeat: Repeat | null; doneOn: string | null }[] = []
   const reminders: { id: string | null; at: number; done: boolean }[] = []
   const links: string[] = []
   for (const c of block.content ?? []) {
     if (c.type === 'text') text += c.text ?? ''
-    else if (c.type === 'dateChip' && c.attrs?.date) dates.push(c.attrs.date as string)
+    else if (c.type === 'dateChip' && c.attrs?.date)
+      dates.push({ date: c.attrs.date as string, repeat: typeof c.attrs.repeat === 'string' ? (c.attrs.repeat as Repeat) : null, doneOn: typeof c.attrs.doneOn === 'string' ? c.attrs.doneOn : null })
     else if (c.type === 'reminder' && c.attrs?.at) reminders.push({ id: (c.attrs.id as string) ?? null, at: Number(c.attrs.at), done: !!c.attrs.done })
     else if (c.type === 'pageMention' && c.attrs?.pageId) links.push(c.attrs.pageId as string)
     else if (c.type === 'hardBreak') text += ' '
@@ -82,7 +88,9 @@ export function indexContent(root: JSONContent): Omit<PageIndexEntry, 'stamp'> {
       const info = first ? inlineInfo(first) : { text: '', dates: [], reminders: [], links: [] }
       const checked = !!node.attrs?.checked
       const rem = info.reminders.find((x) => !x.done) ?? info.reminders[0]
-      const task: IndexedTask = { n: n++, text: info.text, checked, due: info.dates[0] ?? null, reminderId: rem?.id ?? null, remindAt: rem?.at ?? null }
+      const date = info.dates[0]
+      const task: IndexedTask = { n: n++, text: info.text, checked, due: date?.date ?? null, reminderId: rem?.id ?? null, remindAt: rem?.at ?? null }
+      if (date?.repeat) Object.assign(task, { repeat: date.repeat, doneOn: date.doneOn })
       tasks.push(task)
       info.reminders.forEach((x) => reminders.push({ id: x.id, key: x.id ?? `#${r}`, at: x.at, done: x.done || checked, text: info.text, task: task.n }) && r++)
       info.links.forEach((l) => links.add(l))

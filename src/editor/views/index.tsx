@@ -1,7 +1,8 @@
 import { NodeViewContent, NodeViewWrapper, type NodeViewProps } from '@tiptap/react'
-import { ArrowUpLeft, ArrowUpRight, FileText, ImageOff, Loader2 } from 'lucide-react'
+import { ArrowUpLeft, ArrowUpRight, FileText, ImageOff, Loader2, Repeat as RepeatIcon } from 'lucide-react'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { useAssetUrl } from '../../data/assets'
+import { describeRepeat, isRepeat } from '../../data/recurring'
 import { useStore } from '../../data/store'
 import { t } from '../../lib/i18n'
 import { formatDual, formatHijri, formatGregorian } from '../../lib/hijri'
@@ -78,29 +79,55 @@ export function PageMentionView({ node, selected }: NodeViewProps) {
   )
 }
 
-export function DateChipView({ node, updateAttributes, selected, editor }: NodeViewProps) {
+/** The date chip is the date of a task: it sits in the first line of a task item. */
+function inTaskLine(editor: NodeViewProps['editor'], getPos: NodeViewProps['getPos']): boolean {
+  try {
+    const pos = typeof getPos === 'function' ? getPos() : undefined
+    if (typeof pos !== 'number') return false
+    const $pos = editor.state.doc.resolve(pos)
+    const d = $pos.depth
+    return d >= 1 && $pos.node(d - 1).type.name === 'taskItem' && $pos.index(d - 1) === 0
+  } catch {
+    return false
+  }
+}
+
+export function DateChipView({ node, updateAttributes, selected, editor, getPos }: NodeViewProps) {
   const settings = useStore((s) => s.settings)
   const [open, setOpen] = useState(false)
+  const [inTask, setInTask] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
+  const show = () => {
+    setInTask(inTaskLine(editor, getPos))
+    setOpen(true)
+  }
   useEffect(() => {
-    if (consumeOpenNext()) setTimeout(() => setOpen(true), 30)
+    if (consumeOpenNext()) setTimeout(show, 30)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const iso = node.attrs.date as string | null
+  const repeat = isRepeat(node.attrs.repeat) ? node.attrs.repeat : null
   const fmt = { lang: settings.lang, numerals: settings.numerals } as const
   const primary = iso ? (settings.calendar === 'hijri' ? formatHijri(iso, fmt) : formatGregorian(iso, fmt)) : '—'
   const secondary = iso ? (settings.calendar === 'hijri' ? formatGregorian(iso, fmt) : formatHijri(iso, fmt)) : ''
+  const every = repeat && iso ? describeRepeat(repeat, iso, settings) : ''
   return (
-    <NodeViewWrapper as="span" className={'date-chip' + (selected ? ' is-selected' : '')}>
+    <NodeViewWrapper as="span" className={'date-chip' + (selected ? ' is-selected' : '') + (repeat ? ' is-repeating' : '')}>
       <span
         ref={ref}
         contentEditable={false}
         role="button"
         tabIndex={0}
-        title={iso ? formatDual(iso, settings.calendar, { ...fmt, weekday: true }) : ''}
-        onClick={() => editor.isEditable && setOpen(true)}
+        title={iso ? formatDual(iso, settings.calendar, { ...fmt, weekday: true }) + (every ? ` — ${every}` : '') : ''}
+        onClick={() => editor.isEditable && show()}
       >
         <span className="dc-main">{primary}</span>
         {secondary && <span className="dc-sub">{secondary}</span>}
+        {repeat && (
+          <span className="dc-repeat" aria-label={every}>
+            <RepeatIcon size={11} strokeWidth={2.2} />
+          </span>
+        )}
       </span>
       <Popover anchor={ref.current} open={open} onClose={() => setOpen(false)} sheet>
         <DatePicker
@@ -110,6 +137,8 @@ export function DateChipView({ node, updateAttributes, selected, editor }: NodeV
             if (v) updateAttributes({ date: v })
             setOpen(false)
           }}
+          // Only a task comes round again (a repeat set earlier stays changeable wherever the date is)
+          repeat={inTask || repeat ? { value: repeat, onChange: (r) => updateAttributes({ repeat: r }) } : undefined}
         />
       </Popover>
     </NodeViewWrapper>

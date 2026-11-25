@@ -2,6 +2,7 @@ import { MarkdownManager } from '@tiptap/markdown'
 import { yXmlFragmentToProsemirrorJSON } from '@tiptap/y-tiptap'
 import { getDoc, pageDocId } from '../data/docs'
 import { valueText, viewRows } from '../data/dbops'
+import { describeRepeat, isRepeat } from '../data/recurring'
 import { useStore } from '../data/store'
 import type { PageMeta } from '../data/types'
 import { schemaExtensions } from '../editor/ext'
@@ -25,10 +26,11 @@ export function installMarkdownHooks() {
     const p = pages()[id]
     return `[${p?.icon ? p.icon + ' ' : ''}${p?.title || t('untitled')}](#/p/${id})`
   }
-  markdownHooks.date = (iso) => {
+  markdownHooks.date = (iso, repeat) => {
     if (!iso) return ''
     const s = useStore.getState().settings
-    return formatDual(iso, s.calendar, { lang: s.lang, numerals: s.numerals })
+    const date = formatDual(iso, s.calendar, { lang: s.lang, numerals: s.numerals })
+    return isRepeat(repeat) ? `${date} (🔁 ${describeRepeat(repeat, iso, s)})` : date
   }
   markdownHooks.database = (id) => databaseToMarkdown(id)
   markdownHooks.quranRef = (surah, from, to) => {
