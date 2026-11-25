@@ -1,0 +1,450 @@
+npm warn deprecated uuid@7.0.3: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+npm warn deprecated glob@11.1.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 528 packages, and audited 529 packages in 6s
+
+165 packages are looking for funding
+  run `npm fund` for details
+
+9 vulnerabilities (1 low, 8 moderate)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 2199 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/manifest.webmanifest                                             0.78 kB
+dist/index.html                                                       1.94 kB │ gzip:   0.88 kB
+dist/assets/jetbrains-mono-vietnamese-wght-normal-Bt-aOZkq.woff2      7.50 kB
+dist/assets/markazi-text-vietnamese-wght-normal-RTZ-2xZ5.woff2        8.03 kB
+dist/assets/jetbrains-mono-greek-wght-normal-Bw9x6K1M.woff2           9.00 kB
+dist/assets/readex-pro-vietnamese-wght-normal-Do5Nl5oc.woff2         11.22 kB
+dist/assets/jetbrains-mono-cyrillic-wght-normal-D73BlboJ.woff2       12.10 kB
+dist/assets/jetbrains-mono-latin-ext-wght-normal-DBQx-q_a.woff2      15.19 kB
+dist/assets/readex-pro-arabic-wght-normal-DiwT_uOQ.woff2             22.86 kB
+dist/assets/markazi-text-latin-ext-wght-normal-YbDGb6ot.woff2        24.62 kB
+dist/assets/markazi-text-latin-wght-normal-XVaf1yc4.woff2            25.53 kB
+dist/assets/readex-pro-latin-ext-wght-normal-CsYMu49W.woff2          27.68 kB
+dist/assets/readex-pro-latin-wght-normal--ekFhJJC.woff2              31.42 kB
+dist/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2          40.40 kB
+dist/assets/markazi-text-arabic-wght-normal-zEmVoUHK.woff2           41.32 kB
+dist/assets/amiri-quran-arabic-400-normal-wRcqfVJx.woff2             45.68 kB
+dist/assets/amiri-quran-arabic-400-normal-CZ144KtP.woff              55.11 kB
+dist/assets/index-B-fOrr0y.css                                       82.81 kB │ gzip:  19.39 kB
+dist/assets/esm-krJxmTUG.js                                           0.34 kB │ gzip:   0.25 kB
+dist/assets/esm-B_YhHh2h.js                                           0.34 kB │ gzip:   0.25 kB
+dist/assets/web-DQmhhN4g.js                                           0.36 kB │ gzip:   0.24 kB
+dist/assets/esm-CE92O2Ji.js                                           0.59 kB │ gzip:   0.36 kB
+dist/assets/web-BEDspe3t.js                                           0.84 kB │ gzip:   0.40 kB
+dist/assets/inbox-DIUMIKfH.js                                         0.96 kB │ gzip:   0.55 kB
+dist/assets/virtual_pwa-register-DqqMUY85.js                          1.15 kB │ gzip:   0.61 kB
+dist/assets/esm-B26jA3OI.js                                           1.31 kB │ gzip:   0.70 kB
+dist/assets/preload-helper-CRzLMJPS.js                                1.53 kB │ gzip:   0.80 kB
+dist/assets/platform-22uRI5gE.js                                      1.76 kB │ gzip:   0.88 kB
+dist/assets/assets-CHkQzDi2.js                                        1.79 kB │ gzip:   0.87 kB
+dist/assets/ids-D6FrVVu_.js                                           3.64 kB │ gzip:   1.40 kB
+dist/assets/web-DzIr_UPj.js                                           4.43 kB │ gzip:   1.28 kB
+dist/assets/workbox-window.prod.es5-Bd17z0YL.js                       5.65 kB │ gzip:   2.20 kB
+dist/assets/web-oY8vklmT.js                                           8.47 kB │ gzip:   2.83 kB
+dist/assets/dist-BDkT_FEQ.js                                          8.65 kB │ gzip:   3.50 kB
+dist/assets/ImportDialog-HjspOobm.js                                 36.36 kB │ gzip:  14.19 kB
+dist/assets/Popover-GrDn7dH5.js                                      48.47 kB │ gzip:  18.49 kB
+dist/assets/DatabaseView-BzTUiifz.js                                 71.27 kB │ gzip:  22.32 kB
+dist/assets/today-BLvAkKjQ.js                                       145.51 kB │ gzip:  46.83 kB
+dist/assets/docs-DNfLFM_t.js                                        166.61 kB │ gzip:  54.09 kB
+dist/assets/ext-x_DCQ1q1.js                                         519.91 kB │ gzip: 166.50 kB
+dist/assets/index-C0QsjDK_.js                                       552.88 kB │ gzip: 170.87 kB
+dist/assets/quran-Bnx8Pkh2.js                                     1,354.90 kB │ gzip: 271.00 kB
+
+[33m[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/data/autobackup.ts is dynamically imported by src/App.tsx, src/ui/ErrorBoundary.tsx but also statically imported by src/data/boot.ts, src/data/update.ts, src/shell/DataSection.tsx, src/shell/commands.ts, src/sync/AccountSection.tsx, ..., dynamic import will not move module into another chunk.
+[39m
+[33m[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/data/reminders.ts is dynamically imported by src/editor/actions.ts, src/editor/views/ReminderView.tsx, src/shell/DataSection.tsx but also statically imported by src/data/boot.ts, src/shell/SettingsDialog.tsx, src/sync/session.ts, dynamic import will not move module into another chunk.
+[39m
+[33m[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/sync/session.ts is dynamically imported by src/data/boot.ts but also statically imported by src/shell/JoinDialog.tsx, src/shell/ShareDialog.tsx, src/shell/Sidebar.tsx, src/shell/TopBar.tsx, src/shell/WorkspaceMenu.tsx, ..., dynamic import will not move module into another chunk.
+[39m
+[33m[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/editor/PageEditor.tsx is dynamically imported by src/data/versions.ts but also statically imported by src/lib/inbox.ts, src/page/PageView.tsx, dynamic import will not move module into another chunk.
+[39m
+[33m[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/templates/build.ts is dynamically imported by src/data/versions.ts but also statically imported by src/data/boot.ts, src/import/importer.ts, src/lib/inbox.ts, src/templates/index.ts, dynamic import will not move module into another chunk.
+[39m
+[32m✓ built in 730ms[39m
+
+[36mPWA v2.0.0[39m
+mode      [35mgenerateSW[39m
+precache  [32m52 entries[39m [2m(3309.26 KiB)[22m
+files generated
+  [2mdist/sw.js[22m
+  [2mdist/workbox-2fbc6a65.js[22m
+✔ Copying web assets from dist to android/app/src/main/assets/public in 12.11ms
+✔ Creating capacitor.config.json in android/app/src/main/assets in 558.45μs
+✔ copy android in 42.13ms
+✔ Updating Android plugins in 8.66ms
+[info] Found 5 Capacitor plugins for android:
+       @capacitor/app@8.1.2
+       @capacitor/filesystem@8.1.5
+       @capacitor/keyboard@8.0.6
+       @capacitor/local-notifications@8.3.1
+       @capacitor/share@8.0.3
+✔ update android in 53.03ms
+[info] Sync finished in 0.137s
+Downloading https://services.gradle.org/distributions/gradle-8.14.3-all.zip
+.....................10%.....................20%......................30%.....................40%......................50%.....................60%.....................70%......................80%.....................90%......................100%
+
+Welcome to Gradle 8.14.3!
+
+Here are the highlights of this release:
+ - Java 24 support
+ - GraalVM Native Image toolchain selection
+ - Enhancements to test reporting
+ - Build Authoring improvements
+
+For more details see https://docs.gradle.org/8.14.3/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Configure project :capacitor-cordova-android-plugins
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :capacitor-android:preBuild UP-TO-DATE
+> Task :capacitor-android:preDebugBuild UP-TO-DATE
+> Task :capacitor-app:preBuild UP-TO-DATE
+> Task :capacitor-app:preDebugBuild UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:preBuild UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:preDebugBuild UP-TO-DATE
+> Task :capacitor-app:writeDebugAarMetadata
+> Task :capacitor-android:writeDebugAarMetadata
+> Task :app:javaPreCompileDebug
+> Task :capacitor-filesystem:preBuild UP-TO-DATE
+> Task :capacitor-filesystem:preDebugBuild UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:writeDebugAarMetadata
+> Task :capacitor-keyboard:preBuild UP-TO-DATE
+> Task :capacitor-filesystem:writeDebugAarMetadata
+> Task :capacitor-keyboard:preDebugBuild UP-TO-DATE
+> Task :capacitor-local-notifications:preBuild UP-TO-DATE
+> Task :capacitor-local-notifications:preDebugBuild UP-TO-DATE
+> Task :capacitor-keyboard:writeDebugAarMetadata
+> Task :capacitor-local-notifications:writeDebugAarMetadata
+> Task :capacitor-share:preBuild UP-TO-DATE
+> Task :capacitor-share:preDebugBuild UP-TO-DATE
+> Task :capacitor-share:writeDebugAarMetadata
+> Task :capacitor-android:processDebugNavigationResources
+> Task :capacitor-app:processDebugNavigationResources
+> Task :app:checkDebugAarMetadata
+> Task :capacitor-cordova-android-plugins:processDebugNavigationResources
+> Task :capacitor-filesystem:processDebugNavigationResources
+> Task :capacitor-keyboard:processDebugNavigationResources
+> Task :capacitor-local-notifications:processDebugNavigationResources
+> Task :capacitor-share:processDebugNavigationResources
+> Task :app:processDebugNavigationResources
+> Task :app:generateDebugResValues
+> Task :capacitor-android:generateDebugResValues
+> Task :app:compileDebugNavigationResources
+> Task :capacitor-android:generateDebugResources
+> Task :capacitor-android:packageDebugResources
+> Task :capacitor-app:generateDebugResValues
+> Task :capacitor-app:generateDebugResources
+> Task :capacitor-app:packageDebugResources
+> Task :capacitor-cordova-android-plugins:generateDebugResValues
+> Task :capacitor-cordova-android-plugins:generateDebugResources
+> Task :capacitor-cordova-android-plugins:packageDebugResources
+> Task :capacitor-filesystem:generateDebugResValues
+> Task :capacitor-filesystem:generateDebugResources
+> Task :capacitor-filesystem:packageDebugResources
+> Task :capacitor-keyboard:generateDebugResValues
+> Task :capacitor-keyboard:generateDebugResources
+> Task :capacitor-keyboard:packageDebugResources
+> Task :capacitor-local-notifications:generateDebugResValues
+> Task :capacitor-local-notifications:generateDebugResources
+> Task :capacitor-local-notifications:packageDebugResources
+> Task :capacitor-share:generateDebugResValues
+> Task :capacitor-share:generateDebugResources
+> Task :capacitor-share:packageDebugResources
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :capacitor-android:extractDeepLinksDebug
+> Task :capacitor-app:extractDeepLinksDebug
+> Task :capacitor-cordova-android-plugins:extractDeepLinksDebug
+> Task :capacitor-android:processDebugManifest
+> Task :capacitor-app:processDebugManifest
+> Task :capacitor-cordova-android-plugins:processDebugManifest
+> Task :capacitor-filesystem:extractDeepLinksDebug
+> Task :capacitor-filesystem:processDebugManifest
+> Task :capacitor-keyboard:extractDeepLinksDebug
+> Task :capacitor-keyboard:processDebugManifest
+> Task :capacitor-local-notifications:extractDeepLinksDebug
+> Task :capacitor-share:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :capacitor-share:processDebugManifest
+> Task :capacitor-local-notifications:processDebugManifest
+> Task :capacitor-android:compileDebugLibraryResources
+> Task :capacitor-app:compileDebugLibraryResources
+> Task :capacitor-android:parseDebugLocalResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
+> Task :capacitor-cordova-android-plugins:compileDebugLibraryResources
+> Task :capacitor-filesystem:compileDebugLibraryResources
+> Task :capacitor-app:parseDebugLocalResources
+> Task :capacitor-cordova-android-plugins:parseDebugLocalResources
+> Task :capacitor-android:generateDebugRFile
+> Task :capacitor-app:generateDebugRFile
+> Task :capacitor-keyboard:compileDebugLibraryResources
+> Task :capacitor-filesystem:parseDebugLocalResources
+> Task :capacitor-cordova-android-plugins:generateDebugRFile
+> Task :capacitor-local-notifications:compileDebugLibraryResources
+> Task :capacitor-keyboard:parseDebugLocalResources
+> Task :capacitor-filesystem:generateDebugRFile
+> Task :capacitor-share:compileDebugLibraryResources
+> Task :capacitor-keyboard:generateDebugRFile
+> Task :capacitor-local-notifications:parseDebugLocalResources
+> Task :capacitor-share:parseDebugLocalResources
+> Task :capacitor-app:javaPreCompileDebug
+> Task :capacitor-android:javaPreCompileDebug
+> Task :capacitor-local-notifications:generateDebugRFile
+> Task :capacitor-cordova-android-plugins:javaPreCompileDebug
+> Task :capacitor-share:generateDebugRFile
+
+> Task :capacitor-android:compileDebugJavaWithJavac
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :capacitor-cordova-android-plugins:compileDebugJavaWithJavac NO-SOURCE
+> Task :capacitor-filesystem:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :capacitor-cordova-android-plugins:bundleLibCompileToJarDebug
+> Task :capacitor-filesystem:javaPreCompileDebug
+> Task :capacitor-local-notifications:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :capacitor-keyboard:javaPreCompileDebug
+> Task :capacitor-local-notifications:javaPreCompileDebug
+> Task :capacitor-android:bundleLibCompileToJarDebug
+> Task :capacitor-share:javaPreCompileDebug
+> Task :capacitor-app:compileDebugJavaWithJavac
+> Task :capacitor-app:bundleLibCompileToJarDebug
+> Task :app:processDebugResources
+> Task :capacitor-keyboard:compileDebugJavaWithJavac
+> Task :capacitor-keyboard:bundleLibCompileToJarDebug
+> Task :capacitor-share:compileDebugJavaWithJavac
+> Task :capacitor-share:bundleLibCompileToJarDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :capacitor-android:mergeDebugShaders
+> Task :capacitor-android:compileDebugShaders NO-SOURCE
+> Task :capacitor-android:generateDebugAssets UP-TO-DATE
+> Task :capacitor-android:mergeDebugAssets
+> Task :capacitor-app:mergeDebugShaders
+> Task :capacitor-app:compileDebugShaders NO-SOURCE
+> Task :capacitor-app:generateDebugAssets UP-TO-DATE
+> Task :capacitor-app:mergeDebugAssets
+> Task :capacitor-cordova-android-plugins:mergeDebugShaders
+> Task :capacitor-cordova-android-plugins:compileDebugShaders NO-SOURCE
+> Task :capacitor-cordova-android-plugins:generateDebugAssets UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:mergeDebugAssets
+> Task :capacitor-filesystem:mergeDebugShaders
+> Task :capacitor-filesystem:compileDebugShaders NO-SOURCE
+> Task :capacitor-filesystem:generateDebugAssets UP-TO-DATE
+> Task :capacitor-filesystem:mergeDebugAssets
+> Task :capacitor-keyboard:mergeDebugShaders
+> Task :capacitor-keyboard:compileDebugShaders NO-SOURCE
+> Task :capacitor-keyboard:generateDebugAssets UP-TO-DATE
+> Task :capacitor-keyboard:mergeDebugAssets
+> Task :capacitor-local-notifications:mergeDebugShaders
+> Task :capacitor-local-notifications:compileDebugShaders NO-SOURCE
+> Task :capacitor-local-notifications:generateDebugAssets UP-TO-DATE
+> Task :capacitor-local-notifications:mergeDebugAssets
+> Task :capacitor-share:mergeDebugShaders
+> Task :capacitor-share:compileDebugShaders NO-SOURCE
+> Task :capacitor-share:generateDebugAssets UP-TO-DATE
+> Task :capacitor-share:mergeDebugAssets
+> Task :app:mergeDebugAssets
+> Task :capacitor-app:bundleLibRuntimeToJarDebug
+> Task :app:compressDebugAssets
+> Task :capacitor-keyboard:bundleLibRuntimeToJarDebug
+> Task :capacitor-share:bundleLibRuntimeToJarDebug
+> Task :capacitor-android:bundleLibRuntimeToJarDebug
+> Task :capacitor-cordova-android-plugins:bundleLibRuntimeToJarDebug
+> Task :app:desugarDebugFileDependencies
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :capacitor-android:processDebugJavaRes NO-SOURCE
+> Task :capacitor-app:processDebugJavaRes NO-SOURCE
+> Task :capacitor-cordova-android-plugins:processDebugJavaRes NO-SOURCE
+> Task :capacitor-keyboard:processDebugJavaRes NO-SOURCE
+> Task :capacitor-share:processDebugJavaRes NO-SOURCE
+> Task :app:checkDebugDuplicateClasses
+> Task :capacitor-filesystem:compileDebugKotlin
+> Task :capacitor-local-notifications:compileDebugKotlin
+> Task :app:mergeExtDexDebug
+> Task :capacitor-filesystem:compileDebugJavaWithJavac NO-SOURCE
+> Task :capacitor-local-notifications:compileDebugJavaWithJavac NO-SOURCE
+> Task :capacitor-filesystem:bundleLibCompileToJarDebug
+> Task :capacitor-local-notifications:bundleLibCompileToJarDebug
+> Task :capacitor-filesystem:bundleLibRuntimeToJarDebug
+
+> Task :app:compileDebugJavaWithJavac
+Note: /home/runner/work/qirtas/qirtas/android/app/src/main/java/com/m3athrazaq/qirtas/QirtasNativePlugin.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :capacitor-local-notifications:bundleLibRuntimeToJarDebug
+> Task :app:dexBuilderDebug
+> Task :capacitor-filesystem:processDebugJavaRes
+> Task :capacitor-local-notifications:processDebugJavaRes
+> Task :app:mergeDebugGlobalSynthetics
+> Task :capacitor-app:bundleLibRuntimeToDirDebug
+> Task :capacitor-filesystem:bundleLibRuntimeToDirDebug
+> Task :capacitor-keyboard:bundleLibRuntimeToDirDebug
+> Task :capacitor-local-notifications:bundleLibRuntimeToDirDebug
+> Task :capacitor-share:bundleLibRuntimeToDirDebug
+> Task :capacitor-cordova-android-plugins:bundleLibRuntimeToDirDebug
+> Task :capacitor-android:bundleLibRuntimeToDirDebug
+> Task :app:mergeDebugJavaResource
+> Task :app:mergeDebugJniLibFolders
+> Task :capacitor-android:mergeDebugJniLibFolders
+> Task :capacitor-android:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-android:copyDebugJniLibsProjectOnly
+> Task :capacitor-app:mergeDebugJniLibFolders
+> Task :capacitor-app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:mergeProjectDexDebug
+> Task :capacitor-app:copyDebugJniLibsProjectOnly
+> Task :capacitor-cordova-android-plugins:mergeDebugJniLibFolders
+> Task :capacitor-cordova-android-plugins:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-cordova-android-plugins:copyDebugJniLibsProjectOnly
+> Task :capacitor-filesystem:mergeDebugJniLibFolders
+> Task :capacitor-filesystem:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-filesystem:copyDebugJniLibsProjectOnly
+> Task :capacitor-keyboard:mergeDebugJniLibFolders
+> Task :capacitor-keyboard:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-keyboard:copyDebugJniLibsProjectOnly
+> Task :capacitor-local-notifications:mergeDebugJniLibFolders
+> Task :capacitor-local-notifications:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-local-notifications:copyDebugJniLibsProjectOnly
+> Task :capacitor-share:mergeDebugJniLibFolders
+> Task :capacitor-share:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-share:copyDebugJniLibsProjectOnly
+> Task :app:validateSigningDebug
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:mergeLibDexDebug
+> Task :capacitor-android:checkDebugAarMetadata
+> Task :capacitor-android:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-android:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-android:extractDebugAnnotations
+> Task :capacitor-android:extractDeepLinksForAarDebug
+> Task :capacitor-android:mergeDebugGeneratedProguardFiles
+> Task :capacitor-android:mergeDebugConsumerProguardFiles
+> Task :capacitor-android:prepareDebugArtProfile
+> Task :capacitor-android:prepareLintJarForPublish
+> Task :capacitor-android:mergeDebugJavaResource
+> Task :capacitor-app:checkDebugAarMetadata
+> Task :capacitor-android:syncDebugLibJars
+> Task :capacitor-android:bundleDebugAar
+> Task :capacitor-android:assembleDebug
+> Task :capacitor-app:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-app:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-app:extractDebugAnnotations
+> Task :capacitor-app:extractDeepLinksForAarDebug
+> Task :capacitor-app:mergeDebugGeneratedProguardFiles
+> Task :capacitor-app:mergeDebugConsumerProguardFiles
+> Task :capacitor-app:prepareDebugArtProfile
+> Task :capacitor-app:prepareLintJarForPublish
+> Task :capacitor-app:mergeDebugJavaResource
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+> Task :capacitor-app:syncDebugLibJars
+> Task :capacitor-app:bundleDebugAar
+> Task :capacitor-app:assembleDebug
+> Task :capacitor-cordova-android-plugins:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-cordova-android-plugins:checkDebugAarMetadata
+> Task :capacitor-cordova-android-plugins:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-cordova-android-plugins:extractDebugAnnotations
+> Task :capacitor-cordova-android-plugins:extractDeepLinksForAarDebug
+> Task :capacitor-cordova-android-plugins:mergeDebugGeneratedProguardFiles
+> Task :capacitor-cordova-android-plugins:mergeDebugConsumerProguardFiles
+> Task :capacitor-cordova-android-plugins:prepareDebugArtProfile
+> Task :capacitor-cordova-android-plugins:prepareLintJarForPublish
+> Task :capacitor-cordova-android-plugins:mergeDebugJavaResource
+> Task :capacitor-filesystem:checkDebugAarMetadata
+> Task :capacitor-cordova-android-plugins:syncDebugLibJars
+> Task :capacitor-cordova-android-plugins:bundleDebugAar
+> Task :capacitor-cordova-android-plugins:assembleDebug
+> Task :capacitor-filesystem:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-filesystem:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-filesystem:extractDebugAnnotations
+> Task :capacitor-filesystem:extractDeepLinksForAarDebug
+> Task :capacitor-filesystem:mergeDebugGeneratedProguardFiles
+> Task :capacitor-filesystem:mergeDebugConsumerProguardFiles
+> Task :capacitor-filesystem:prepareDebugArtProfile
+> Task :capacitor-filesystem:prepareLintJarForPublish
+> Task :capacitor-filesystem:mergeDebugJavaResource
+> Task :capacitor-keyboard:checkDebugAarMetadata
+> Task :capacitor-filesystem:syncDebugLibJars
+> Task :capacitor-filesystem:bundleDebugAar
+> Task :capacitor-filesystem:assembleDebug
+> Task :capacitor-keyboard:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-keyboard:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-keyboard:extractDebugAnnotations
+> Task :capacitor-keyboard:extractDeepLinksForAarDebug
+> Task :capacitor-keyboard:mergeDebugGeneratedProguardFiles
+> Task :capacitor-keyboard:mergeDebugConsumerProguardFiles
+> Task :capacitor-keyboard:prepareDebugArtProfile
+> Task :capacitor-keyboard:prepareLintJarForPublish
+> Task :capacitor-keyboard:mergeDebugJavaResource
+> Task :capacitor-local-notifications:checkDebugAarMetadata
+> Task :capacitor-keyboard:syncDebugLibJars
+> Task :capacitor-keyboard:bundleDebugAar
+> Task :capacitor-keyboard:assembleDebug
+> Task :capacitor-local-notifications:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-local-notifications:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-local-notifications:extractDebugAnnotations
+> Task :capacitor-local-notifications:extractDeepLinksForAarDebug
+> Task :capacitor-local-notifications:mergeDebugGeneratedProguardFiles
+> Task :capacitor-local-notifications:mergeDebugConsumerProguardFiles
+> Task :capacitor-local-notifications:prepareDebugArtProfile
+> Task :capacitor-local-notifications:prepareLintJarForPublish
+> Task :capacitor-local-notifications:mergeDebugJavaResource
+> Task :capacitor-share:checkDebugAarMetadata
+> Task :capacitor-local-notifications:syncDebugLibJars
+> Task :capacitor-local-notifications:bundleDebugAar
+> Task :capacitor-local-notifications:assembleDebug
+> Task :capacitor-share:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-share:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-share:extractDebugAnnotations
+> Task :capacitor-share:extractDeepLinksForAarDebug
+> Task :capacitor-share:mergeDebugGeneratedProguardFiles
+> Task :capacitor-share:mergeDebugConsumerProguardFiles
+> Task :capacitor-share:prepareDebugArtProfile
+> Task :capacitor-share:prepareLintJarForPublish
+> Task :capacitor-share:mergeDebugJavaResource
+> Task :capacitor-share:syncDebugLibJars
+> Task :capacitor-share:bundleDebugAar
+> Task :capacitor-share:assembleDebug
+w: Detected multiple Kotlin daemon sessions at 
+
+[Incubating] Problems report is available at: file:///home/runner/work/qirtas/qirtas/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 2m 21s
+245 actionable tasks: 245 executed
