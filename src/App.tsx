@@ -5,6 +5,7 @@ import { useStore } from './data/store'
 import { PageView } from './page/PageView'
 import { PagePicker } from './shell/PagePicker'
 import { QuranDialog } from './quran/QuranDialog'
+import { ImportHost } from './import/ImportHost'
 import { RowPeek } from './shell/RowPeek'
 import { SearchDialog } from './shell/SearchDialog'
 import { SettingsDialog } from './shell/SettingsDialog'
@@ -81,6 +82,7 @@ export default function App() {
       <ShareDialog />
       <PagePicker />
       <QuranDialog />
+      <ImportHost />
       <RowPeek />
       <AiPanel />
       <JoinDialog />

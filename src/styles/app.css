@@ -3021,3 +3021,161 @@ button.sb-brand:hover {
 .q-links {
   white-space: nowrap;
 }
+
+/* ---------- import from other apps ---------- */
+
+.imp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 20px 20px;
+  overflow-y: auto;
+}
+
+.imp-body p {
+  margin: 0;
+  line-height: 1.65;
+}
+
+.imp-sources {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.imp-source {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.imp-mark {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.imp-mark.is-notion {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.imp-mark.is-obsidian {
+  color: #7c3aed;
+}
+
+.imp-mark.is-files {
+  font-size: 10.5px;
+}
+
+.imp-source-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.55;
+}
+
+.imp-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border: 1.5px dashed var(--rule-2);
+  border-radius: var(--radius-l);
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.imp-drop.is-over {
+  background: var(--lapis-softer);
+  border-color: var(--lapis);
+}
+
+.imp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.imp-actions label {
+  cursor: pointer;
+}
+
+.imp-error {
+  color: var(--tc-red);
+}
+
+.imp-wait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 0;
+  color: var(--ink-2);
+}
+
+.imp-bar {
+  width: 100%;
+  max-width: 360px;
+  flex: none;
+}
+
+.imp-found {
+  font-weight: 600;
+}
+
+.imp-preview {
+  margin: 0;
+  padding: 8px 10px;
+  list-style: none;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.imp-preview li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.imp-icon {
+  width: 20px;
+  text-align: center;
+}
+
+.imp-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imp-skipped {
+  overflow-wrap: anywhere;
+}
+
+.imp-done {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--tc-green, var(--ink));
+}
