@@ -1,0 +1,27 @@
+name: Live sync check
+
+# Checks a deployed sync server (an account, a workspace, an update, a linked device; all deleted
+# again). Runs when this check changes (against the branch's own Pages address), or by hand.
+on:
+  push:
+    paths: ['.github/workflows/live-check.yml', 'e2e/sync_live_check.py']
+  workflow_dispatch:
+    inputs:
+      site:
+        description: 'Site address, e.g. https://qirtas-al8.pages.dev'
+        required: true
+        default: 'https://qirtas-al8.pages.dev'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the server
+        env:
+          API: ${{ inputs.site || (github.ref_name == 'main' && 'https://qirtas-al8.pages.dev' || format('https://{0}.qirtas-al8.pages.dev', github.ref_name)) }}/api
+        run: python3 e2e/sync_live_check.py
