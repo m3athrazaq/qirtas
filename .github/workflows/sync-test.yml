@@ -15,7 +15,8 @@ permissions:
 
 jobs:
   sync:
-    runs-on: ubuntu-latest
+    # A fixed image: test browsers support each Ubuntu release some time after it comes out
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +34,7 @@ jobs:
 
       - name: Install the test tools
         run: |
-          pip install playwright==1.55.0
+          pip install playwright
           python -m playwright install --with-deps chromium || python -m playwright install chromium
 
       - name: Start the server with a local database
