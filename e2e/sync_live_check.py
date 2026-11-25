@@ -1,7 +1,7 @@
 """A quick check of a deployed sync server (the Pages project with its D1 database): an account, a
 workspace, an update stored and read back, a second device linked with a code, then everything it
 made is deleted again. Usage: API=https://<site>/api python3 e2e/sync_live_check.py"""
-import json, urllib.request, base64, uuid, os, sys
+import json, urllib.request, base64, uuid, os, sys, time
 B = os.environ['API'].rstrip('/')
 fails = []
 def check(c, m):
@@ -21,8 +21,12 @@ def call(method, path, body=None, token=None):
         try: return e.code, json.loads(b)
         except Exception: return e.code, b
 
-s, h = call('GET', '/health')
-check(s == 200 and h.get('ok'), f'the server answers ({s} {h})')
+# Right after a push the site may still be the previous deployment: wait for the server (5 minutes at most)
+for _ in range(30):
+    s, h = call('GET', '/health')
+    if s == 200 and isinstance(h, dict) and h.get('ok'): break
+    time.sleep(10)
+check(s == 200 and isinstance(h, dict) and h.get('ok'), f'the server answers ({s} {h if isinstance(h, dict) else str(h[:80])})')
 s, a = call('POST', '/account', {'name': 'live check', 'label': 'CI'})
 check(s == 200 and a.get('token'), f'an account is made, so the database works ({s})')
 if s != 200:
