@@ -237,11 +237,9 @@ async function evaluate(c, expression, timeout) {
     await sleep(1200)
     // A Quran verse from the slash menu, in the Quran font; a repeating task ticked; the import dialog
     try {
-      console.log('new page:', await click('.fab'))
-      await sleep(1500)
-      await type('آيات ومهام')
-      await key('Enter', 'Enter')
-      await sleep(600)
+      // on the page that is open: a new line at its end
+      await newParagraph('')
+      await sleep(400)
       await type('/')
       await sleep(1200)
       await type('آية')
