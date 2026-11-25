@@ -277,6 +277,25 @@ async function evaluate(c, expression, timeout) {
     } catch (e) {
       console.log('new features failed:', e.message.slice(0, 300))
     }
+    // The sync server, reached from the app as the phone reaches it (another origin): an account made
+    // and deleted again
+    try {
+      console.log('sync server from the app:', await evaluate(c, `(async () => {
+        const base = 'https://qirtas-al8.pages.dev/api'
+        const out = []
+        const h = await fetch(base + '/health').then((r) => r.json())
+        out.push('health ' + h.ok)
+        const a = await fetch(base + '/account', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: 'emulator', label: 'Android CI' }) }).then((r) => r.json())
+        out.push('account ' + !!a.token)
+        const me = await fetch(base + '/account', { headers: { authorization: 'Bearer ' + a.token } })
+        out.push('signed in ' + me.status)
+        const del = await fetch(base + '/account', { method: 'DELETE', headers: { authorization: 'Bearer ' + a.token } })
+        out.push('deleted ' + del.status)
+        return out.join(', ')
+      })()`, 40000))
+    } catch (e) {
+      console.log('sync server from the app failed:', e.message.slice(0, 300))
+    }
     // The address the widget and the launcher shortcut use for a quick note
     try {
       adb('am start -a android.intent.action.VIEW -d qirtas://capture -n com.m3athrazaq.qirtas/.MainActivity')
