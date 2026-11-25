@@ -31,3 +31,8 @@ out/
 dist-preview
 sync-shots/
 .wrangler/
+
+# local test runs
+.wrangler/
+sync-shots/
+__pycache__/
