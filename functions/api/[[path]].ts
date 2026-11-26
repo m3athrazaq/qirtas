@@ -421,11 +421,33 @@ async function createWorkspace(ctx: Ctx, me: Caller) {
   if (ws?.owner_id !== me.account) {
     // Someone else's workspace: only its members get in
     const role = await roleIn(db, id, me.account)
-    if (!role) throw new Fail(403, 'forbidden')
-    return json({ role })
+    if (role) return json({ role })
+    // …unless it was left behind: its account has no device any more and nobody else is in it. That
+    // happens when someone starts an account on each device and then moves the first device into the
+    // second account. The account their devices use now takes it over, with everything already in it.
+    if (ws && (await leftBehind(db, id, ws.owner_id))) {
+      await db.batch([
+        db.prepare('UPDATE workspaces SET owner_id = ? WHERE id = ?').bind(me.account, id),
+        db.prepare('DELETE FROM members WHERE workspace_id = ?').bind(id),
+        db.prepare('DELETE FROM invites WHERE workspace_id = ?').bind(id),
+        db.prepare('INSERT INTO members (workspace_id, account_id, role, name, joined_at) VALUES (?, ?, \'owner\', ?, ?)').bind(id, me.account, clip(body.my_name, 80), t),
+        bump(db, id),
+      ])
+      return json({ role: 'owner' })
+    }
+    throw new Fail(403, 'forbidden')
   }
   await db.prepare('INSERT OR IGNORE INTO members (workspace_id, account_id, role, name, joined_at) VALUES (?, ?, \'owner\', ?, ?)').bind(id, me.account, clip(body.my_name, 80), t).run()
   return json({ role: 'owner' })
+}
+
+/** A workspace whose account has no linked device left and that nobody else is a member of. */
+async function leftBehind(db: D1Database, ws: string, owner: string): Promise<boolean> {
+  const row = await db
+    .prepare('SELECT (SELECT COUNT(*) FROM devices WHERE account_id = ?) AS devices, (SELECT COUNT(*) FROM members WHERE workspace_id = ? AND account_id <> ?) AS others')
+    .bind(owner, ws, owner)
+    .first<{ devices: number; others: number }>()
+  return !!row && row.devices === 0 && row.others === 0
 }
 
 async function renameWorkspace(ctx: Ctx, me: Caller, ws: string) {
