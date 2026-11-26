@@ -135,7 +135,15 @@ function randomCode(length: number): string {
   for (const b of bytes) s += ALPHABET[b % ALPHABET.length]
   return s
 }
-const normalizeCode = (s: string) => s.toUpperCase().replace(/[^0-9A-Z]/g, '')
+/** A code or key as typed or pasted: Arabic and Persian digits as Latin ones, letters and digits only. */
+const normalizeCode = (s: string) =>
+  s
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x660))
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x6f0))
+    .toUpperCase()
+    .replace(/[^0-9A-Z]/g, '')
+/** Recovery keys are 25 characters (link codes 8). */
+const RECOVERY_LENGTH = 25
 
 async function sha256(text: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
@@ -319,7 +327,10 @@ async function claimLinkCode(ctx: Ctx) {
   await throttle(ctx, 'link', 30, 3_600_000, false)
   const body = await readJson<{ code?: string; label?: string }>(ctx.request)
   const db = ctx.env.DB
-  const hash = await sha256(normalizeCode(String(body.code ?? '')))
+  const code = normalizeCode(String(body.code ?? ''))
+  // The recovery key typed where the code goes (it is the one shown with a copy button): it links too
+  if (code.length === RECOVERY_LENGTH) return linkByKey(ctx, code, body.label)
+  const hash = await sha256(code)
   const row = await db.prepare('SELECT account_id, expires_at FROM link_codes WHERE code = ?').bind(hash).first<{ account_id: string; expires_at: number }>()
   if (!row || row.expires_at < now()) {
     await throttle(ctx, 'link', 30, 3_600_000, true)
@@ -333,15 +344,19 @@ async function claimLinkCode(ctx: Ctx) {
 }
 
 async function recover(ctx: Ctx) {
-  await throttle(ctx, 'recover', 20, 3_600_000, false)
   const body = await readJson<{ key?: string; label?: string }>(ctx.request)
+  return linkByKey(ctx, normalizeCode(String(body.key ?? '')), body.label)
+}
+
+async function linkByKey(ctx: Ctx, key: string, label: unknown) {
+  await throttle(ctx, 'recover', 20, 3_600_000, false)
   const db = ctx.env.DB
-  const row = await db.prepare('SELECT id FROM accounts WHERE recovery = ?').bind(await sha256(normalizeCode(String(body.key ?? '')))).first<{ id: string }>()
+  const row = await db.prepare('SELECT id FROM accounts WHERE recovery = ?').bind(await sha256(key)).first<{ id: string }>()
   if (!row) {
     await throttle(ctx, 'recover', 20, 3_600_000, true)
     throw new Fail(400, 'bad_key')
   }
-  const token = await newDevice(db, row.id, body.label)
+  const token = await newDevice(db, row.id, label)
   return json({ token, account: await accountInfo(db, row.id) })
 }
 
