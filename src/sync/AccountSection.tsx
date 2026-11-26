@@ -49,6 +49,17 @@ export function AccountSection() {
 /** 25 characters in groups of five, easy to copy by hand. */
 const groups = (key: string) => key.match(/.{1,5}/g)?.join('-') ?? key
 
+/** What was typed or pasted, as the server reads it: Arabic and Persian digits as Latin ones,
+ *  letters and digits only (dashes, spaces and invisible marks dropped). */
+export const cleanCode = (s: string) =>
+  s
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x660))
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x6f0))
+    .toUpperCase()
+    .replace(/[^0-9A-Z]/g, '')
+/** A recovery key is 25 characters; a link code 8. */
+const KEY_LENGTH = 25
+
 function RecoveryKey({ value, onDone }: { value: string; onDone: () => void }) {
   const toast = useStore((s) => s.toast)
   return (
@@ -143,8 +154,10 @@ function NotLinked({ onRecovery }: { onRecovery: (key: string) => void }) {
           className="link-form"
           onSubmit={(e) => {
             e.preventDefault()
-            if (code.replace(/[^0-9a-z]/gi, '').length < 8) return
-            void run(() => linkWithCode(code))
+            const c = cleanCode(code)
+            if (c.length < 8) return
+            // The recovery key pasted here (it is the one with a copy button) links just as well
+            void run(() => (c.length === KEY_LENGTH ? linkWithRecoveryKey(c) : linkWithCode(c)))
           }}
         >
           <p className="muted small">{t('linkJoinHow')}</p>
@@ -161,7 +174,7 @@ function NotLinked({ onRecovery }: { onRecovery: (key: string) => void }) {
               onChange={(e) => setCode(e.target.value.toUpperCase())}
             />
           </label>
-          <button type="submit" className="btn btn-primary" disabled={busy || code.replace(/[^0-9a-z]/gi, '').length < 8}>
+          <button type="submit" className="btn btn-primary" disabled={busy || cleanCode(code).length < 8}>
             {t('linkThisDevice')}
           </button>
         </form>
@@ -171,14 +184,14 @@ function NotLinked({ onRecovery }: { onRecovery: (key: string) => void }) {
           className="link-form"
           onSubmit={(e) => {
             e.preventDefault()
-            void run(() => linkWithRecoveryKey(key))
+            void run(() => linkWithRecoveryKey(cleanCode(key)))
           }}
         >
           <label className="field">
             <span>{t('recoveryTitle')}</span>
             <input className="input link-code-input" dir="ltr" value={key} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" spellCheck={false} onChange={(e) => setKey(e.target.value.toUpperCase())} />
           </label>
-          <button type="submit" className="btn btn-primary" disabled={busy || key.replace(/[^0-9a-z]/gi, '').length < 25}>
+          <button type="submit" className="btn btn-primary" disabled={busy || cleanCode(key).length < KEY_LENGTH}>
             {t('linkThisDevice')}
           </button>
         </form>
@@ -313,9 +326,20 @@ function Linked({ onRecovery }: { onRecovery: (key: string) => void }) {
         {code && (
           <div className="link-code-box">
             <p className="muted small">{t('linkCodeHow')}</p>
-            <code className="link-code" dir="ltr">
-              {code.code}
-            </code>
+            <div className="link-code-row">
+              <code className="link-code" dir="ltr">
+                {code.code}
+              </code>
+              <button
+                type="button"
+                className="btn btn-small"
+                onClick={async () => {
+                  if (await copyText(code.code)) toast(t('copied'))
+                }}
+              >
+                <Copy size={15} /> {t('copy')}
+              </button>
+            </div>
             <p className="muted small">{t('linkCodeLeft', { n: num(left, settings.numerals) })}</p>
           </div>
         )}
@@ -359,7 +383,7 @@ function Linked({ onRecovery }: { onRecovery: (key: string) => void }) {
             onSubmit={async (e) => {
               e.preventDefault()
               try {
-                await relinkWithCode(relink)
+                await relinkWithCode(cleanCode(relink))
                 setRelink(null)
               } catch (err) {
                 toast(friendlyError(err))
@@ -376,7 +400,7 @@ function Linked({ onRecovery }: { onRecovery: (key: string) => void }) {
               spellCheck={false}
               onChange={(e) => setRelink(e.target.value.toUpperCase())}
             />
-            <button type="submit" className="btn btn-primary" disabled={relink.replace(/[^0-9a-z]/gi, '').length < 8}>
+            <button type="submit" className="btn btn-primary" disabled={cleanCode(relink).length < 8}>
               {t('linkThisDevice')}
             </button>
           </form>

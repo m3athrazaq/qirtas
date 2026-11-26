@@ -3365,3 +3365,10 @@ button.sb-brand:hover {
   min-width: 0;
   font-size: 14px;
 }
+
+.link-code-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
