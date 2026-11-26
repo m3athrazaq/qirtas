@@ -205,7 +205,10 @@ function retryLater(user: SyncUser) {
 /** Was this workspace synced with the old server (before the move to this one)? As whose? */
 async function carriedOver(wsId: string): Promise<'own' | 'shared' | null> {
   if (!(await kvGet(`sync:linked:${wsId}`))) return null
-  return (await kvGet<string>(`sync:role:${wsId}`)) === 'owner' ? 'own' : 'shared'
+  // Someone else's only when the old server said so: the first versions kept no role at all, and a
+  // device whose old sign-in had run out never saved one; such a workspace is the person's own
+  const role = await kvGet<string>(`sync:role:${wsId}`)
+  return role === 'editor' || role === 'viewer' ? 'shared' : 'own'
 }
 
 let carrying = false
